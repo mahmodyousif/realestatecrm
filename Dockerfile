@@ -6,9 +6,16 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    zip unzip git curl \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql mbstring bcmath exif pcntl
+    libwebp-dev \
+    libxpm-dev \
+    zip unzip git curl pkg-config \
+    && docker-php-ext-configure gd \
+        --with-freetype \
+        --with-jpeg \
+        --with-webp \
+        --with-xpm \
+    && docker-php-ext-install gd pdo pdo_mysql mbstring bcmath exif pcntl \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # تثبيت Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -25,7 +32,7 @@ RUN composer install --optimize-autoloader --no-interaction --no-scripts
 # توليد مفتاح Laravel
 RUN php artisan key:generate
 
-# تخزين الصلاحيات
+# تفريغ الكاش
 RUN php artisan config:cache
 RUN php artisan route:cache
 RUN php artisan view:cache

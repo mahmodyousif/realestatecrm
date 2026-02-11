@@ -1,0 +1,267 @@
+@extends('layout')
+
+@section('title')
+<div class="page-header">
+    <h1>📈 التقارير والإحصائيات التحليلية</h1>
+    <p>مراقبة المبيعات، التدفقات النقدية، وأداء المشاريع</p>
+</div>
+@endsection
+
+@section('content')
+<div class="reports-container">
+
+    <div class="summary-grid">
+        <div class="summary-card primary">
+            <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="card-content">
+                <h3>إجمالي المبيعات</h3>
+                <div class="amount">{{ number_format($totalPrice) }} <small>ريال</small></div>
+                <div class="trend positive">+{{ number_format($currentMonthSalesPayment) }}  عن الشهر الماضي</div>
+            </div>
+        </div>
+        
+        <div class="summary-card success">
+            <div class="card-icon"><i class="fas fa-cash-register"></i></div>
+            <div class="card-content">
+                <h3>الإيرادات المحققة</h3>
+                <div class="amount">{{ number_format($totalPaid) }} <small>ريال</small></div>
+                <div class="trend positive">+{{ number_format($currentMonthSalesPayment) }} عن الشهر الماضي</div>
+            </div>
+        </div>
+
+        <div class="summary-card danger">
+            <div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+            <div class="card-content">
+                <h3>المبالغ المتبقية</h3>
+                <div class="amount">{{ number_format($remaining) }} <small>ريال</small></div>
+                <div class="trend">قيد التحصيل</div>
+            </div>
+        </div>
+
+        <div class="summary-card info">
+            <div class="card-icon"><i class="fas fa-home"></i></div>
+            <div class="card-content">
+                <h3>عدد الوحدات المباعة</h3>
+                <div class="amount">{{ number_format($unitSalesCount) }} <small>وحدة</small></div>
+                <div class="trend positive">+{{ number_format($currentMonthSalesCount) }} هذا الشهر</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="performance-grid">
+        <div class="performance-card">
+            <div class="card-head">
+                <h4><i class="far fa-calendar-check"></i> أداء اليوم</h4>
+            </div>
+            <div class="mini-stats">
+                <div class="mini-item">
+                    <span class="label">وحدات مباعة</span>
+                    <span class="val">{{ number_format($todaySales) }}</span>
+                </div>
+                <div class="mini-item">
+                    <span class="label">مدفوعات اليوم</span>
+                    <span class="val highlight">{{ number_format($todayPayments) }} ريال</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="performance-card">
+            <div class="card-head">
+                <h4><i class="far fa-calendar-alt"></i> أداء الشهر الحالي</h4>
+            </div>
+            <div class="mini-stats">
+                <div class="mini-item">
+                    <span class="label">وحدات مباعة</span>
+                    <span class="val">{{ number_format($currentMonthSalesCount) }}</span>
+                </div>
+                <div class="mini-item">
+                    <span class="label">إجمالي التحصيل</span>
+                    <span class="val highlight">{{ number_format($currentMonthSalesPayment) }} ريال</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-section">
+        <form action="{{route('reports')}}" method="GET" class="filter-form">
+            <div class="filter-info">
+                <i class="fas fa-filter"></i>
+                <div>
+                    <h4>تخصيص النطاق الزمني</h4>
+                    <p>استخرج تقارير لفترة محددة</p>
+                </div>
+            </div>
+            <div class="filter-inputs">
+                <div class="input-group">
+                    <label>من تاريخ</label>
+                    <input type="date" name="from" value="{{ request('from') }}">
+                </div>
+                <div class="input-group">
+                    <label>إلى تاريخ</label>
+                    <input type="date" name="to" value="{{ request('to') }}">
+                </div>
+                <button type="submit" class="btn-refresh">
+                    تحديث <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    @if(request('from'))
+    <div class="summary-grid mini">
+        <div class="summary-card">
+            <p>وحدات مباعة في الفترة</p>
+            <div class="amount small">{{ number_format($unitSalesCountInDate) }} وحدة</div>
+        </div>
+        <div class="summary-card">
+            <p>إجمالي المدفوع في الفترة</p>
+            <div class="amount small">{{ number_format($PaymentInDate) }} ريال</div>
+        </div>
+    </div>
+    @endif
+
+    <div class="data-card">
+        <div class="card-header">
+            <h2><i class="fas fa-list-ul"></i> تقرير المبيعات التفصيلي</h2>
+            <a href="{{route('reports.export')}}" class="btn-export">
+                <i class="fas fa-file-export"></i> تصدير التقرير
+            </a>
+        </div>
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>رقم الوحدة</th>
+                        <th>المشروع</th>
+                        <th>المساحة</th>
+                        <th>السعر الكلي</th>
+                        <th>المدفوع</th>
+                        <th>المتبقي</th>
+                        <th>المشتري</th>
+                        <th>تاريخ البيع</th>
+                        <th>الحالة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($data as $unit)
+                        @php
+                            $totalPaidByUnit = $unit->unitSale ? $unit->unitSale->payments->sum('amount_paid') : 0;
+                            $remainingAmount = $unit->price - $totalPaidByUnit;
+                            $status = $unit->unitSale ? ($remainingAmount > 0 ? 'محجوزة' : 'مباعة') : 'جاهزة للبيع';
+                        @endphp
+                        <tr>
+                            <td class="bold">{{ $unit->unit_number }}</td>
+                            <td>{{ $unit->project->name }}</td>
+                            <td>{{ $unit->area }} م²</td>
+                            <td class="price">{{ number_format($unit->price) }}</td>
+                            <td class="paid">{{ number_format($totalPaidByUnit) }}</td>
+                            <td class="remaining">{{ number_format($remainingAmount) }}</td>
+                            <td>{{ $unit->unitSale->buyer->name ?? '-' }}</td>
+                            <td>{{ $unit->unitSale->sale_date ?? '-' }}</td>
+                            <td>
+                                <span class="badge {{ $status === 'جاهزة للبيع' ? 'available' : ($status === 'محجوزة' ? 'reserved' : 'sold') }}">
+                                    {{ $status }}
+                                </span>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div class="data-card">
+    <div class="card-header">
+        <h2><i class="fas fa-chart-line"></i> نمو المبيعات هذا الشهر</h2>
+    </div>
+    <div class="card-body">
+        <div id="monthlySalesChart" style="min-height:300px;"></div>
+    </div>
+</div>
+
+<!-- ApexCharts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+    (function(){
+        const labels = @json($salesLabels ?? []);
+        const values = @json($salesData ?? []);
+
+        if(!labels.length || !values.length) return;
+
+        const options = {
+            chart: {
+                type: 'area',
+                height: 350,
+                toolbar: { show: true }
+            },
+            series: [{
+                name: 'المبيعات (ريال)',
+                data: values
+            }],
+            stroke: { curve: 'smooth' },
+            xaxis: {
+                categories: labels,
+                title: { text: 'اليوم' }
+            },
+            yaxis: {
+                title: { text: 'المبيعات (ريال)' , colors: '#fff'}
+            },
+            tooltip: {
+                y: { formatter: function (val) { return new Intl.NumberFormat().format(val) + ' ريال' ; } },
+                style: {
+                    color: '#003d82'
+                }
+            },
+            dataLabels: { enabled: false },
+            fill: { opacity: 0.3 }
+        };
+
+        const chart = new ApexCharts(document.querySelector('#monthlySalesChart'), options);
+        chart.render();
+    })();
+</script>
+
+
+        <div class="data-card" style="margin-top:20px;">
+            <div class="card-header">
+                <h2><i class="fas fa-building"></i> إحصائيات الوحدات حسب المشاريع</h2>
+            </div>
+            <div class="card-body">
+                <div id="projectsUnitsChart" style="min-height:400px;"></div>
+            </div>
+        </div>
+
+        <script>
+            (function(){
+                const pLabels = @json($projectLabels ?? []);
+                const pAvailable = @json($projectAvailable ?? []);
+                const pReserved = @json($projectReserved ?? []);
+                const pSold = @json($projectSold ?? []);
+
+                if(!pLabels.length) return;
+
+                const options = {
+                    chart: { type: 'bar', height: 420, toolbar: { show: true } },
+                    plotOptions: { bar: { horizontal: false, columnWidth: '100%' } },
+                    dataLabels: { enabled: false },
+                    stroke: { show: true, width: 1, colors: ['#fff'] },
+                    series: [
+                        { name: 'محجوزة', data: pReserved },
+                        { name: 'مباعة', data: pSold },
+                        { name: 'متاحة', data: pAvailable }
+                    ],
+                    colors: ['#f6c23e', '#4e73df', '#1cc88a'],
+                    xaxis: { categories: pLabels, title: { text: 'المشروع' } },
+                    yaxis: { title: { text: 'عدد الوحدات' } },
+                    legend: { position: 'top' },
+                    tooltip: { y: { formatter: function (val) { return parseInt(val); } } }
+                };
+
+                const chart = new ApexCharts(document.querySelector('#projectsUnitsChart'), options);
+                chart.render();
+            })();
+        </script>
+
+@endsection

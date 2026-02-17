@@ -18,21 +18,24 @@
 
     <div class="action-bar-nested">
         <div class="export-group">
-            <a href="{{route('unit_export')}}" class="btn-export success">
-                <i class="fas fa-file-excel"></i> تصدير الوحدات
-            </a>
-            <a href="{{route('sales_export')}}" class="btn-export info">
-                <i class="fas fa-file-invoice-dollar"></i> تصدير المبيعات
-            </a>
-        </div>
+            <div>
 
-        <form action="{{ route('unit.import') }}" accept=".xlsx,.xls,.csv" method="POST" enctype="multipart/form-data" id="importForm">
-            @csrf
-            <input type="file" name="file" id="importInput" style="display: none;" onchange="submitImport()">
-            <button type="button" class="btn-accent-custom" onclick="document.getElementById('importInput').click()">
-                <i class="fas fa-cloud-upload-alt"></i> استيراد من Excel
-            </button>
-        </form>
+                <a href="{{route('unit_export')}}" class="btn-export success">
+                    <i class="fas fa-file-excel"></i> تصدير الوحدات
+                </a>
+                <a href="{{route('sales_export')}}" class="btn-export info">
+                    <i class="fas fa-file-invoice-dollar"></i> تصدير المبيعات
+                </a>
+            </div>
+            
+            <form action="{{ route('unit.import') }}" accept=".xlsx,.xls,.csv" method="POST" enctype="multipart/form-data" id="importForm">
+                @csrf
+                <input type="file" name="file" id="importInput" style="display: none;" onchange="submitImport()">
+                <button type="button" class="btn-import" onclick="document.getElementById('importInput').click()">
+                    <i class="fas fa-cloud-upload-alt"></i> استيراد من Excel
+                </button>
+            </form>
+        </div>
 
 
     </div>
@@ -41,13 +44,25 @@
         <form method="GET" action="">
             <div class="filters-grid-nested">
                 <div class="filter-group-nested">
+                    <label>الشركة</label>
+                    <select name="company_id" id="companySelect">
+                        <option value="">جميع الشركات</option>
+                        @foreach($companies as $company)
+                            <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                {{ $company->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="filter-group-nested">
                     <label>المشروع</label>
-                    <select name="project_id">
+                    <select name="project_id"  id="projectSelect">
                         <option value="">جميع المشاريع</option>
                         @foreach($projects as $project)
                             <option value="{{ $project->id }}" {{ request('project_id') == $project->id ? 'selected' : '' }}>
                                 {{ $project->name }}
                             </option>
+                            
                         @endforeach
                     </select>
                 </div>
@@ -161,7 +176,7 @@
             <div class="form-grid-2">
                 <div class="form-group-nested">
                     <label>المشتري</label>
-                    <select name="buyer_id" required>
+                    <select name="buyer_id" class="searchable-select2" >
                         @foreach($buyers as $buyer)
                             <option value="{{$buyer->id}}">{{$buyer->name}}</option>
                         @endforeach
@@ -169,7 +184,7 @@
                 </div>
                 <div class="form-group-nested">
                     <label>المسوق</label>
-                    <select name="marketer_id">
+                    <select name="marketer_id" class="searchable-select2" >
                         <option value="">الشركة مباشرة</option>
                         @foreach($marketers as $marketer)
                             <option value="{{ $marketer->id }}">{{ $marketer->name }}</option>
@@ -186,11 +201,12 @@
                         <option value="cash">كاش</option>
                         <option value="installment">تقسيط</option>
                         <option value="mortgage">رهن عقاري</option>
+                        <option value="transfer">تحويل بنكي</option>
                     </select>
                 </div>
                 <div class="form-group-nested">
                     <label>المبلغ المدفوع</label>
-                    <input type="number" name="amount_paid" required>
+                    <input type="number" name="amount_paid" min="1" max="{{$unit->price}}" required>
                 </div>
                 <div class="form-group-nested">
                     <label>تاريخ البيع</label>
@@ -210,8 +226,3 @@
 </div>
 
 @endsection
-
-<script>
-
-
-</script>

@@ -25,6 +25,11 @@ class UnitSaleController extends Controller
             'total_price' => ['required', 'numeric', 'min:0'],
             'amount_paid' => ['required', 'numeric', 'min:0', 'lte:total_price'],
             'contract_number' => ['required', 'string', 'unique:unit_sales,contract_number'],
+        ],
+        [
+            'contract_number.unique' => 'رقم العقد مستخدم مسبقًا، يرجى إدخال رقم عقد آخر',
+            'contract_number.required' => 'رقم العقد مطلوب',
+        
         ]);
     
         $remaining = (float)$validated['total_price'] - (float)$validated['amount_paid'];
@@ -37,7 +42,6 @@ class UnitSaleController extends Controller
             'sale_date' => $validated['sale_date'],
             'payment_method' => $validated['payment_method'],
             'total_price' => $validated['total_price'],
-            // 'amount_paid' => $validated['amount_paid'],  // مؤقت للتوافق
             'contract_number'=> $validated['contract_number'],
         ]);
     
@@ -57,7 +61,7 @@ class UnitSaleController extends Controller
         $totalPaid = $unitSale->payments->sum('amount_paid');
 
        if ($totalPaid >= $unit->price) {
-    $unit->status = 'sold';
+            $unit->status = 'sold';
         } else {
             $unit->status = 'reserved';
         }

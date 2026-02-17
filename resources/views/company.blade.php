@@ -6,27 +6,71 @@
         <h1>🏢 {{ $company->name }}</h1>
         <p>عرض شامل لإحصائيات الشركة، المشاريع، والوحدات التابعة</p>
     </div>
-    <div class="header-actions">
-      
-    
-        <a href="{{ route('company.export', $company->id) }}" class="btn-export">
-            <i class="fas fa-file-excel"></i> تصدير Excel
-        </a>
-   
-    </div>
 </div>
 @endsection
 
 @section('content')
 <div class="company-detail-wrapper">
-    
+    <div class="header-actions">
+        <a href="{{ route('company.export', $company->id) }}" class="btn-export">
+            <i class="fas fa-file-excel"></i> تصدير Excel
+        </a>   
+    </div>
     @if (session('success'))
         <div class="alert alert-success">
             <i class="fas fa-check-circle"></i> {{ session('success') }}
         </div>
     @endif
 
-    <div class="company-stats-grid">
+
+    <div class="stats-grid">
+        <div class="stat-card blue">
+            <div class="card-icon"><i class="fa-solid fa-city"></i></div>
+            <div class="card-info">
+                <h3>إجمالي المشاريع</h3>
+                <h2 class="count">{{ $company->projects_count }}</h2>
+
+                <span class="trend">+{{$projectCountThisMonth}} هذا الشهر</span>
+            </div>
+        </div>
+
+        <div class="stat-card green">
+            <div class="card-icon"><i class="fa-solid fa-door-open"></i></div>
+            <div class="card-info">
+                <h3>الوحدات المتاحة</h3>
+                <h2 class="count">{{ $company->available_units_count }}</h2>
+                <div class="trend neutral">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>متاحة للبيع</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card red">
+            <div class="card-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+            <div class="card-info">
+                <h3>الوحدات المباعة</h3>
+                <h2 class="count">{{ $company->sold_units_count }}</h2>
+                <div class="trend neutral">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>تم البيع</span>
+                </div>
+             </div>
+        </div>
+
+        <div class="stat-card orange">
+            <div class="card-icon"><i class="fa-solid fa-key"></i></div>
+            <div class="card-info">
+                <h3>الوحدات المحجوزة</h3>
+                <h2 class="count">{{ $company->reserved_units_count }}</h2>
+                <div class="trend neutral">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>تم الحجز</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- <div class="company-stats-grid">
         <div class="stat-card project">
             <div class="card-inner">
                 <div class="icon-box">
@@ -90,7 +134,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <div class="financial-grid">
         <div class="fin-card blue">

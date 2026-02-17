@@ -22,6 +22,11 @@
             <label>اسم المشروع</label>
             <input type="text" placeholder="مثال: شقة" value="{{$project->name}}" required="" name="name"/>
         </div>
+
+        <div class="form-group">
+            <label>قيمة المشروع</label>
+            <input type="text"value="{{$project->price}}" required="" name="price"/>
+        </div>
       
         <div class="form-group">
             <label>عدد الطوابق</label>

@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\UnitSale;
 use App\Exports\UnitExport;
 use App\Imports\UnitsImport;
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -15,6 +16,11 @@ class UnitsController extends Controller
 
     public function index(Request $request) {
         $data = Unit::with(['project'])
+        ->when($request->company_id, function($q) use ($request){
+            $q->whereHas('project', function($query) use ($request){
+                $query->where('company_id' , $request->company_id) ;
+            }) ;
+        }) 
         ->when($request->project_id, fn($q) => $q->where('project_id', $request->project_id))
         ->when($request->status, fn($q) => $q->where('status', $request->status))
         ->when($request->floor, fn($q) => $q->where('floor', $request->floor))
@@ -22,6 +28,7 @@ class UnitsController extends Controller
         return view('units.index', [
             'data' => $data,
             'projects' => Project::all(),
+            'companies' =>Company::all(),
             'buyers' =>Customer::where('type','buyer')->get(),
             'marketers'=>Customer::where('type','marketer')->get(),
         ]);

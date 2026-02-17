@@ -164,6 +164,18 @@ document.getElementById('projectForm')?.addEventListener('submit', function() {
 // ============================
 // Select2 (بحث داخل الـ select) لو موجود
 // ============================
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof $ !== 'undefined' && $.fn.select2) {
+        // كل العناصر التي تحمل class "searchable-select" سيتم تحويلها لـ Select2
+        $('.searchable-select').select2({
+            width: '100%',
+            dir: 'rtl' // لتغيير اتجاه القائمة للعربي
+        });
+    }
+});
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof $ !== 'undefined' && $.fn.select2) {
         $('.searchable-select').select2({
@@ -428,3 +440,37 @@ function toggleDropdown() {
                 btn.classList.toggle('active');
             }
         }
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const companySelect = document.getElementById('companySelect');
+            const projectSelect = document.getElementById('projectSelect');
+        
+            if (!companySelect || !projectSelect) return;
+        
+            companySelect.addEventListener('change', function () {
+                const companyId = this.value;
+                projectSelect.innerHTML = '<option value="">جميع المشاريع</option>';
+        
+                if (!companyId) return;
+        
+                fetch(`/companies/${companyId}/projects`)
+                    .then(res => res.json())
+                    .then(projects => {
+                        projects.forEach(p => {
+                            const option = document.createElement('option');
+                            option.value = p.id;
+                            option.textContent = p.name;
+                            projectSelect.appendChild(option);
+                        });
+                    })
+                    .catch(err => console.error(err));
+            });
+        });
+        
+
+        let menu = document.getElementById('menu');
+
+        menu.addEventListener('click', function() {
+            this.classList.toggle('open');
+        });

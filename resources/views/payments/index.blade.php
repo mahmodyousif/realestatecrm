@@ -28,7 +28,7 @@
     <div class="card">
         <div class="card-header">
             <h2>سجل دفعات العملاء</h2>
-            <button class="btn-add" onclick="toggleModal()">
+            <button class="add-btn" onclick="toggleModal()">
                 <i class="fas fa-plus"></i> تسجيل دفعة جديدة
             </button>
         </div>

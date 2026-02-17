@@ -18,6 +18,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UsersController;
   
 
+Route::get('projects/create', [ProjectsController::class, 'create'])->name('projects.create');
+
 Route::middleware(['auth' , 'role:admin'])->group(function(){
   Route::get('/projects/export' , [ProjectsController::class , 'export'])->name('projects_export') ;
     Route::get('users' , [UsersController::class , 'index'] )->name('users') ;    
@@ -33,8 +35,7 @@ Route::middleware(['auth' , 'role:admin'])->group(function(){
     Route::get('marketers/{id}', [CustomersController::class , 'marketerShow'])->name('marketer.show'); 
     Route::get('company/{id}', [CompaniesController::class,'index'])->name('company');
     Route::post('add_company', [CompaniesController::class, 'store'])->name('add_company');
-
-
+    
     // units crud 
     Route::get('edit_unit/{id}', [UnitsController::class, 'edit'])->name('edit_unit') ;
     Route::put('update_unit/{id}', [UnitsController::class, 'update'])->name('update_unit') ;
@@ -85,6 +86,7 @@ Route::middleware(['auth' , 'role:seller'])->group(function(){
     Route::get('units', [UnitsController::class, 'index'])->name('units');
     Route::get('/units/{unit}', [UnitsController::class, 'show'])->name('units.show');
     Route::post('unit_sell',[UnitSaleController::class,'store'])->name('unit_sell');
+    
 }); 
 
 

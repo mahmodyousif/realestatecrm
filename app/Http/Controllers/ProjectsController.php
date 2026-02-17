@@ -24,9 +24,17 @@ class ProjectsController extends Controller
     }
 
 
+    
+    public  function create() {
+        return view('projects.create' , [
+            'companies' =>Company::all(),
+        ]) ;
+    }
+
     public function add_project(Request $request){
         $dataToInsert = [
             'name' =>$request->name,
+            'price' =>$request->price,
             'company_id'=>$request->company,
             'floors' =>$request->floors,
             'total_units' =>$request->total_units,
@@ -68,6 +76,7 @@ class ProjectsController extends Controller
         $project = Project::find($id);
 
         $project->name = $request->name ;
+        $project->price = $request->price ;
         $project->floors = $request->floors ;
         $project->total_units = $request->total_units ;
         $project->aria_range = $request->aria_range ;

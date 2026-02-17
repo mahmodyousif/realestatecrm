@@ -66,7 +66,7 @@ class CompaniesController extends Controller
 
         // جلب عدد المشاريع هذا الشهر 
 
-        $projectCountThisMonth = Project::whereMonth('created_at' , now()->month)->whereYear('created_at' , now()->year)->Count() ;
+        $projectCountThisMonth = Project::where('company_id' , $id)->whereMonth('created_at' , now()->month)->whereYear('created_at' , now()->year)->Count() ;
     
        
         return view('company', compact(

@@ -8,8 +8,8 @@
 <div class="project-details-page">
 
     <div class="export-container">
-        <a href="{{ route('projects.info.export', $project->id) }}" class="export-btn">
-            <i class="fas fa-file-export"></i> تصدير التقرير الكامل
+        <a href="{{ route('projects.info.export', $project->id) }}" class="btn-export">
+            <i class="fas fa-file-export"></i> تصدير تقرير المشروع
         </a>
     </div>
 

@@ -35,6 +35,7 @@ class UnitExport implements FromCollection , WithMapping , WithHeadings , WithSt
            $unit->area , 
            $unit->floor ,
            $unit->rooms , 
+           $unit->zone , 
            $unit->unitSale?->buyer?->name ?? 'غير مباعة' ,
            $price, 
            $amount_paid , 
@@ -51,6 +52,7 @@ class UnitExport implements FromCollection , WithMapping , WithHeadings , WithSt
             'المساحة' , 
             'الطابق' , 
             'عدد الغرف' , 
+            'الزون' ,
             'اسم المشتري' ,
             'سعر الوحدة' ,
             'المبلغ المدفوع' , 
@@ -61,10 +63,10 @@ class UnitExport implements FromCollection , WithMapping , WithHeadings , WithSt
     public function styles(Worksheet $sheet)
     {
          // تنسيق النص للصفوف A:J
-         $sheet->getStyle('A:J')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+         $sheet->getStyle('A:K')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
          // تنسيق الرأس
-         $sheet->getStyle('A1:J1')->applyFromArray([
+         $sheet->getStyle('A1:K1')->applyFromArray([
              'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
              'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF2196F3']],
              'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],

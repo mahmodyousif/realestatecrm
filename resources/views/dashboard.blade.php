@@ -1,16 +1,17 @@
 @extends('layout')
 
 @section('title')
-    <div class="page-header">
-        <h1>🏢 نظام إدارة المشاريع العقارية</h1>
-        <p>مرحباً بك مجدداً، إليك نظرة عامة على استثماراتك</p>
-    </div>
+        <div class="page-title-main">
+            <h1><i class="fas fa-chart-line"></i> لوحة التحكم</h1>
+            <p>نظرة عامة على أداء النظام والإحصائيات الرئيسية</p>
+        </div>
+    
 @endsection
 
 @section('content')
 <div class="dashboard-wrapper">
 
-    <button class="btn" onclick="openAddCompany()">
+    <button class="btn add-btn" onclick="openAddCompany()">
         <i class="fas fa-plus"></i> إضافة شركة
     </button>
     @if(session('success'))
@@ -19,6 +20,40 @@
             {{ session('success') }}
         </div>
     @endif
+
+    <div class="filters-card-nested">
+        <form method="GET" action="">
+            <div class="filters-grid-nested">
+                <div class="filter-group-nested">
+                    <label>الشركة</label>
+                    <select name="company_id" id="companySelect">
+                        <option value="">جميع الشركات</option>
+                        @foreach($companies as $company)
+                            <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                {{ $company->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="filter-group-nested">
+                    <label>المشروع</label>
+                    <select name="project_id"  id="projectSelect">
+                        <option value="">جميع المشاريع</option>
+                        @foreach($projects as $project)
+                            <option value="{{ $project->id }}" {{ request('project_id') == $project->id ? 'selected' : '' }}>
+                                {{ $project->name }}
+                            </option>
+                            
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="filter-group-nested">
+                    <button class="filter-btn-custom">🔍 تصفية</button>
+                </div>
+            </div>
+        </form>
+    </div>
 
     <div class="stats-grid">
         <div class="stat-card blue">

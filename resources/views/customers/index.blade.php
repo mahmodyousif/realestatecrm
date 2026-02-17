@@ -1,6 +1,17 @@
 @extends('layout')
 
+
+
+
+@section('title')
+    <div class="page-title-main">
+        <h1><i class="fas fa-users"></i> إدارة العملاء</h1>
+        <p>عرض وتنظيم بيانات العملاء ومتابعة تعاملاتهم داخل النظام</p>
+    </div>
+@endsection
 @section('content')
+
+
 
 @if(session('success'))
     <div class= "alert-success">
@@ -15,17 +26,20 @@
         <button class="tab-btn" onclick="showTab(event, 'marketers')">📢 المسوقون</button>
     </div>
 
-    <button class="add-client-btn" onclick="openAddClientModal()">
-        <i class="fas fa-plus-circle"></i> إضافة عميل جديد
-    </button>
+    <div class="export-group">
 
+        <button class="add-btn" onclick="openAddClientModal()">
+            <i class="fas fa-plus"></i> إضافة عميل جديد
+        </button>
+        
         <form action="{{ route('customers.import') }}" accept=".xlsx,.xls,.csv" method="POST" enctype="multipart/form-data" id="importForm3">
             @csrf
             <input type="file" name="file" id="importInput3" style="display: none;" onchange="submitImport3()">
-            <button type="button" class="btn-accent-custom" onclick="document.getElementById('importInput3').click()">
+            <button type="button" class="btn-import" onclick="document.getElementById('importInput3').click()">
                 <i class="fas fa-cloud-upload-alt"></i> استيراد من Excel
             </button>
         </form>
+    </div>
 
 
     <div id="buyers" class="tab-content active-content">
@@ -52,9 +66,18 @@
                         </div>
                     </div>
                     <div class="client-actions">
-                        <a href="{{route('customer.show' , $customer->id)}}" class="action-btn btn-view">عرض التفاصيل</a>
-                        <a href="{{route('edit_customer' , $customer->id )}}" class="action-btn btn-edit"><i class="fas fa-edit"></i> تعديل</a>
-                        <a href="tel:{{$customer->phone}}" class="action-btn btn-contact"><i class="fas fa-phone"></i> اتصال</a>
+                        <a href="{{ route('customer.show', $customer->id) }}" class="action-btn btn-view">
+                            <i class="fas fa-eye"></i> عرض
+                        </a>
+                    
+                        <a href="{{ route('edit_customer', $customer->id) }}" class="action-btn btn-edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    
+                        <a href="tel:{{ $customer->phone }}" class="action-btn btn-contact">
+                            <i class="fas fa-phone"></i>
+                        </a>
+                    
                     </div>
                 </div>
                 @endif

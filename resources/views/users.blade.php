@@ -24,7 +24,7 @@
 @endif
     {{-- شريط الإجراءات العلوي --}}
     <div class="action-bar-nested mb-4">
-        <button class="btn-accent-custom" id="openUserModal">
+        <button class="add-btn" id="openUserModal">
             <i class="fas fa-user-plus"></i> إضافة مستخدم جديد
         </button>
     </div>

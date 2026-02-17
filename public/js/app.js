@@ -75,6 +75,27 @@ function togglePaymentModal() {
     modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
 }
 
+
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.querySelector('.sidebar');
+    const toggle = document.querySelector('.menu-toggle');
+
+    if (!sidebar || !toggle) return;
+
+    toggle.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+            e.stopPropagation();
+            sidebar.classList.toggle('mobile-open');
+        }
+    });
+
+    document.addEventListener('click', () => {
+        sidebar.classList.remove('mobile-open');
+    });
+});
+
+
+
 // ============================
 // استيراد Excel
 // ============================
@@ -229,11 +250,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // مودل اضافة المستخدمين والتعديل
-    let addUserModal = document.getElementById('addUserModal') ; 
-    let openBtn = document.getElementById('openUserModal'); 
-    openBtn.addEventListener('click' , function(){
-        addUserModal.style.display = 'flex' ;
-    })
+document.addEventListener('DOMContentLoaded', () => {
+    const addUserModal = document.getElementById('addUserModal');
+    const openBtn = document.getElementById('openUserModal');
+
+    if (!addUserModal || !openBtn) return;
+
+    openBtn.addEventListener('click', () => {
+        addUserModal.style.display = 'flex';
+    });
+});
+
 
 function openEditModal(el) {
     document.getElementById('editUserModal').style.display = 'flex';
@@ -346,6 +373,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // ============================
 
 // تفعيل/إخفاء القائمة الجانبية على الشاشات الصغيرة
+
+
 document.addEventListener('DOMContentLoaded', function() {
     const sidebar = document.querySelector('.sidebar');
     
@@ -355,6 +384,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (logo && window.innerWidth <= 768) {
             logo.style.cursor = 'pointer';
             logo.addEventListener('click', function(e) {
+
+                logo.addEventListener('click', (e) => {
+                    console.log('LOGO CLICKED');
+                    if (window.innerWidth <= 768) {
+                        e.stopPropagation();
+                        sidebar.classList.toggle('mobile-open');
+                    }
+                });
                 // تجنب الانتشار إذا كنا على سطح المكتب
                 if (window.innerWidth <= 768) {
                     e.stopPropagation();
@@ -393,6 +430,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.querySelector('.sidebar');
+    const toggle = document.querySelector('.menu-toggle');
+
+    if (!sidebar || !toggle) return;
+
+    toggle.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+            e.stopPropagation();
+            sidebar.classList.toggle('mobile-open');
+        }
+    });
+});
 // تحسين الـ Dropdown على الهواتف
 function toggleDropdown() {
     const dropdownBtn = event.currentTarget;
@@ -468,9 +520,31 @@ function toggleDropdown() {
             });
         });
         
-
-        let menu = document.getElementById('menu');
-
-        menu.addEventListener('click', function() {
-            this.classList.toggle('open');
+        document.addEventListener('DOMContentLoaded', () => {
+            const menu = document.getElementById('menu');
+            if (!menu) return;
+        
+            menu.addEventListener('click', function() {
+                this.classList.toggle('open');
+            });
         });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.querySelector('.sidebar');
+            const toggle = document.querySelector('.menu-toggle');
+        
+            if (!sidebar || !toggle) return;
+        
+            toggle.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768) {
+                    e.stopPropagation();
+                    sidebar.classList.toggle('mobile-open');
+                }
+            });
+        
+            document.addEventListener('click', () => {
+                sidebar.classList.remove('mobile-open');
+            });
+        });
+        

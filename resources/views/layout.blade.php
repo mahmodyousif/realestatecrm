@@ -18,7 +18,9 @@
     <body>
         <div class="app-layout">
             <aside class="sidebar">
-                <div class="logo">نظام إدارة المشاريع العقارية</div>
+                <div class="logo">نظام إدارة المشاريع العقارية
+                    <div class="menu-toggle" aria-label="فتح القائمة"></div>
+                </div>
                 <nav class="nav-links">
                     <a href="{{route('dashboard')}}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
                         <i class="fa-solid fa-chart-line icon"></i> <span>لوحة التحكم</span>
@@ -56,7 +58,6 @@
                     @endcan
                 </nav>
             </aside>
-
             <main class="main-wrapper">
 
 

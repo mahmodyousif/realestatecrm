@@ -2880,12 +2880,6 @@ textarea {
         align-items: center;
     }
     
-    .sidebar .logo::after {
-        content: '☰';
-        cursor: pointer;
-        font-size: 24px;
-        color: var(--accent);
-    }
     
     .sidebar .nav-links {
         gap: 5px;
@@ -3378,4 +3372,20 @@ textarea {
     margin: 10px 0;
     font-size: 0.85rem;
 
+}
+
+.menu-toggle {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+
+.menu-toggle::before {
+    content: "☰";
+    font-size: 24px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }

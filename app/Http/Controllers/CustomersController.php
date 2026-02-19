@@ -2,20 +2,55 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Customer;
-use App\Models\UnitSale;
-use Illuminate\Http\Request;
 use App\Exports\CustomerExport;
 use App\Exports\CustomerFullExport;
+use App\Exports\MarketerExport;
 use App\Imports\CustomerImport;
+use App\Models\Company;
+use App\Models\Customer;
+use App\Models\Project;
+use App\Models\UnitSale;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class CustomersController extends Controller
 {
 
-    public function index() {
-        $data = Customer::all();
-        return view('customers.index' , ['data' => $data]);
+    public function index(Request $request) {
+        $data = Customer::query()
+        ->when($request->company_id, function ($query, $companyId) {
+            $query->where(function($q) use ($companyId) {
+                // المشترين
+                $q->whereHas('purchases.unit.project', function($qq) use ($companyId) {
+                    $qq->where('company_id', $companyId);
+                })
+                // المستثمرين
+                ->orWhereHas('investor.unit.project', function($qq) use ($companyId) {
+                    $qq->where('company_id', $companyId);
+                })
+                // البائعين
+                ->orWhereHas('marketedSales.unit.project', function($qq) use ($companyId) {
+                    $qq->where('company_id', $companyId);
+                });
+            });
+        })
+        ->when($request->project_id, function ($query, $projectId) {
+            $query->where(function($q) use ($projectId) {
+                $q->whereHas('purchases.unit.project', function($qq) use ($projectId) {
+                    $qq->where('id', $projectId);
+                })
+                ->orWhereHas('investor.unit.project', function($qq) use ($projectId) {
+                    $qq->where('id', $projectId);
+                })
+                ->orWhereHas('marketedSales.unit.project', function($qq) use ($projectId) {
+                    $qq->where('id', $projectId);
+                });
+            });
+        })
+        ->get();
+        $allProjects = Project::all();
+        $companies = Company::all();    
+        return view('customers.index' , compact('data', 'allProjects', 'companies')) ;
     }
 
     public function show($id){
@@ -36,8 +71,9 @@ class CustomersController extends Controller
             ->withSum('sellers as totalPaid', 'amount_paid')
             ->withCount('marketedSales as sales_count')
             ->findOrFail($id);
+        $commission = UnitSale::where('marketer_id' , $id)->sum('commission') ;
         $remaining = ($marketer->totalPrice ?? 0) - ($marketer->totalPaid ?? 0);
-        return view('customers.marketer_show', compact('marketer', 'remaining'));
+        return view('customers.marketer_show', compact('marketer','commission', 'remaining'));
     }
 
     public function store(Request $request){
@@ -82,6 +118,13 @@ class CustomersController extends Controller
     
         // تمرير الـ Model مباشرة للـ Export
         return Excel::download(new CustomerExport($customer), $fileName);
+    }
+
+    public function exportMarketer($id)
+    {
+        $marketer = Customer::findOrFail($id);
+        $fileName = 'marketer_' . $marketer->name . '_report.xlsx';
+        return Excel::download(new MarketerExport($id), $fileName);
     }
 
 

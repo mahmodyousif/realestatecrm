@@ -211,11 +211,13 @@ document.addEventListener('DOMContentLoaded', function() {
         $('.searchable-select2').select2({
             width: '100%',
             dir: 'rtl',
-            placeholder: "اختر مسوق",
+            placeholder: "اختر مشتري",
             dropdownParent: $('#sellUnitModal')
         }).on('select2:open', function () {
-            document.querySelector('.select2-search__field').placeholder = 'ابحث عن مسوق...';
+            document.querySelector('.select2-search__field').placeholder = 'ابحث عن مشتري...';
         });
+
+        
 
         $('.searchable-select3').select2({
             width: '100%',
@@ -225,6 +227,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }).on('select2:open', function () {
             document.querySelector('.select2-search__field').placeholder = 'ابحث عن مشتري...';
         });
+
+        $('.searchable-select5').select2({
+            width: '100%',
+            dir: 'rtl',
+            placeholder: "اختر مستثمر",
+            dropdownParent: $('#sellUnitModal')
+        }).on('select2:open', function () {
+            document.querySelector('.select2-search__field').placeholder = 'ابحث عن مستثمر...';
+        });
+
     }
 });
 
@@ -548,3 +560,11 @@ function toggleDropdown() {
             });
         });
         
+
+        $(document).ready(function() {
+            $('.searchable-select4').select2({
+                // placeholder: "اختر المشروع",
+                allowClear: false,
+                width: '100%'
+            });
+        });

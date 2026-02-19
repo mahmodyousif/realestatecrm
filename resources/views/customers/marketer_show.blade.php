@@ -1,7 +1,11 @@
 @extends('layout')
 
-@section('title', 'بيانات المسوق - ' . $marketer->name)
-
+@section('title')
+    <div class="page-title-main">
+        <h1><i class="fas fa-user-tag"></i> تفاصيل المسوّق {{ $marketer->name}}</h1>
+        <p>عرض البيانات التفصيلية للمسوّق ومتابعة المبيعات والعمولات والمستحقات المالية</p>
+    </div>
+@endsection
 @section('content')
 <div class="marketer-profile-wrapper">
     
@@ -30,12 +34,20 @@
        
     </div>
         <div class="header-actions">
-            <a href="{{ route('customers.exportFull', $marketer->id) }}" class="btn-export">
+            <a href="{{ route('marketer.export', $marketer->id) }}"class="btn-export">
                 <i class="fas fa-file-export"></i> تصدير تقرير العميل
             </a>
         </div>
     {{-- كروت الإحصائيات السريعة --}}
     <div class="stats-dashboard">
+
+        <div class="stat-card-modern">
+            <div class="icon bg-soft-blue"><i class="fas fa-key"></i></div>
+            <div class="data">
+                <span class="label">العمولة المستحقة</span>
+                <strong class="value">{{ number_format($commission) }} <small>ر.س</small></strong>
+            </div>
+        </div>
         <div class="stat-card-modern">
             <div class="icon bg-soft-blue"><i class="fas fa-key"></i></div>
             <div class="data">
@@ -72,7 +84,6 @@
     <div class="content-card-modern">
         <div class="card-header-flex">
             <h2><i class="fas fa-file-invoice"></i> سجل المبيعات والعمليات</h2>
-            <button class="btn-export-mini"><i class="fas fa-download"></i> تصدير التقرير</button>
         </div>
         
         <div class="table-responsive-custom">
@@ -80,9 +91,10 @@
                 <thead>
                     <tr>
                         <th>الوحدة</th>
+                        <th>قيمة العمولة</th>
                         <th>المشتري</th>
                         <th>قيمة البيع</th>
-                        <th>الحالة المالية</th>
+                        {{-- <th>الحالة المالية</th> --}}
                         <th>التاريخ</th>
                     </tr>
                 </thead>
@@ -95,9 +107,11 @@
                                 <span class="u-num">#{{ $sale->unit->unit_number }}</span>
                             </div>
                         </td>
+                        
+                        <td><span class="buyer-name">{{ $sale->commission ?? '-' }} ر.س</span></td>
                         <td><span class="buyer-name">{{ $sale->buyer->name ?? '-' }}</span></td>
                         <td><span class="price-bold">{{ number_format($sale->total_price) }} ريال</span></td>
-                        <td>
+                        {{-- <td>
                             <div class="payment-progress-mini">
                                 @php 
                                     $paid = $sale->payments->sum('amount_paid');
@@ -108,7 +122,7 @@
                                 </div>
                                 <span class="percent-text">{{ number_format($percent, 0) }}% محصل</span>
                             </div>
-                        </td>
+                        </td> --}}
                         <td><span class="date-text">{{ $sale->sale_date }}</span></td>
                     </tr>
                     @endforeach

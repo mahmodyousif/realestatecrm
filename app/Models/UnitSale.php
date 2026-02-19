@@ -13,12 +13,14 @@ class UnitSale extends Model {
         'unit_id',
         'buyer_id',
         'marketer_id',
+        'investor_id',
         'sale_date', 
         'payment_method',
         'total_price',
         'amount_paid',        // مؤقت للتوافق مع النظام الحالي
         'remaining_amount',   // مؤقت للتوافق
         'contract_number',
+        'commission',
     ]; 
 
     // العلاقات
@@ -28,6 +30,10 @@ class UnitSale extends Model {
     
     public function buyer(){
         return $this->belongsTo(Customer::class , 'buyer_id') ;
+    }
+
+    public function investor(){
+        return $this->belongsTo(Customer::class , 'investor_id') ;
     }
 
     public function marketer() {

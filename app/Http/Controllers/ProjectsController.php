@@ -15,8 +15,11 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ProjectsController extends Controller
 {
-    public function index() {
-        $data = Project::with('company')->get();
+    public function index(Request $request) {
+        $data = Project::with('company')->when($request->company_id, function($q) use ($request){
+            $q->where('company_id' , $request->company_id) ;
+        })->when($request->project_id, fn($q) => $q->where('id', $request->project_id))
+        ->get();
         return view('projects.index' , [
             'data' => $data,
             'companies' =>Company::all(),

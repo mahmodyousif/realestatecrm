@@ -6,13 +6,13 @@ use App\Models\Unit;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class SalesReportExport implements FromCollection, WithHeadings, WithStyles, WithColumnWidths
+class SalesReportExport implements FromCollection, WithHeadings, WithStyles, ShouldAutoSize
 {
     public function collection()
     {
@@ -20,22 +20,32 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Wit
             ->where('status', '!=', 'available')
             ->get();
 
-        return $units->map(function($unit) {
+        $counter = 1;
+        return $units->map(function($unit) use (&$counter) {
             $unitPrice = $unit->price ?? 0;
             $totalPaid = $unit->unitSale?->payments->sum('amount_paid') ?? 0;
             $remainingAmount = $unitPrice - $totalPaid;
             $buyerName = $unit->unitSale?->buyer?->name ?? '-';
+            $marketerName = $unit->unitSale?->marketer?->name ?? '-';
             $saleDate = $unit->unitSale?->sale_date ?? '-';
             $status = $unit->status == 'sold' ? 'مباعة' : 'محجوزة';
 
             return [
-                'رقم الوحدة' => $unit->unit_number,
+                'الرقم التسلسلي' => $counter++, 
+                'الشركة' => $unit->project?->company->name ?? '-',
                 'المشروع' => $unit->project?->name ?? '-',
+                'نموذج الوحدة' => $unit->unit_number,
+                'نوع الوحدة' => $unit->type,
+                'الطابق' => $unit->floor, 
+                'الزون' => $unit->zone,
                 'المساحة' => $unit->area,
                 'السعر الكلي' => $unitPrice,
                 'المبلغ المدفوع' => $totalPaid,
                 'المتبقي' => $remainingAmount,
                 'المشتري' => $buyerName,
+                'المسوق الرئيسي' => $marketerName, 
+                'رقم العقد' => $unit->unitSale?->contract_number,
+                'قيمة العمولة' => $unit->unitSale?->commission , 
                 'تاريخ البيع' => $saleDate,
                 'الحالة' => $status,
             ];
@@ -45,13 +55,21 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Wit
     public function headings(): array
     {
         return [
-            'رقم الوحدة',
+            'الرقم التسلسلي',
+            'الشركة',
             'المشروع',
+            'نموذج الوحدة',
+            'نوع الوحدة',
+            'الطابق',
+            'الزون',
             'المساحة',
             'السعر الكلي',
             'المبلغ المدفوع',
             'المتبقي',
             'المشتري',
+            'المسوق الرئيسي',
+            'رقم العقد',
+            'قيمة العمولة' ,
             'تاريخ البيع',
             'الحالة',
         ];
@@ -60,14 +78,14 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Wit
     public function styles(Worksheet $sheet)
     {
         // تنسيق الرأس
-        $sheet->getStyle('A1:I1')->applyFromArray([
+        $sheet->getStyle('A1:Q1')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF2196F3']],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ]);
 
         // محاذاة الأعمدة
-        $sheet->getStyle('A:I')->getAlignment()
+        $sheet->getStyle('A:Q')->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
 
@@ -75,13 +93,13 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Wit
 
         // تنسيق الأرقام كأرقام مع فاصلة آلاف
         for ($row = 2; $row <= $highestRow; $row++) {
-            $sheet->getStyle('D' . $row . ':F' . $row)
+            $sheet->getStyle('I' . $row . ':K' . $row)
                 ->getNumberFormat()
                 ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 
             // تلوين عمود المتبقي
-            $remaining = $sheet->getCell('F' . $row)->getValue();
-            $price = $sheet->getCell('D' . $row)->getValue();
+            $remaining = $sheet->getCell('K' . $row)->getValue();
+            $price = $sheet->getCell('I' . $row)->getValue();
 
             if ($remaining == 0) {
                 $color = 'FF4CAF50'; // أخضر
@@ -91,24 +109,11 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Wit
                 $color = 'FFFF0000'; // أحمر
             }
 
-            $sheet->getStyle('F' . $row)->getFill()
+            $sheet->getStyle('K' . $row)->getFill()
                 ->setFillType(Fill::FILL_SOLID)
                 ->getStartColor()->setARGB($color);
         }
     }
-
-    public function columnWidths(): array
-    {
-        return [
-            'A' => 15, // رقم الوحدة
-            'B' => 25, // المشروع
-            'C' => 12, // المساحة
-            'D' => 15, // السعر الكلي
-            'E' => 18, // المبلغ المدفوع
-            'F' => 15, // المتبقي
-            'G' => 25, // المشتري
-            'H' => 18, // تاريخ البيع
-            'I' => 15, // الحالة
-        ];
-    }
 }
+
+

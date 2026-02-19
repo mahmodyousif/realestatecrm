@@ -122,11 +122,17 @@
                     <span>الغرف: <strong>{{$unit->rooms}}</strong></span>
                 </div>
 
-                @if ($unit->status !== 'available' && $unit->unitSale)
-                <div class="buyer-info">
-                    <i class="fas fa-user"></i>
-                    <span>المشتري: <strong>{{$unit->unitSale->buyer->name}}</strong></span>
-                </div>
+                @if(isset($unit->unitSale->buyer))
+                    <div class="buyer-info">
+                        <i class="fas fa-user"></i>
+                        <span>المشتري: <strong>{{$unit->unitSale->buyer->name ?? '-' }}</strong></span>
+                    </div>
+                @endif
+                @if(isset($unit->unitSale->investor))
+                    <div class="investor-info">
+                        <i class="fas fa-user"></i>
+                        <span>المستثمر: <strong>{{$unit->unitSale->investor->name ?? '-' }}</strong></span>
+                    </div>
                 @endif
             </div>
 
@@ -177,8 +183,20 @@
                 <div class="form-group-nested">
                     <label>المشتري</label>
                     <select name="buyer_id" class="searchable-select2" >
+                        <option value="">اختر مشتري</option>
+
                         @foreach($buyers as $buyer)
                             <option value="{{$buyer->id}}">{{$buyer->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group-nested">
+                    <label>المستثمر</label>
+                    <select name="investor_id" class="searchable-select5" >
+                        <option value="">الشركة مباشرة</option>
+
+                        @foreach($investors as $investor)
+                            <option value="{{$investor->id}}">{{$investor->name}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -212,11 +230,16 @@
                     <label>تاريخ البيع</label>
                     <input type="date" name="sale_date" required>
                 </div>
+                <div class="form-group-nested">
+                    <label>رقم العقد</label>
+                    <input type="text" name="contract_number" required>
+                </div>
+                <div class="form-group-nested">
+                    <label>قيمة العمولة</label>
+                    <input type="number" name="commission" min="0">
+                </div>
             </div>
-            <div class="form-group-nested">
-                <label>رقم العقد</label>
-                <input type="text" name="contract_number" required>
-            </div>
+          
             <div class="modal-actions">
                 <button type="submit" class="save-btn sell">إتمام البيع</button>
                 <button type="button" class="cancel-btn" onclick="closeSellUnitModal()">إلغاء</button>

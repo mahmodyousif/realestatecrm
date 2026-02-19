@@ -31,6 +31,7 @@ class UnitsController extends Controller
             'companies' =>Company::all(),
             'buyers' =>Customer::where('type','buyer')->get(),
             'marketers'=>Customer::where('type','marketer')->get(),
+            'investors'=>Customer::where('type','investor')->get(),
         ]);
     }
 

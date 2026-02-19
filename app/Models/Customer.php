@@ -20,8 +20,12 @@ class Customer extends Model
         'notes',
     ]; 
 
+  
     public function purchases() {
         return $this->hasMany(UnitSale::class, 'buyer_id');
+    }
+    public function investor() {
+        return $this->hasMany(UnitSale::class, 'investor_id');
     }
 
     public function marketedSales() {
@@ -35,15 +39,9 @@ class Customer extends Model
         ) ;
     }
 
-    // public function payments(){
-    //     return $this->hasMany(Payment::class);
-    // }
-    
-
-
 
     public function payments()
-{
+    {
     return $this->hasManyThrough(
         Payment::class,   // الجدول النهائي اللي بدك توصله
         UnitSale::class,  // الجدول الوسيط

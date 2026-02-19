@@ -15,6 +15,10 @@
 
     <div class="summary-grid">
         <div class="summary-card">
+            <h3>قيمة المشروع</h3>
+            <div class="amount profit">{{number_format($project->price)}} ريال</div>
+        </div>
+        <div class="summary-card">
             <h3>إجمالي قيمة الوحدات</h3>
             <div class="amount profit">{{number_format($totalPrice)}} ريال</div>
         </div>

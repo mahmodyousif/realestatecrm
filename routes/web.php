@@ -63,6 +63,9 @@ Route::middleware(['auth' , 'role:admin'])->group(function(){
     ->name('projects.info.export');
     Route::get('/company/{id}/export', [CompaniesController::class, 'export'])
      ->name('company.export');
+
+     Route::get('/marketers/{id}/export', [CustomersController::class, 'exportMarketer'])
+    ->name('marketer.export');
     Route::POST('/projects/import' , [ProjectsController::class , 'import'])->name('projects.import'); 
     Route::POST('/units/import', [UnitsController::class , 'import'])->name('unit.import') ;
     Route::POST('/customers/import', [CustomersController::class , 'import'])->name('customers.import') ;

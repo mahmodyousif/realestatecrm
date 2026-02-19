@@ -32,6 +32,7 @@ class ProjectsImport implements ToModel, WithHeadingRow, WithChunkReading
             return match (trim($value)) {
                 'الشركة'            => 'company',
                 'اسم المشروع'       => 'name',
+                'قيمة المشروع' => 'price',
                 'عدد الطوابق'       => 'floors',
                 'إجمالي الوحدات'    => 'total_units',
                 'نطاق المساحات'     => 'aria_range',
@@ -79,6 +80,7 @@ class ProjectsImport implements ToModel, WithHeadingRow, WithChunkReading
         return new Project([
             'company_id' => $companyId,
             'name' => $projectName,
+            'price' => $row['price'],
             'floors' => $row['floors'],
             'total_units' => $row['total_units'],
             'aria_range' => $row['aria_range'],

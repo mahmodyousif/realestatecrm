@@ -69,8 +69,12 @@ body {
     margin: 0;
     transition: all 0.3s ease;
 }
-
-
+html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
 /* ==========================================================================
    الهيكل الرئيسي والتخطيط (Layout)
    ========================================================================== */
@@ -78,6 +82,7 @@ body {
 .app-layout {
     display: flex;
     min-height: 100vh;
+
 }
 
 
@@ -479,6 +484,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
+    margin: 20px 0;
 }
 
 .summary-grid.mini {
@@ -750,6 +756,18 @@ body {
     border: 1px solid var(--border-color);
     overflow: hidden;
     box-shadow: var(--shadow);
+    margin: 20px 0;
+}
+
+.menu-toggle {
+    display: none;
+}
+
+/* أظهر الزر فقط في الشاشات الصغيرة */
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
 }
 
 .table-card {
@@ -1334,7 +1352,7 @@ body {
     margin-right: 4px;
 }
 
-.unit-card-nested .unit-body-nested .buyer-info {
+.unit-card-nested .unit-body-nested .buyer-info , .investor-info {
     grid-column: span 2;
     background: var(--bg-body);
     padding: 10px 15px;
@@ -1344,6 +1362,11 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.investor-info{
+    background-color: #deff91;
+    color: #222;
 }
 
 .unit-card-nested .unit-body-nested .buyer-info i {

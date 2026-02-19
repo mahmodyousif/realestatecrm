@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\UnitSale;
+use App\Exports\UnitSalesExport;
 use App\Models\Unit;
+use App\Models\UnitSale;
+use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Exports\UnitExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class UnitSaleController extends Controller
@@ -16,21 +16,25 @@ class UnitSaleController extends Controller
         $validated = $request->validate([
             'unit_id' => ['required', Rule::exists('units', 'id')],
             'buyer_id' => [
-                'required',
+                'nullable',
                 Rule::exists('customers', 'id')->where('type', 'buyer'),
             ],
             'marketer_id' => ['nullable', 'exists:customers,id'],
+            'investor_id' => ['nullable', 'exists:customers,id'],
             'sale_date' => ['required', 'date'],
             'payment_method' => ['required', 'string'],
             'total_price' => ['required', 'numeric', 'min:0'],
             'amount_paid' => ['required', 'numeric', 'min:0', 'lte:total_price'],
             'contract_number' => ['required', 'string', 'unique:unit_sales,contract_number'],
+            'commission' => ['numeric', 'min:0'],
         ],
         [
             'contract_number.unique' => 'رقم العقد مستخدم مسبقًا، يرجى إدخال رقم عقد آخر',
             'contract_number.required' => 'رقم العقد مطلوب',
         
-        ]);
+        ]
+    
+    );
     
         $remaining = (float)$validated['total_price'] - (float)$validated['amount_paid'];
     
@@ -39,10 +43,12 @@ class UnitSaleController extends Controller
             'unit_id' => $validated['unit_id'],
             'buyer_id' => $validated['buyer_id'],
             'marketer_id' => $validated['marketer_id'] ?? null,
+            'investor_id' => $validated['investor_id'] ?? null,
             'sale_date' => $validated['sale_date'],
             'payment_method' => $validated['payment_method'],
             'total_price' => $validated['total_price'],
             'contract_number'=> $validated['contract_number'],
+            'commission' => $validated['commission'] ,
         ]);
     
         // تسجيل الدفعة الأولى في payments
@@ -72,6 +78,6 @@ class UnitSaleController extends Controller
     
     public function export()
     {
-        return Excel::download(new UnitExport, 'units.xlsx');
+        return Excel::download(new UnitSalesExport, 'units.xlsx');
     }
 }

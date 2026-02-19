@@ -37,7 +37,7 @@
                 <form action="{{ route('projects.import') }}" method="POST" enctype="multipart/form-data" accept=".xlsx,.xls,.csv"  id="importForm2">
                     @csrf
                     <input type="file" name="file" id="importInput2" style="display: none;" onchange="submitImport2()">
-                    <button type="button" class="btn-import" onclick="document.getElementById('importInput2').click()">
+                    <button type="button" class="btn-import btn-accent-custom" onclick="document.getElementById('importInput2').click()">
                         <i class="fas fa-cloud-upload-alt"></i> استيراد من Excel
                     </button>
                 </form>
@@ -45,6 +45,40 @@
             </div>
         </div>
 
+        <div class="filters-card-nested">
+            <form method="GET" action="">
+                <div class="filters-grid-nested">
+                    <div class="filter-group-nested">
+                        <label>الشركة</label>
+                        <select name="company_id" id="companySelect"  class="searchable-select4">
+                            <option value="">جميع الشركات</option>
+                            @foreach($companies as $company)
+                                <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                    {{ $company->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="filter-group-nested">
+                        <label>المشروع</label>
+                        <select name="project_id"  id="projectSelect" class="searchable-select4">
+                            <option value="">جميع المشاريع</option>
+                            @foreach($data as $project)
+                                <option value="{{ $project->id }}" {{ request('project_id') == $project->id ? 'selected' : '' }}>
+                                    {{ $project->name }}
+                                </option>
+                                
+                            @endforeach
+                        </select>
+                    </div>
+
+                    
+                    <div class="filter-group-nested">
+                        <button class="filter-btn-custom">🔍 تصفية</button>
+                    </div>
+                </div>
+            </form>
+        </div>
 {{-- </div> --}}
 </div>
 

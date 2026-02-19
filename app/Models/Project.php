@@ -14,6 +14,7 @@ class Project extends Model
     protected $fillable = [
         'name',
         'company_id',
+        'price' , 
         'floors',
         'total_units',
         'aria_range',

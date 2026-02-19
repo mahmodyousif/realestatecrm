@@ -8,8 +8,44 @@
 @endsection
 
 @section('content')
-<div class="reports-container">
 
+<div class="reports-container">
+    <div class="filters-card-nested">
+        <form method="GET" action="">
+            <div class="filters-grid-nested">
+                <div class="filter-group-nested">
+                    <label>الشركة</label>
+                    <select name="company_id" id="companySelect"  class="searchable-select4">
+                        <option value="">جميع الشركات</option>
+                        @foreach($companies as $company)
+                            <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                {{ $company->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="filter-group-nested">
+                    <label>المشروع</label>
+                    <select name="project_id"  id="projectSelect" class="searchable-select4">
+                        <option value="">جميع المشاريع</option>
+                        @foreach($allProjects as $project)
+                            <option value="{{ $project->id }}" {{ request('project_id') == $project->id ? 'selected' : '' }}>
+                                {{ $project->name }}
+                            </option>
+                            
+                        @endforeach
+                    </select>
+                </div>
+
+                
+                <div class="filter-group-nested">
+                    <button class="filter-btn-custom">🔍 تصفية</button>
+                </div>
+            </div>
+        </form>
+    </div>
+{{-- </div> --}}
+</div>
     <div class="summary-grid">
         <div class="summary-card primary">
             <div class="card-icon"><i class="fas fa-chart-line"></i></div>
@@ -82,43 +118,7 @@
         </div>
     </div>
 
-    <div class="filter-section">
-        <form action="{{route('reports')}}" method="GET" class="filter-form">
-            <div class="filter-info">
-                <i class="fas fa-filter"></i>
-                <div>
-                    <h4>تخصيص النطاق الزمني</h4>
-                    <p>استخرج تقارير لفترة محددة</p>
-                </div>
-            </div>
-            <div class="filter-inputs">
-                <div class="input-group">
-                    <label>من تاريخ</label>
-                    <input type="date" name="from" value="{{ request('from') }}">
-                </div>
-                <div class="input-group">
-                    <label>إلى تاريخ</label>
-                    <input type="date" name="to" value="{{ request('to') }}">
-                </div>
-                <button type="submit" class="btn-refresh">
-                    تحديث <i class="fas fa-sync-alt"></i>
-                </button>
-            </div>
-        </form>
-    </div>
 
-    @if(request('from'))
-    <div class="summary-grid mini">
-        <div class="summary-card">
-            <p>وحدات مباعة في الفترة</p>
-            <div class="amount small">{{ number_format($unitSalesCountInDate) }} وحدة</div>
-        </div>
-        <div class="summary-card">
-            <p>إجمالي المدفوع في الفترة</p>
-            <div class="amount small">{{ number_format($PaymentInDate) }} ريال</div>
-        </div>
-    </div>
-    @endif
 
     <div class="data-card">
         <div class="card-header">
@@ -131,37 +131,39 @@
             <table class="custom-table">
                 <thead>
                     <tr>
-                        <th>رقم الوحدة</th>
+                        <th>الشركة</th>
                         <th>المشروع</th>
-                        <th>المساحة</th>
-                        <th>السعر الكلي</th>
-                        <th>المدفوع</th>
-                        <th>المتبقي</th>
-                        <th>المشتري</th>
-                        <th>تاريخ البيع</th>
+                        <th>نموذج الوحدة</th>
+                        <th>نوع الوحدة</th>
                         <th>الحالة</th>
+                        <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($data as $unit)
-                        @php
-                            $totalPaidByUnit = $unit->unitSale ? $unit->unitSale->payments->sum('amount_paid') : 0;
-                            $remainingAmount = $unit->price - $totalPaidByUnit;
-                            $status = $unit->unitSale ? ($remainingAmount > 0 ? 'محجوزة' : 'مباعة') : 'جاهزة للبيع';
-                        @endphp
+
+
+                    @php
+                        if($unit->unit->status === 'sold') {
+                            $status = 'مباعة';
+                        } elseif($unit->unit->status === 'reserved') {  
+                            $status = 'محجوزة';
+                        } else {
+                            $status = 'جاهزة للبيع';
+                        }
+                    @endphp
                         <tr>
-                            <td class="bold">{{ $unit->unit_number }}</td>
-                            <td>{{ $unit->project->name }}</td>
-                            <td>{{ $unit->area }} م²</td>
-                            <td class="price">{{ number_format($unit->price) }}</td>
-                            <td class="paid">{{ number_format($totalPaidByUnit) }}</td>
-                            <td class="remaining">{{ number_format($remainingAmount) }}</td>
-                            <td>{{ $unit->unitSale->buyer->name ?? '-' }}</td>
-                            <td>{{ $unit->unitSale->sale_date ?? '-' }}</td>
+                            <td>{{ $unit->unit->project->company->name }}</td>
+                            <td>{{$unit->unit->project->name}}</td>
+                            <td class="bold">{{ $unit->unit->unit_number }}</td>
+                            <td>{{ $unit->unit->type }}</td>
                             <td>
                                 <span class="badge {{ $status === 'جاهزة للبيع' ? 'available' : ($status === 'محجوزة' ? 'reserved' : 'sold') }}">
                                     {{ $status }}
                                 </span>
+                            </td>
+                            <td>
+                                <a href="{{route('units.show' ,$unit->unit->id)}}" class="btn-primary">تفاصيل الوحدة</a>
                             </td>
                         </tr>
                     @endforeach
@@ -170,7 +172,6 @@
         </div>
     </div>
 </div>
-
 
 <div class="data-card">
     <div class="card-header">

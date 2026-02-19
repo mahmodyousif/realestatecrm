@@ -19,6 +19,41 @@
     </div>
 @endif
 
+
+<div class="filters-card-nested">
+    <form method="GET" action="">
+        <div class="filters-grid-nested">
+            <div class="filter-group-nested">
+                <label>الشركة</label>
+                <select name="company_id" id="companySelect"  class="searchable-select4">
+                    <option value="">جميع الشركات</option>
+                    @foreach($companies as $company)
+                        <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                            {{ $company->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="filter-group-nested">
+                <label>المشروع</label>
+                <select name="project_id"  id="projectSelect" class="searchable-select4">
+                    <option value="">جميع المشاريع</option>
+                    @foreach($allProjects as $project)
+                        <option value="{{ $project->id }}" {{ request('project_id') == $project->id ? 'selected' : '' }}>
+                            {{ $project->name }}
+                        </option>
+                        
+                    @endforeach
+                </select>
+            </div>
+
+            
+            <div class="filter-group-nested">
+                <button class="filter-btn-custom">🔍 تصفية</button>
+            </div>
+        </div>
+    </form>
+</div>
 <div class="container">
     <div class="client-tabs">
         <button class="tab-btn active" onclick="showTab(event, 'buyers')">👤 المشترون</button>
@@ -35,7 +70,7 @@
         <form action="{{ route('customers.import') }}" accept=".xlsx,.xls,.csv" method="POST" enctype="multipart/form-data" id="importForm3">
             @csrf
             <input type="file" name="file" id="importInput3" style="display: none;" onchange="submitImport3()">
-            <button type="button" class="btn-import" onclick="document.getElementById('importInput3').click()">
+            <button type="button" class="btn-import btn-accent-custom" onclick="document.getElementById('importInput3').click()">
                 <i class="fas fa-cloud-upload-alt"></i> استيراد من Excel
             </button>
         </form>

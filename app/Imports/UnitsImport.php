@@ -25,7 +25,7 @@ class UnitsImport implements ToModel, WithHeadingRow, WithChunkReading, WithVali
             
         HeadingRowFormatter::extend('custom', function ($value) {
             return match (trim($value)) {
-                'رقم الوحدة'   => 'unit_number',
+                'نموذج الوحدة'   => 'unit_number',
                 'نوع الوحدة'   => 'type',
                 'المشروع'      => 'project_id',
                 'المساحة'      => 'area',

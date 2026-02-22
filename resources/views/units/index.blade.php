@@ -31,7 +31,7 @@
             <form action="{{ route('unit.import') }}" accept=".xlsx,.xls,.csv" method="POST" enctype="multipart/form-data" id="importForm">
                 @csrf
                 <input type="file" name="file" id="importInput" style="display: none;" onchange="submitImport()">
-                <button type="button" class="btn-import" onclick="document.getElementById('importInput').click()">
+                <button type="button" class="btn-import btn-accent-custom" onclick="document.getElementById('importInput').click()">
                     <i class="fas fa-cloud-upload-alt"></i> استيراد من Excel
                 </button>
             </form>
@@ -202,7 +202,7 @@
                 </div>
                 <div class="form-group-nested">
                     <label>المسوق</label>
-                    <select name="marketer_id" class="searchable-select2" >
+                    <select name="marketer_id" class="searchable-select3" >
                         <option value="">الشركة مباشرة</option>
                         @foreach($marketers as $marketer)
                             <option value="{{ $marketer->id }}">{{ $marketer->name }}</option>
@@ -224,7 +224,7 @@
                 </div>
                 <div class="form-group-nested">
                     <label>المبلغ المدفوع</label>
-                    <input type="number" name="amount_paid" min="1" max="{{$unit->price}}" required>
+                    <input type="number" name="amount_paid" min="1" required>
                 </div>
                 <div class="form-group-nested">
                     <label>تاريخ البيع</label>

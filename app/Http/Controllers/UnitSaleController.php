@@ -20,14 +20,14 @@ class UnitSaleController extends Controller
                 Rule::exists('customers', 'id')->where('type', 'buyer'),
             ],
             'marketer_id' => ['nullable', 'exists:customers,id'],
-            'investor_id' => ['nullable', 'exists:customers,id'],
+            'investor_id' => ['nullable',Rule::exists('customers', 'id')->where('type', 'investor'),
+],
             'sale_date' => ['required', 'date'],
             'payment_method' => ['required', 'string'],
             'total_price' => ['required', 'numeric', 'min:0'],
-            'amount_paid' => ['required', 'numeric', 'min:0', 'lte:total_price'],
+            'amount_paid' => ['nullable', 'numeric', 'min:0', 'lte:total_price'],
             'contract_number' => ['required', 'string', 'unique:unit_sales,contract_number'],
-            'commission' => ['numeric', 'min:0'],
-        ],
+            'commission' => ['nullable', 'numeric', 'min:0'],        ],
         [
             'contract_number.unique' => 'رقم العقد مستخدم مسبقًا، يرجى إدخال رقم عقد آخر',
             'contract_number.required' => 'رقم العقد مطلوب',
@@ -36,8 +36,7 @@ class UnitSaleController extends Controller
     
     );
     
-        $remaining = (float)$validated['total_price'] - (float)$validated['amount_paid'];
-    
+
         // إنشاء عملية البيع في unit_sales
         $unitSale = UnitSale::create([
             'unit_id' => $validated['unit_id'],
@@ -49,6 +48,7 @@ class UnitSaleController extends Controller
             'total_price' => $validated['total_price'],
             'contract_number'=> $validated['contract_number'],
             'commission' => $validated['commission'] ,
+            
         ]);
     
         // تسجيل الدفعة الأولى في payments
@@ -57,6 +57,7 @@ class UnitSaleController extends Controller
                 'amount_paid' => $validated['amount_paid'],
                 'payment_date' => $validated['sale_date'],
                 'payment_method' => $validated['payment_method'],
+                 'reference_number' => 0 ,
                 'notes' => 'دفعة أولى',
             ]);
         }

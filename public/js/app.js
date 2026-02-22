@@ -222,10 +222,10 @@ document.addEventListener('DOMContentLoaded', function() {
         $('.searchable-select3').select2({
             width: '100%',
             dir: 'rtl',
-            placeholder: "اختر مشتري",
+            placeholder: "اختر مسوق",
             dropdownParent: $('#sellUnitModal')
         }).on('select2:open', function () {
-            document.querySelector('.select2-search__field').placeholder = 'ابحث عن مشتري...';
+            document.querySelector('.select2-search__field').placeholder = 'ابحث عن مسوق...';
         });
 
         $('.searchable-select5').select2({

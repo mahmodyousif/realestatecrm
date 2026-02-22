@@ -84,7 +84,13 @@
 
             <tr>
                 <th><i class="fas fa-user"></i> المشتري</th>
-                <td>{{$unit->unitSale->buyer->name ?? '-'}}</td>
+                <td>
+                    {{
+                        $unit->unitSale->buyer->name 
+                        ?? $unit->unitSale->investor->name . ' (مستثمر)'
+                        ?? '-'
+                    }}
+                </td>
             </tr>
 
             

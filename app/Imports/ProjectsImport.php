@@ -50,7 +50,10 @@ class ProjectsImport implements ToModel, WithHeadingRow, WithChunkReading
         // تنظيف البيانات
         $projectName = trim($row['name']);
         $companyNameFromExcel = trim($row['company']);
-
+        
+        if($projectName === '' || $companyNameFromExcel === '') {
+            return null;
+        }
         // تجاهل المشاريع الموجودة مسبقًا
         if(in_array($projectName, $this->existingProjects)) {
             return null;
@@ -67,6 +70,8 @@ class ProjectsImport implements ToModel, WithHeadingRow, WithChunkReading
             $this->companies[$companyNameFromExcel] = $companyId;
         }
 
+
+        
         $this->addedCount++;
         $status = null ; 
         if($row['status'] == 'نشط') {
@@ -76,6 +81,8 @@ class ProjectsImport implements ToModel, WithHeadingRow, WithChunkReading
         } elseif($row['status'] == 'مكتمل') {
             $status = 'completed' ;
         }
+
+       
         // إنشاء المشروع الجديد
         return new Project([
             'company_id' => $companyId,

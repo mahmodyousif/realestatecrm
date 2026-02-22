@@ -20,6 +20,16 @@
 @endif
 
 
+@if (isset($errors) && count($errors) > 0)
+    <div class="alert-error">
+        <ul>
+            @foreach ($errors as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <div class="filters-card-nested">
     <form method="GET" action="">
         <div class="filters-grid-nested">

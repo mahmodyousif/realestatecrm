@@ -77,16 +77,29 @@ class CustomersController extends Controller
     }
 
     public function store(Request $request){
-        $dataToInsert = [
-            'type'=>$request->type,
-            'name'=>$request->name,
-            'id_card'=>$request->id_card,
-            'phone'=>$request->phone,
-            'email'=>$request->email,
-            'address'=>$request->address,
-            'notes'=>$request->notes
-        ] ; 
-        Customer::create($dataToInsert) ;
+
+        $validated = $request->validate([
+            'type' => 'required|in:buyer,investor,marketer',
+            'name' => 'required|string|max:255',
+            'id_card' => 'nullable|string|size:10',
+            'email' => 'nullable|email|max:255',
+            'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'notes' => 'nullable|string',
+        ],
+        [
+            'type.required' => 'نوع العميل مطلوب',
+            'type.in' => 'نوع العميل غير صالح',
+            'name.required' => 'اسم العميل مطلوب',
+            'name.string' => 'اسم العميل يجب أن يكون نصًا',
+            'id_card.size' => 'رقم الهوية يجب أن يكون 10 أرقام',
+            'email.email' => 'البريد الإلكتروني غير صالح',
+            
+        ]
+        
+        
+        ) ;
+        Customer::create($validated) ;
         return redirect()->route('customers')->with('success', 'تم إضافة العميل بنجاح');
     }
 
@@ -136,7 +149,11 @@ class CustomersController extends Controller
         $import = new CustomerImport();
         Excel::import($import, $request->file('file'));
         $added = $import->addedCount;
-        return redirect()->back()->with('success', "تم إضافة {$added} عميل جديد بنجاح!");
+        $errors = $import->errors;
+
+        return redirect()->back()
+        ->with('success', "تم إضافة {$added} عميل جديد بنجاح!")
+        ->with('errors', $errors);
 
     }
 }

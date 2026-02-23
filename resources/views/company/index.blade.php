@@ -11,10 +11,23 @@
 
 @section('content')
 <div class="company-detail-wrapper">
-    <div class="header-actions">
+    <div class="header-actions" style="justify-content: space-between">
         <a href="{{ route('company.export', $company->id) }}" class="btn-export">
             <i class="fas fa-file-excel"></i> تصدير Excel
         </a>   
+        <div class="unit-actions-nested">
+            <a href="{{ route('company.edit', $company)}}" class="action-link edit" title="تعديل"><i class="fas fa-edit"></i></a>
+            <form action="{{ route('company.destroy' , $company)}}" method="POST" style="display:inline;">
+                @csrf
+                @method('DELETE')
+                <button type="submit"
+                        class="action-link delete"
+                        title="حذف"
+                        onclick="return confirm('هل أنت متأكد من حذف هذه الشركة؟سيتم حذف الشركة بكافة مشاريعها ووحداتها، لا يمكن التراجع عن العملية');">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+        </div>
     </div>
     @if (session('success'))
         <div class="alert alert-success">

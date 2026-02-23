@@ -88,115 +88,47 @@
 
 
     <div id="buyers" class="tab-content active-content">
-        <div class="clients-grid">
-            @foreach ($data as $customer)
-                @if($customer->type == 'buyer')
-                <div class="client-card">
-                    <div class="client-header">
-                        <div class="client-name">{{$customer->name}}</div>
-                        <div class="client-type type-buyer">مشتري</div>
-                    </div>
-                    <div class="client-details">
-                        <div class="detail-row">
-                            <span class="detail-label">رقم الهوية:</span>
-                            <span class="detail-value">{{$customer->id_card}}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">رقم الجوال:</span>
-                            <span class="detail-value">{{$customer->phone}}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">البريد الإلكتروني:</span>
-                            <span class="detail-value text-truncate" title="{{$customer->email}}">{{$customer->email ?? 'غير متوفر'}}</span>
-                        </div>
-                    </div>
-                    <div class="client-actions">
-                        <a href="{{ route('customer.show', $customer->id) }}" class="action-btn btn-view">
-                            <i class="fas fa-eye"></i> عرض
-                        </a>
-                    
-                        <a href="{{ route('edit_customer', $customer->id) }}" class="action-btn btn-edit">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                    
-                        <a href="tel:{{ $customer->phone }}" class="action-btn btn-contact">
-                            <i class="fas fa-phone"></i>
-                        </a>
-                    
-                    </div>
+        
+            <div class="main-content-card">
+                <div class="card-title-area">
+                    <h2><i class="fa-solid fa-user-group icon"></i> جدول المشترون</h2>
+                    <p>عرض جميع المشترون وتفاصيلهم</p>
                 </div>
-                @endif
-            @endforeach
-        </div>
+        
+                <div class="table-frame">
+                    <x-customer-table :customers="$data->where('type','buyer')" />              
+                </div>
+            </div>
+
     </div>
 
+
     <div id="investors" class="tab-content" style="display: none;">
-        <div class="clients-grid">
-            @foreach($data as $customer)
-                @if($customer->type === 'investor')
-                <div class="client-card">
-                    <div class="client-header">
-                        <div class="client-name">{{$customer->name}}</div>
-                        <div class="client-type type-investor">مستثمر</div>
-                    </div>
-                    <div class="client-details">
-                        <div class="detail-row">
-                            <span class="detail-label">رقم السجل:</span>
-                            <span class="detail-value">{{$customer->id_card}}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">رقم الجوال:</span>
-                            <span class="detail-value">{{$customer->phone}}</span>
-                        </div>
-                    </div>
-                    <div class="client-stats">
-                        <div class="stat-row">
-                            <span class="stat-label">إجمالي الاستثمار:</span>
-                            <span class="stat-value" style="color: var(--primary-color);">جاري الحساب...</span>
-                        </div>
-                    </div>
-                    <div class="client-actions">
-                        <a href="{{route('customer.show' , $customer->id)}}" class="action-btn btn-view">ملف المستثمر</a>
-                        <a href="{{route('edit_customer' , $customer->id )}}" class="action-btn btn-edit">تعديل</a>
-                        <a href="https://wa.me/{{$customer->phone}}" class="action-btn btn-contact" style="background: #25D366;"><i class="fab fa-whatsapp"></i> واتساب</a>
-                    </div>
-                </div>
-                @endif
-            @endforeach
+        <div class="main-content-card">
+            <div class="card-title-area">
+                <h2><i class="fa-solid fa-user-group icon"></i> جدول المستثمرون</h2>
+                <p>عرض جميع المستثمرون وتفاصيلهم</p>
+            </div>
+    
+            <div class="table-frame">
+                <x-customer-table :customers="$data->where('type','investor')" />
+
+            </div>
         </div>
     </div>
 
     <div id="marketers" class="tab-content" style="display: none;">
-        <div class="clients-grid">
-            @foreach($data as $customer)
-                @if($customer->type === 'marketer')
-                <div class="client-card">
-                    <div class="client-header">
-                        <div class="client-name">{{$customer->name}}</div>
-                        <div class="client-type type-marketer">مسوق</div>
-                    </div>
-                    <div class="client-details">
-                        <div class="detail-row">
-                            <span class="detail-label">رقم الهوية:</span>
-                            <span class="detail-value">{{$customer->id_card}}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">رقم الجوال:</span>
-                            <span class="detail-value">{{$customer->phone}}</span>
-                        </div>
-                    </div>
-                    <div class="client-actions">
-                        <a href="{{route('marketer.show' , $customer->id)}}" class="action-btn btn-view">الأداء المالي</a>
-                        <a href="{{route('edit_customer' , $customer->id )}}" class="action-btn btn-edit">تعديل</a>
-                        <a href="tel:{{$customer->phone}}" class="action-btn btn-contact">اتصال</a>
-                    </div>
-                </div>
-                @endif
-            @endforeach
-        </div>
-    </div>
+        <div class="main-content-card">
+            <div class="card-title-area">
+                <h2><i class="fa-solid fa-user-group icon"></i> جدول المسوقون</h2>
+                <p>عرض جميع المسوقون وتفاصيلهم</p>
+            </div>
+    
+            <div class="table-frame">
+                <x-customer-table :customers="$data->where('type','marketer')" />
+            </div>
 </div>
-
+    </div>
 <div id="addClientModal" class="modal">
     <div class="modal-content">
         <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -243,7 +175,10 @@
                     <label>العنوان</label>
                     <input type="text" placeholder="المدينة، الحي، الشارع" name="address">
                 </div>
-
+                <div class="form-group" >
+                    <label>رقم حساب العميل</label>
+                    <input type="text" placeholder="ادخل رقم حساب العميل..." name="iban">
+                </div>
             </div>
             
             <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px;">

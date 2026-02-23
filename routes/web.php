@@ -27,12 +27,16 @@ Route::middleware(['auth' , 'role:admin'])->group(function(){
     Route::get('customers', [CustomersController::class, 'index'])->name('customers');
     Route::get('customers/{id}', [CustomersController::class , 'show'])->name('customer.show'); 
     Route::post('add_customer',[CustomersController::class,'store'])->name('add_customer') ;
-    Route::get('edit_customer/{id}', [CustomersController::class, 'edit'])->name('edit_customer') ;
+    Route::get('edit_customer/{id}', [CustomersController::class, 'edit'])->name('customer.edit') ;
+    Route::delete('/customers/{id}', [CustomersController::class, 'destroy'])->name('customer.destroy');
     Route::put('update_customer/{id}', [CustomersController::class, 'update'])->name('update_customer') ;
     Route::get('marketers/{id}', [CustomersController::class , 'marketerShow'])->name('marketer.show'); 
     Route::get('company/{id}', [CompaniesController::class,'index'])->name('company');
     Route::post('add_company', [CompaniesController::class, 'store'])->name('add_company');
-    
+    Route::get('company.edit/{id}', [CompaniesController::class, 'edit'])->name('company.edit') ;
+    Route::put('company.update/{id}', [CompaniesController::class, 'update'])->name('company.update') ;
+    Route::delete('company/{id}', [CompaniesController::class, 'destroy'])->name('company.destroy') ;
+   
     // units crud 
     Route::get('edit_unit/{id}', [UnitsController::class, 'edit'])->name('edit_unit') ;
     Route::put('update_unit/{id}', [UnitsController::class, 'update'])->name('update_unit') ;

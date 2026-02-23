@@ -34,7 +34,7 @@
         </div>
 
         <div class="form-group">
-            <label><i class="fas fa-hashtag"></i> رقم الوحدة</label>
+            <label><i class="fas fa-hashtag"></i> نموذج الوحدة</label>
             <input type="text" placeholder="مثال: 5A" value="{{$unit->unit_number}}" required name="unit_number"/>
         </div>
 

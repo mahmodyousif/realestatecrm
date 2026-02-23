@@ -18,7 +18,7 @@ class PaymentsController extends Controller
         $unitSales = UnitSale::with(['buyer', 'unit.project', 'payments'])
                              ->latest()
                              ->get();
-        $remainingUnits = Unit::with(['UnitSale', 'UnitSale.buyer'])->where('status','reserved')->get() ; 
+        $remainingUnits = Unit::with(['unitSale.buyer'])->where('status','reserved')->has('unitSale')->get() ; 
 
         // إجمالي المبيعات
         $totalPrice = UnitSale::sum('total_price');

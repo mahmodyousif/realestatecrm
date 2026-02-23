@@ -84,6 +84,7 @@ class CustomersController extends Controller
             'id_card' => 'nullable|string|size:10',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string|max:255',
+            'iban' => 'nullable|string|max:34',
             'phone' => 'nullable|string|max:20',
             'notes' => 'nullable|string',
         ],
@@ -92,6 +93,7 @@ class CustomersController extends Controller
             'type.in' => 'نوع العميل غير صالح',
             'name.required' => 'اسم العميل مطلوب',
             'name.string' => 'اسم العميل يجب أن يكون نصًا',
+            'iban.max' => 'رقم الآيبان لا يجب أن يتجاوز 34 حرفًا',
             'id_card.size' => 'رقم الهوية يجب أن يكون 10 أرقام',
             'email.email' => 'البريد الإلكتروني غير صالح',
             
@@ -116,10 +118,17 @@ class CustomersController extends Controller
         $customer->phone = $request->phone;
         $customer->email = $request->email;
         $customer->address = $request->address;
+        $customer->iban = $request->iban;
         $customer->notes = $request->notes;
         $customer->save();
-        return redirect()->route('edit_customer', $customer->id)
+        return redirect()->route('customer.edit', $customer->id)
         ->with('success', 'تم التحديث بنجاح');
+    }
+
+    public function destroy($id) {
+        $customer = Customer::findOrFail($id);
+        $customer->delete() ;
+        return redirect()->route('customers')->with('success', 'تم حذف العميل بنجاح');
     }
 
     public function exportCustomerFull($id)

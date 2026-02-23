@@ -10,6 +10,17 @@
         <div class="table-header">
             <h3>تفاصيل الوحدة السكنية</h3>
             <div class="action-icons">
+                @if ($unit->status === 'available')
+                <button class="btn-sell-mini"
+                    data-unit-id="{{ $unit->id }}"
+                    data-unit-name="{{ $unit->type }} {{ $unit->unit_number }}"
+                    data-project-name="{{ $unit->project->name }}"
+                    data-price="{{ $unit->price }}"
+                    onclick="openSellUnitModal(this)" data-bs-target="#openSellUnitModal-{{ $unit->id }}">
+                    بيع
+                </button>
+                <x-unit-sell-modal :unit="$unit" :buyers="$buyers" :investors="$investors" :marketers="$marketers" />
+            @endif
                 <a href="{{route('edit_unit', $unit)}}" class="edit"><i class="fa-solid fa-pen-to-square"></i></a>
                 <span class="divider">|</span>
                 <a href="{{route('delete_unit', $unit)}}" class="delete"><i class="fa fa-trash"></i></a>
@@ -66,54 +77,54 @@
 
             @if($unit->unitSale)
 
-            <tr >
-            <th colspan="2" style="text-align: center; font-weight: bold; color:">تفاصيل البيع</th>
-            </tr>
-            <tr class="highlight-row">
-                <th><i class="fas fa-cash-register"></i> المبلغ المدفوع</th>
-                <td>{{ number_format($totalPaid) }} ريال</td>
-            </tr>
-           
+                <tr >
+                <th colspan="2" style="text-align: center; font-weight: bold; color:">تفاصيل البيع</th>
+                </tr>
+                <tr class="highlight-row">
+                    <th><i class="fas fa-cash-register"></i> المبلغ المدفوع</th>
+                    <td>{{ number_format($totalPaid) }} ريال</td>
+                </tr>
+            
+
+            
+                <tr class="highlight-row">
+                    <th><i class="fas fa-clock"></i> المبلغ المتبقي</th>
+                    <td style="color: var(--danger-color)">{{number_format($remaining)}} ريال</td>
+                </tr>
+            
+
+                <tr>
+                    <th><i class="fas fa-user"></i> المشتري</th>
+                    <td>
+                        {{
+                            $unit->unitSale->buyer->name  ?? '-'
+                        }}
+                    </td>
+                </tr>
+
+                
+                <tr>
+                    <th><i class="fas fa-user-tie"></i> المستثمر</th>
+                    <td>{{$unit->unitSale->investor->name ?? '-'}}</td>
+                </tr>
+                <tr>
+                    <th><i class="fas fa-user-tie"></i> المسوق الرئيسي</th>
+                    <td>{{$unit->unitSale->marketer->name ?? '-'}}</td>
+                </tr>
+                
+    
+                <tr>
+                    <th><i class="fas fa-money-bill-wave"></i> قيمة العمولة</th>
+                    <td>{{number_format($unit->unitSale->commission) ?? 0 }} ر.س</td>
+                </tr>
+                
+                <tr>
+                    <th><i class="fas fa-user"></i> رقم العقد</th>
+                    <td>{{$unit->unitSale->contract_number ?? '-'}}</td>
+                </tr>
+            @endif
 
           
-            <tr class="highlight-row">
-                <th><i class="fas fa-clock"></i> المبلغ المتبقي</th>
-                <td style="color: var(--danger-color)">{{number_format($remaining)}} ريال</td>
-            </tr>
-        
-
-            <tr>
-                <th><i class="fas fa-user"></i> المشتري</th>
-                <td>
-                    {{
-                        $unit->unitSale->buyer->name 
-                        ?? $unit->unitSale->investor->name . ' (مستثمر)'
-                        ?? '-'
-                    }}
-                </td>
-            </tr>
-
-            
-            <tr>
-                <th><i class="fas fa-user"></i> المسوق الرئيسي</th>
-                <td>{{$unit->unitSale->marketer->name ?? '-'}}</td>
-            </tr>
-            
-            <tr>
-                <th><i class="fas fa-user"></i> رقم العقد</th>
-                <td>{{$unit->unitSale->marketer->name ?? '-'}}</td>
-            </tr>
-            
-            <tr>
-                <th><i class="fas fa-user"></i> قيمة العمولة</th>
-                <td>{{$unit->unitSale->commission ?? '-'}}</td>
-            </tr>
-            
-            <tr>
-                <th><i class="fas fa-user"></i> رقم العقد</th>
-                <td>{{$unit->unitSale->contract_number ?? '-'}}</td>
-            </tr>
-            @endif
         </table>
     </div>
 </div>

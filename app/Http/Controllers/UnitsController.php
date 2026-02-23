@@ -24,7 +24,8 @@ class UnitsController extends Controller
         ->when($request->project_id, fn($q) => $q->where('project_id', $request->project_id))
         ->when($request->status, fn($q) => $q->where('status', $request->status))
         ->when($request->floor, fn($q) => $q->where('floor', $request->floor))
-        ->get();
+        ->paginate(10);
+
         return view('units.index', [
             'data' => $data,
             'projects' => Project::all(),
@@ -58,7 +59,18 @@ class UnitsController extends Controller
         $totalPrice = $unit->unitSale?->total_price ?? 0;
         $totalPaid  = $unit->unitSale?->payments->sum('amount_paid') ?? 0;
         $remaining  = $totalPrice - $totalPaid;
-        return view('units.show', compact('unit' , 'totalPrice' , 'totalPaid' , 'remaining')) ;  
+        $buyers = Customer::where('type', 'buyer')->get();
+        $marketers = Customer::where('type', 'marketer')->get();
+        $investors = Customer::where('type', 'investor')->get();
+        return view('units.show', compact(
+                'unit' , 
+                'totalPrice' ,
+                'totalPaid' ,
+                'remaining',
+                'buyers',
+                'marketers',
+                'investors'
+              )) ;  
     } 
 
     public function edit($id) {

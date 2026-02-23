@@ -94,10 +94,10 @@
                 <select name="unit_sale_id" required>
                     <option value="">اختر العملية...</option>
                     @foreach($remainingUnits as $sale)
-                        <option value="{{ $sale->UnitSale->id }}">
+                        <option value="{{ $sale->unitSale->id }}">
                             {{ $sale->unit_number }} |
-                            {{ $sale->UnitSale->buyer->name }}
-                            (المتبقي: {{ number_format($sale->UnitSale->remaining) }})
+                            {{ $sale->unitSale->buyer->name }}
+                            (المتبقي: {{ number_format($sale->unitSale->remaining) }})
                         </option>
                     @endforeach
                 </select>

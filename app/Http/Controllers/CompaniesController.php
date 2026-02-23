@@ -69,7 +69,7 @@ class CompaniesController extends Controller
         $projectCountThisMonth = Project::where('company_id' , $id)->whereMonth('created_at' , now()->month)->whereYear('created_at' , now()->year)->Count() ;
     
        
-        return view('company', compact(
+        return view('company.index', compact(
             'company',
             'allUnits',
             'allProjects',
@@ -92,6 +92,25 @@ class CompaniesController extends Controller
         return redirect()->route('dashboard')->with('success', 'تم إضافة الشركة بنجاح');
     }
 
+    public function edit($id)
+    {
+        $company = Company::findOrFail($id);
+        return view('company.edit', compact('company'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $company = Company::findOrFail($id);
+        $company->update(['name' => $request->name]);
+        return redirect()->route('company', $id)->with('success', 'تم تحديث الشركة بنجاح');
+    }
+
+    public function destroy($id)
+    {
+        $company = Company::findOrFail($id);
+        $company->delete();
+        return redirect()->route('dashboard')->with('success', 'تم حذف الشركة بنجاح');
+    }
     public function export($id)
     {
         return Excel::download(

@@ -1402,6 +1402,23 @@ html, body {
     gap: 10px;
 }
 
+.unit-actions-nested {
+    display: flex;
+    gap: 10px;
+}
+.action-link {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-body);
+    color: var(--text-main);
+    transition: 0.3s;
+    text-decoration: none;
+    border: none;
+}
 .unit-card-nested .unit-footer-nested .action-link {
     width: 40px;
     height: 40px;
@@ -1413,19 +1430,39 @@ html, body {
     color: var(--text-main);
     transition: 0.3s;
     text-decoration: none;
+    
 }
 
-.unit-card-nested .unit-footer-nested .action-link:hover {
+.action-link:hover {
     background: var(--accent);
     color: white;
 }
 
-.unit-card-nested .unit-footer-nested .action-link.edit:hover {
+.action-link.edit:hover {
     background: #f59e0b;
     color: white;
 }
 
-.unit-card-nested .unit-footer-nested .btn-sell-mini {
+.action-link.delete:hover {
+    background: #dc2626;
+    color: white;
+}
+
+.header-actions .action-link.edit {
+    background: #f59e0b;
+    color: #fff;
+}
+
+.header-actions .action-link.edit:hover , .header-actions .action-link.delete:hover {
+    transform: translateY(-2px);
+    cursor: pointer;
+}
+.header-actions .action-link.delete {
+    background: #dc2626;
+    color: #fff;
+}
+
+ .btn-sell-mini {
     background: var(--accent);
     color: white;
     border: none;
@@ -1437,7 +1474,7 @@ html, body {
     transition: 0.3s;
 }
 
-.unit-card-nested .unit-footer-nested .btn-sell-mini:hover {
+ .btn-sell-mini:hover {
     transform: scale(1.05);
     box-shadow: 0 5px 15px rgba(67, 24, 255, 0.3);
 }

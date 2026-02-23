@@ -32,6 +32,7 @@ class CustomerImport  implements ToModel, WithHeadingRow, WithChunkReading
                 'الهاتف'    => 'phone',
                 'البريد الإلكتروني'     => 'email',
                 'العنوان'            => 'address',
+                'رقم حساب العميل'            => 'iban',
                 'ملاحظات'            => 'notes',
                 default              => $value,
             };
@@ -79,6 +80,7 @@ class CustomerImport  implements ToModel, WithHeadingRow, WithChunkReading
             'phone' => $phone ?: null,
             'email' => isset($row['email']) ? trim($row['email']) : null,
             'address' => isset($row['address']) ? trim($row['address']) : null,
+            'iban' => isset($row['iban']) ? trim($row['iban']) : null,
             'notes' => isset($row['notes']) ? trim($row['notes']) : null,
         ]);
 

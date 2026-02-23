@@ -93,7 +93,7 @@
                         <td>
                             <div class="unit-info-cell">
                                 <span class="u-type">{{ $pur->unit->type }}</span>
-                                <span class="u-id">رقم {{ $pur->unit->unit_number }}</span>
+                                <span class="u-id">نموذج {{ $pur->unit->unit_number }}</span>
                             </div>
                         </td>
                         <td><span class="price-text">{{ number_format($pur->total_price) }} ريال</span></td>

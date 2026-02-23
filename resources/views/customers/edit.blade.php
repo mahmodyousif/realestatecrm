@@ -48,6 +48,11 @@
         <label>العنوان</label>
         <input type="text" placeholder="العنوان الكامل" value="{{$customer->address}}" name="address"/>
     </div>
+
+    <div class="form-group">
+        <label>رقم الحساب</label>
+        <input type="text" placeholder="ادخل رقم حساب العميل..." value="{{$customer->iban}}" name="iban"/>
+    </div>
     <div class="form-group">
         <label>ملاحظات</label>
         <textarea rows="3" placeholder="أي ملاحظات إضافية..." name="notes"></textarea>

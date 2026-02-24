@@ -26,6 +26,7 @@
                 <div class="contact-links">
                     <span><i class="fas fa-phone"></i> {{ $marketer->phone }}</span>
                     <span><i class="fas fa-envelope"></i> {{ $marketer->email }}</span>
+                    <span><i class="fas fa-credit-card"></i> {{ $customer->iban }}</span>
                 </div>
             </div>
             

@@ -12,7 +12,7 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class CompanyProjectsSheet implements FromCollection, WithHeadings, WithTitle,WithStyles , ShouldAutoSize
+class CompanyProjectsSheet implements FromCollection, WithHeadings, WithTitle, WithStyles, ShouldAutoSize
 {
     protected $companyId;
 
@@ -23,9 +23,28 @@ class CompanyProjectsSheet implements FromCollection, WithHeadings, WithTitle,Wi
 
     public function collection()
     {
+        // نرجع Collection لتتوافق مع FromCollection
         return Project::where('company_id', $this->companyId)
-            ->select('name', 'floors','total_units' , 'location', 'aria_range', 'status','notes')
-            ->get();
+            ->select('name', 'floors','total_units', 'location', 'aria_range', 'status','notes')
+            ->get()
+            ->map(function ($project) {
+                // تحويل الحالة
+                $statusText = match($project->status) {
+                    'active' => 'نشط',
+                    'planning' => 'تحت التجهيز',
+                    'completed' => 'مكتمل',
+                    default => $project->status,
+                };
+                return [
+                    $project->name,
+                    $project->floors,
+                    $project->total_units,
+                    $project->location,
+                    $project->aria_range,
+                    $statusText,
+                    $project->notes,
+                ];
+            });
     }
 
     public function headings(): array
@@ -33,7 +52,7 @@ class CompanyProjectsSheet implements FromCollection, WithHeadings, WithTitle,Wi
         return [
             'اسم المشروع',
             'عدد الطوابق',
-            'إجمالي الوحدات' ,
+            'إجمالي الوحدات',
             'المنطقة',
             'نطاق المساحات', 
             'الحالة',
@@ -43,15 +62,20 @@ class CompanyProjectsSheet implements FromCollection, WithHeadings, WithTitle,Wi
 
     public function styles(Worksheet $sheet)
     {
+        // محاذاة جميع الأعمدة
         $sheet->getStyle('A:G')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-         // تنسيق الرأس
-         $sheet->getStyle('A1:G1')->applyFromArray([
-             'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
-             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF2196F3']],
-             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-         ]);
- 
+        // تنسيق رأس الأعمدة
+        $sheet->getStyle('A1:G1')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF2196F3']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        ]);
+
+        // تنسيق الأعمدة الرقمية (عدد الطوابق، إجمالي الوحدات) كأرقام
+        $sheet->getStyle('B2:C' . $sheet->getHighestRow())
+              ->getNumberFormat()
+              ->setFormatCode('#,##0');
     }
 
     public function title(): string

@@ -48,6 +48,7 @@ class UnitSalesExport implements FromCollection , WithMapping , WithHeadings , W
             $unit->commission ?? 0,
             $unit->contract_number,
             $unit->sale_date,
+            $unit->buyer->iban ?? '-',
             $unit->created_at?->format('Y-m-d')
         ];
     }
@@ -72,6 +73,7 @@ class UnitSalesExport implements FromCollection , WithMapping , WithHeadings , W
             'قيمة العمولة' ,
             'رقم العقد' ,
             'تاريخ العقد',
+            'رقم حساب العميل',
             'تاريخ تسجيل البيع',
         ];
     }

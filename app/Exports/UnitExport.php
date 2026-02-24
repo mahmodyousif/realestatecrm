@@ -45,6 +45,7 @@ class UnitExport implements FromCollection , WithMapping , WithHeadings , WithSt
            $remaining ,
            $unit->unitSale?->contract_number,
            $unit->unitSale?->commission,
+           $unit->unitSale?->buyer->iban ?? '-',
            $unit->unitSale?->sale_date,
            
         ];
@@ -68,6 +69,7 @@ class UnitExport implements FromCollection , WithMapping , WithHeadings , WithSt
             'المبلغ المتبقي' , 
             'رقم العقد',
             'قيمة العمولة' ,
+            'رقم حساب العميل' ,
             'تاريخ البيع',
         ];
     }

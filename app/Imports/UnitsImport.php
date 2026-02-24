@@ -83,10 +83,9 @@ class UnitsImport implements ToModel, WithHeadingRow, WithChunkReading, WithVali
             'مباعة'=> 'sold',
             'محجوزة' => 'reserved' , 
             'جاهزة للبيع' => 'available' ,
-            default => null ,
-        } ; 
+            default => 'available' ,} ; 
       
-        // إنشاء المشروع الجديد
+        // إنشاء الوحدة الجديدة
 
         return new Unit([
             'unit_number' => trim((string) $row['unit_number']),

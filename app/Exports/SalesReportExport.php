@@ -47,6 +47,7 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
                 'رقم العقد' => $unit->unitSale?->contract_number,
                 'قيمة العمولة' => $unit->unitSale?->commission , 
                 'تاريخ البيع' => $saleDate,
+                'رقم حساب العميل' => $unit->unitSale?->buyer->iban ?? '-',
                 'الحالة' => $status,
             ];
         });
@@ -71,6 +72,7 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
             'رقم العقد',
             'قيمة العمولة' ,
             'تاريخ البيع',
+            'رقم حساب العميل',
             'الحالة',
         ];
     }

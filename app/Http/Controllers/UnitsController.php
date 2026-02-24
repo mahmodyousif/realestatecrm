@@ -114,6 +114,7 @@ class UnitsController extends Controller
         $import = new UnitsImport();
         Excel::import($import, $request->file('file'));
         $added = $import->addedCount;
+        
         return redirect()->back()->with('success', "تم إضافة {$added} وحدة جديد بنجاح!");
 
     }

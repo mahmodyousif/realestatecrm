@@ -112,7 +112,7 @@
                         <h4>{{ $project->name }}</h4>
                         <p>{{ $project->floors }} طابق • {{ $project->total_units }} وحدة سكنية</p>
                     </div>
-                    <span class="badge available">{{ $project->units->count() }} متاحة</span>
+                    <span class="badge available">{{ $project->units->where('status', 'available')->count() }} متاحة</span>
                 </div>
                 @endforeach
             </div>

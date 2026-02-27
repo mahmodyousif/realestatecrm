@@ -81,7 +81,9 @@
                     <tr>
                         <th>#</th>
                         <th>تفاصيل الوحدة</th>
-                        <th>القيمة الإجمالية</th>
+                        <th>قيمة الوحدة</th>
+                        <th>قيمة الخصم</th>
+                        <th>السعر النهائي</th>
                         <th>تم سداد</th>
                         <th>الرصيد المتبقي</th>
                         <th>تاريخ العملية</th>
@@ -97,7 +99,9 @@
                                 <span class="u-id">نموذج {{ $pur->unit->unit_number }}</span>
                             </div>
                         </td>
-                        <td><span class="price-text">{{ number_format($pur->total_price) }} ريال</span></td>
+                        <td><span class="price-text">{{ number_format($pur->unit_price) }} ريال</span></td>
+                        <td><span class="price-text">{{ number_format($pur->discount) }} ريال</span></td>
+                        <td><span class="final-price-text">{{ number_format($pur->total_price) }} ريال</span></td>
                         <td><span class="paid-text">{{ number_format($pur->payments->sum('amount_paid')) }} ريال</span></td>
                         <td>
                             <span class="remaining-text {{ ($pur->total_price - $pur->payments->sum('amount_paid')) > 0 ? 'active' : '' }}">

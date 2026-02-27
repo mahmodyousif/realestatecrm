@@ -101,6 +101,18 @@ class UnitsController extends Controller
         return redirect()->route('units')->with('success', 'تم حذف الوحدة بنجاح');
     }
 
+
+    public function unitSell($id){
+        $unit = Unit::findOrFail($id) ;
+        return view('units.sell', [
+            'unit' => $unit,
+            'projects' => Project::all(),
+            'buyers' => Customer::where('type', 'buyer')->get(),
+            'marketers' => Customer::where('type', 'marketer')->get(),
+            'investors' => Customer::where('type', 'investor')->get(),
+        ]) ;
+    }
+
     public function export()
     {
         return Excel::download(new UnitExport, 'units.xlsx');

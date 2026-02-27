@@ -24,7 +24,9 @@ class UnitSaleController extends Controller
 ],
             'sale_date' => ['required', 'date'],
             'payment_method' => ['required', 'string'],
-            'total_price' => ['required', 'numeric', 'min:0'],
+            'unit_price' => ['required', 'numeric', 'min:0'],
+            'discount' => ['nullable', 'numeric', 'min:0', 'lte:total_price'],
+            'total_price' => ['nullable', 'numeric', 'min:0', 'lte:total_price'],
             'amount_paid' => ['nullable', 'numeric', 'min:0', 'lte:total_price'],
             'contract_number' => ['required', 'string', 'unique:unit_sales,contract_number'],
             'commission' => ['nullable', 'numeric', 'min:0'],        ],
@@ -36,7 +38,10 @@ class UnitSaleController extends Controller
     
     );
     
-
+        
+        if($validated['buyer_id'] == null && $validated['investor_id'] == null) {
+            return back()->with('error',  'يجب اختيار مشتري أو مستثمر');
+        }
         // إنشاء عملية البيع في unit_sales
         $unitSale = UnitSale::create([
             'unit_id' => $validated['unit_id'],
@@ -45,7 +50,9 @@ class UnitSaleController extends Controller
             'investor_id' => $validated['investor_id'] ?? null,
             'sale_date' => $validated['sale_date'],
             'payment_method' => $validated['payment_method'],
-            'total_price' => $validated['total_price'],
+            'unit_price' => $validated['unit_price'],
+            'discount' => $validated['discount'] ?? 0,
+            'total_price' => $validated['unit_price'] - ($validated['discount'] ?? 0),
             'contract_number'=> $validated['contract_number'],
             'commission' => $validated['commission'] ,
             
@@ -57,7 +64,7 @@ class UnitSaleController extends Controller
                 'amount_paid' => $validated['amount_paid'],
                 'payment_date' => $validated['sale_date'],
                 'payment_method' => $validated['payment_method'],
-                 'reference_number' => 0 ,
+                'reference_number' => 0 ,
                 'notes' => 'دفعة أولى',
             ]);
         }
@@ -67,7 +74,7 @@ class UnitSaleController extends Controller
 
         $totalPaid = $unitSale->payments->sum('amount_paid');
 
-       if ($totalPaid >= $unit->price) {
+       if ($totalPaid == $validated['total_price']) {
             $unit->status = 'sold';
         } else {
             $unit->status = 'reserved';

@@ -27,7 +27,7 @@ return new class extends Migration
             $table->date('sale_date');
     
             $table->string('payment_method');
-            $table->unsignedBigInteger('total_price');
+            $table->unsignedBigInteger('unit_price');
             $table->timestamps();
         });
     }

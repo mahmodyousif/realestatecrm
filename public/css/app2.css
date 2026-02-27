@@ -1090,6 +1090,16 @@ html, body {
     justify-content: space-around;
 }
 
+.unit-summary-mini {
+    background: var(--bg-body);
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
 .modal-nested .unit-summary-mini p {
     margin: 0;
     color: var(--text-light);
@@ -1979,19 +1989,8 @@ html, body {
 }
 
 .paymentsPage .card table tr.completed-payment {
-    background-color: var(--success-light-alpha);
-}
-
-.paymentsPage .card table tr.completed-payment:hover  {
     background-color: var(--success-light);
 }
-
-.paymentsPage .card table tr.completed-payment:hover td {
-    color: var(--bg-body);
-
-}
-
-
 /* ==========================================================================
    صفحة العملاء (Clients Page)
    ========================================================================== */
@@ -2444,6 +2443,7 @@ html, body {
     padding: 2rem;
     box-shadow: var(--shadow);
     border: 1px solid var(--border-color);
+    overflow-x: auto;
 }
 
 .card-title-area {

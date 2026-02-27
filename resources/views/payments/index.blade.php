@@ -40,7 +40,9 @@
                         <th>رقم العقد</th>
                         <th>الوحدة</th>
                         <th>اسم العميل</th>
-                        <th>إجمالي السعر</th>
+                        <th>قيمة الوحدة</th>
+                        <th>قيمة الخصم</th>
+                        <th>السعر النهائي</th>
                         <th>المدفوع</th>
                         <th>المتبقي</th>
                         <th>الحالة</th>
@@ -52,9 +54,11 @@
                     <tr class="{{ $unit->remaining > 0 ? 'pending-payment' : 'completed-payment' }}">
                         <td><strong>#{{ $unit->contract_number }}</strong></td>
                         <td>{{ $unit->unit->type }} - {{ $unit->unit->unit_number }}</td>
-                        <td>{{ $unit->buyer->name }}</td>
-                        <td>{{ number_format($unit->total_price) }} ريال</td>
-                        <td style="color: var(--success-color); font-weight: 700;">{{ number_format($unit->total_paid) }}</td>
+                        <td>{{ $unit->buyer->name ?? '-' }}</td>
+                        <td>{{ number_format($unit->unit_price) }} ريال</td>
+                        <td>{{ number_format($unit->discount) }} ريال</td>
+                        <td style="color: var(--primary-color); font-weight: 700;">{{ number_format($unit->total_price) }} ريال</td>
+                        <td style="color: var(--success-color); font-weight: 700;">{{ number_format($unit->payments()->sum('amount_paid')) }} ريال</td>
                         <td style="color: var(--danger-color); font-weight: 700;">{{ number_format($unit->remaining) }}</td>
                         <td>
                             @if($unit->remaining > 0)
@@ -96,7 +100,7 @@
                     @foreach($remainingUnits as $sale)
                         <option value="{{ $sale->unitSale->id }}">
                             {{ $sale->unit_number }} |
-                            {{ $sale->unitSale->buyer->name }}
+                            {{ $sale->unitSale->buyer->name ?? '-' }}
                             (المتبقي: {{ number_format($sale->unitSale->remaining) }})
                         </option>
                     @endforeach

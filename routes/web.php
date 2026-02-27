@@ -89,6 +89,7 @@ Route::middleware(['auth' , 'role:admin'])->group(function(){
 Route::middleware(['auth' , 'role:seller'])->group(function(){
     Route::get('units', [UnitsController::class, 'index'])->name('units');
     Route::get('/units/{unit}', [UnitsController::class, 'show'])->name('units.show');
+    Route::get('unit.sell/{id}', [UnitsController::class, 'unitSell'])->name('unit.sell') ;
     Route::post('unit_sell',[UnitSaleController::class,'store'])->name('unit_sell');
     
 }); 
@@ -117,7 +118,7 @@ Route::middleware(['auth' , 'role:accountant'])->group(function(){
 
 
 
-    Route::get('/', [AuthController::class, 'index'])->name('login');
+    Route::get('/', [AuthController::class, 'index']);
     Route::get('/login', [AuthController::class, 'index'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
 

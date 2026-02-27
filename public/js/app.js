@@ -568,3 +568,43 @@ function toggleDropdown() {
                 width: '100%'
             });
         });
+
+
+        // تحديد نوع العميل في صفحة بيع الوحدة 
+        document.querySelector('select[name="customerType"]').addEventListener('change', function() {
+            const investorSelect = document.querySelector('#investor');
+            const marketerSelect = document.querySelector('#customer');
+            
+            if (this.value === 'investor') {
+                investorSelect.style.display = 'flex';
+                marketerSelect.style.display = 'none';
+            } else {
+                investorSelect.style.display = 'none';
+                marketerSelect.style.display = 'flex';
+            }
+        });
+
+        // Initialize the form with the correct visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const event = new Event('change');
+            document.querySelector('select[name="customerType"]').dispatchEvent(event);
+        });
+
+        const today = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+        document.querySelector('input[name="sale_date"]').value = today;
+
+        // تحديث السعر الاجمالي عند الخصم
+
+            const unitPriceInput = document.getElementById('unit_price');
+            const discountInput = document.getElementById('discount');
+            const totalPriceInput = document.getElementById('total_price');
+
+            function calculateFinalPrice() {
+                const unitPrice = parseFloat(unitPriceInput.value) || 0;
+                const discount = parseFloat(discountInput.value) || 0;
+                const totalPrice = Math.max(unitPrice - discount, 0);
+                totalPriceInput.value = totalPrice.toFixed(2);
+            }
+
+            discountInput.addEventListener('input', calculateFinalPrice);
+            window.addEventListener('load', calculateFinalPrice);

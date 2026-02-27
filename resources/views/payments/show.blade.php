@@ -26,6 +26,7 @@
                         <th><i class="fas fa-calendar-alt"></i> تاريخ الاستلام</th>
                         <th><i class="fas fa-credit-card"></i> طريقة الدفع</th>
                         <th><i class="fas fa-hashtag"></i> الرقم المرجعي</th>
+                        <th><i class="fa fa-pen"></i> ملاحظات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -50,6 +51,9 @@
                             <code style="background: var(--input-bg); padding: 2px 6px; border-radius: 4px;">
                                 {{$payment->reference_number ?? '---'}}
                             </code>
+                        </td>
+                        <td>
+                            {{$payment->notes ?? '---'}}
                         </td>
                     </tr>
                     @empty

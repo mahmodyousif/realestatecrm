@@ -16,9 +16,9 @@ class UnitSale extends Model {
         'investor_id',
         'sale_date', 
         'payment_method',
+        'unit_price',
+        'discount',
         'total_price',
-        'amount_paid',        // مؤقت للتوافق مع النظام الحالي
-        'remaining_amount',   // مؤقت للتوافق
         'contract_number',
         'commission',
     ]; 
@@ -53,7 +53,7 @@ class UnitSale extends Model {
       // المتبقي ديناميكي
       public function getRemainingAttribute()
       {
-          return $this->unit ? $this->unit->price - $this->total_paid : 0;
+         return $this->total_price - $this->total_paid;
       }
 
       public function getStatusAttribute()

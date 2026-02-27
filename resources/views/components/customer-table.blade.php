@@ -23,7 +23,15 @@
             <td>{{ $customer->iban ?? '-' }}</td>
             <td>
                 <div class="unit-actions-nested">
-                    <a href="{{ route('customer.show', $customer) }}" class="action-link view" title="عرض"><i class="fas fa-eye"></i></a>
+                    <a href="{{ $customer->type === 'marketer' 
+                        ? route('marketer.show', $customer) 
+                        : route('customer.show', $customer) }}"
+                        class="action-link view" 
+                        title="عرض">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    
+                    
                     <a href="{{ route('customer.edit', $customer) }}" class="action-link edit" title="تعديل"><i class="fas fa-edit"></i></a>
                     <form action="{{ route('customer.destroy', $customer) }}" method="POST" style="display:inline;">
                         @csrf

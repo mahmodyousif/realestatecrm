@@ -78,8 +78,20 @@
             @if($unit->unitSale)
 
                 <tr >
-                <th colspan="2" style="text-align: center; font-weight: bold; color:">تفاصيل البيع</th>
+                     <th colspan="2" style="text-align: center; font-weight: bold; color:">تفاصيل البيع</th>
                 </tr>
+
+                <tr class="highlight-row">
+                    <th><i class="fas fa-cash-register"></i> قيمة الخصم</th>
+                    <td>{{ number_format($unit->unitSale->discount) }} ريال</td>
+                </tr>
+
+                <tr class="highlight-row">
+                    <th><i class="fas fa-cash-register"></i> السعر النهائي</th>
+                    <td>{{ number_format($unit->unitSale->total_price) }} ريال</td>
+                </tr>
+            
+            
                 <tr class="highlight-row">
                     <th><i class="fas fa-cash-register"></i> المبلغ المدفوع</th>
                     <td>{{ number_format($totalPaid) }} ريال</td>

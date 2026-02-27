@@ -23,7 +23,7 @@
                 <a href="{{route('unit_export')}}" class="btn-export success">
                     <i class="fas fa-file-excel"></i> تصدير الوحدات
                 </a>
-                <a href="{{route('sales_export')}}" class="btn-export info">
+                <a href="{{route('reports.export')}}" class="btn-export info">
                     <i class="fas fa-file-invoice-dollar"></i> تصدير المبيعات
                 </a>
             </div>
@@ -134,16 +134,9 @@
                                 @can('manager')
                                     <a href="{{route('edit_unit', $unit)}}" class="action-link edit" title="تعديل"><i class="fas fa-edit"></i></a>
                                 @endcan
+                                
                                 @if ($unit->status === 'available')
-                                    <button class="btn-sell-mini"
-                                        data-unit-id="{{ $unit->id }}"
-                                        data-unit-name="{{ $unit->type }} {{ $unit->unit_number }}"
-                                        data-project-name="{{ $unit->project->name }}"
-                                        data-price="{{ $unit->price }}"
-                                        onclick="openSellUnitModal(this)" data-bs-target="#openSellUnitModal-{{ $unit->id }}">
-                                        بيع
-                                    </button>
-                                    <x-unit-sell-modal :unit="$unit" :buyers="$buyers" :investors="$investors" :marketers="$marketers" />
+                                    <a href="{{route('unit.sell', $unit)}}" class="btn-sell-mini">بيع</a>
                                 @endif
                             </div>
                         </td>

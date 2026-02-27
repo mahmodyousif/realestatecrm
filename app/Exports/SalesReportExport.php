@@ -24,7 +24,7 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
         return $units->map(function($unit) use (&$counter) {
             $unitPrice = $unit->price ?? 0;
             $totalPaid = $unit->unitSale?->payments->sum('amount_paid') ?? 0;
-            $remainingAmount = $unitPrice - $totalPaid;
+            $remainingAmount = $unit->unitSale->total_price - $totalPaid;
             $buyerName = $unit->unitSale?->buyer?->name ?? '-';
             $marketerName = $unit->unitSale?->marketer?->name ?? '-';
             $saleDate = $unit->unitSale?->sale_date ?? '-';
@@ -39,7 +39,9 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
                 'الطابق' => $unit->floor, 
                 'الزون' => $unit->zone,
                 'المساحة' => $unit->area,
-                'السعر الكلي' => $unitPrice,
+                'قيمة الوحدة' => $unitPrice,
+                'قيمة الخصم' => $unit->unitSale->discount ?? 0,
+                'السعر النهائي' => $unit->unitSale?->total_price ?? $unitPrice,
                 'المبلغ المدفوع' => $totalPaid,
                 'المتبقي' => $remainingAmount,
                 'المشتري' => $buyerName,
@@ -64,7 +66,9 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
             'الطابق',
             'الزون',
             'المساحة',
-            'السعر الكلي',
+            'قيمة الوحدة',
+            'قيمة الخصم',
+            'السعر النهائي',
             'المبلغ المدفوع',
             'المتبقي',
             'المشتري',
@@ -80,14 +84,14 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
     public function styles(Worksheet $sheet)
     {
         // تنسيق الرأس
-        $sheet->getStyle('A1:Q1')->applyFromArray([
+        $sheet->getStyle('A1:T1')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF2196F3']],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ]);
 
         // محاذاة الأعمدة
-        $sheet->getStyle('A:Q')->getAlignment()
+        $sheet->getStyle('A:T')->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
 
@@ -95,13 +99,13 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
 
         // تنسيق الأرقام كأرقام مع فاصلة آلاف
         for ($row = 2; $row <= $highestRow; $row++) {
-            $sheet->getStyle('I' . $row . ':K' . $row)
+            $sheet->getStyle('I' . $row . ':M' . $row)
                 ->getNumberFormat()
                 ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 
             // تلوين عمود المتبقي
-            $remaining = $sheet->getCell('K' . $row)->getValue();
-            $price = $sheet->getCell('I' . $row)->getValue();
+            $remaining = $sheet->getCell('M' . $row)->getValue();
+            $price = $sheet->getCell('K' . $row)->getValue();
 
             if ($remaining == 0) {
                 $color = 'FF4CAF50'; // أخضر
@@ -111,7 +115,7 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
                 $color = 'FFFF0000'; // أحمر
             }
 
-            $sheet->getStyle('K' . $row)->getFill()
+            $sheet->getStyle('M' . $row)->getFill()
                 ->setFillType(Fill::FILL_SOLID)
                 ->getStartColor()->setARGB($color);
         }

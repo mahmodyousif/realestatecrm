@@ -135,7 +135,7 @@
           
             <div class="project-actions">
                 <a href="{{route('project.show', $project)}}" class="action-btn btn-view">عرض التفاصيل</a>
-                <button class="action-btn btn-edit">تعديل</button>
+                <a href="{{route('edit_project', $project)}}" class="action-btn btn-edit">تعديل</a>
             </div>
         </div>
         @endforeach

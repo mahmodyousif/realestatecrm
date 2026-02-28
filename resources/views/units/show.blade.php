@@ -31,7 +31,8 @@
             $statusData = [
                 'sold' => ['label' => 'مباعة', 'class' => 'sold'],
                 'reserved' => ['label' => 'محجوزة', 'class' => 'reserved'],
-                'available' => ['label' => 'جاهزة للبيع', 'class' => 'available']
+                'available' => ['label' => 'جاهزة للبيع', 'class' => 'available'],
+                'partially_paid' => ['label' => 'مدفوعة جزئياً', 'class' => 'partially_paid']
             ];
             $currentStatus = $statusData[$unit->status] ?? $statusData['available'];
         @endphp

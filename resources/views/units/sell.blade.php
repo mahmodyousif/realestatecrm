@@ -83,7 +83,7 @@
         
         <div class="form-group">
             <label><i class="fas fa-dollar-sign"></i> السعر النهائي </label>
-            <input type="number" name="total_price" id="total_price">
+            <input type="number" name="total_price" id="total_price" readonly>
         </div>
 
         <script>

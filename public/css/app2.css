@@ -429,11 +429,18 @@ html, body {
     color: #e74c3c;
 }
 
+
 .badge.reserved,
 .status-badge.reserved {
     background: #fffbeb;
     color: #d97706;
 }
+.badge.partially_paid,
+.status-badge.partially_paid {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
 
 .type-badge {
     background: var(--accent);
@@ -1336,6 +1343,12 @@ html, body {
     background: #fee2e2;
     color: #b91c1c;
 }
+
+.unit-card-nested .status-badge-custom.partially_paid {
+    background: #ecfeff;
+    color: #0f766e;
+}
+
 
 .unit-card-nested .unit-body-nested {
     display: grid;

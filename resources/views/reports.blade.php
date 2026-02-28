@@ -44,6 +44,31 @@
             </div>
         </form>
     </div>
+    
+    <div class="filter-section">
+        <form action="{{route('reports')}}" method="GET" class="filter-form">
+            <div class="filter-info">
+                <i class="fas fa-filter"></i>
+                <div>
+                    <h4>تخصيص النطاق الزمني</h4>
+                    <p>استخرج تقارير لفترة محددة</p>
+                </div>
+            </div>
+            <div class="filter-inputs">
+                <div class="input-group">
+                    <label>من تاريخ</label>
+                    <input type="date" name="from" value="{{ request('from') }}">
+                </div>
+                <div class="input-group">
+                    <label>إلى تاريخ</label>
+                    <input type="date" name="to" value="{{ request('to') }}">
+                </div>
+                <button type="submit" class="btn-refresh">
+                    تحديث <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </form>
+    </div>
 {{-- </div> --}}
 </div>
     <div class="summary-grid">
@@ -119,6 +144,20 @@
     </div>
 
 
+ 
+
+    {{-- @if(request('from'))
+    <div class="summary-grid mini">
+        <div class="summary-card">
+            <p>وحدات مباعة في الفترة</p>
+            <div class="amount small">{{ number_format($unitSalesCountInDate) }} وحدة</div>
+        </div>
+        <div class="summary-card">
+            <p>إجمالي المدفوع في الفترة</p>
+            <div class="amount small">{{ number_format($PaymentInDate) }} ريال</div>
+        </div>
+    </div>
+    @endif --}}
 
     <div class="data-card">
         <div class="card-header">

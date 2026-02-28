@@ -76,6 +76,8 @@ class UnitSaleController extends Controller
 
        if ($totalPaid == $validated['total_price']) {
             $unit->status = 'sold';
+        }elseif($totalPaid > 1000 && $totalPaid < $validated['total_price']) {
+            $unit->status = 'partially_paid';
         } else {
             $unit->status = 'reserved';
         }

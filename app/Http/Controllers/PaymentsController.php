@@ -6,6 +6,8 @@ use PDO;
 use App\Models\Unit;
 use App\Models\Payment;
 use App\Models\Customer;
+use Carbon\Carbon;
+
 use App\Models\UnitSale;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -14,17 +16,34 @@ use App\Exports\PaymentCustomerExport;
 class PaymentsController extends Controller
 {
     // صفحة عرض الدفعات والتقارير المالية
-    public function index() {
+    public function index(Request $request) {
+        $from = $request->filled('from')
+            ? Carbon::parse($request->from)->startOfDay()
+            : null;
+
+        $to = $request->filled('to')
+            ? Carbon::parse($request->to)->endOfDay()
+            : null;
+
+
+
         $unitSales = UnitSale::with(['buyer', 'unit.project', 'payments'])
+                            ->when($from, fn ($q) => $q->where('created_at', '>=', $from))
+                            ->when($to, fn ($q) => $q->where('created_at', '<=', $to))
                              ->latest()
                              ->get();
+
         $remainingUnits = Unit::with(['unitSale.buyer'])->where('status','reserved')->has('unitSale')->get() ; 
 
         // إجمالي المبيعات
-        $totalPrice = UnitSale::sum('total_price');
-
+        $totalPrice = UnitSale::when($from, fn ($q) => $q->where('sale_date', '>=', $from))
+        ->when($to, fn ($q) => $q->where('sale_date', '<=', $to))
+        ->sum('total_price') ;
         // إجمالي المدفوعات من جدول payments
-        $totalPaid = Payment::sum('amount_paid');
+        $totalPaid = Payment
+        ::when($from, fn ($q) => $q->where('created_at', '>=', $from))
+        ->when($to, fn ($q) => $q->where('created_at', '<=', $to))
+        ->sum('amount_paid');
 
         // المتبقي
         $remaining = $totalPrice - $totalPaid;

@@ -74,6 +74,7 @@
                         <option value="available" {{ request('status')=='available'?'selected':'' }}>متاحة</option>
                         <option value="sold" {{ request('status')=='sold'?'selected':'' }}>مباعة</option>
                         <option value="reserved" {{ request('status')=='reserved'?'selected':'' }}>محجوزة</option>
+                        <option value="partially_paid" {{ request('status')=='partially_paid'?'selected':'' }}>دفع جزئي</option>
                     </select>
                 </div>
 
@@ -123,9 +124,11 @@
                         <td>{{$unit->project->company->name}}</td>
                         <td>{{$unit->price}} </td>
                         <td>
-                            @if ($unit->status === 'available') جاهزة للبيع
-                            @elseif ($unit->status === 'reserved') محجوزة
-                            @else مباعة @endif
+                            @if ($unit->status === 'sold') مباعة
+                                @elseif ($unit->status === 'reserved') محجوزة
+                                @elseif ($unit->status === 'partially_paid') دفع جزئي
+                                @else  جاهزة للبيع 
+                            @endif
                        
                         </td>
                         <td>

@@ -22,6 +22,16 @@
         </div>
     @endif
 
+    @if($errors->any())
+        <div class="alert alert-error">
+            <i class="fas fa-exclamation-triangle"></i> يرجى تصحيح الأخطاء التالية:
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <div class="unit-summary-mini">
         <p>الوحدة: <strong>{{$unit->type}} - {{$unit->unit_number}}</strong></p>
         <p>المشروع: <strong>{{$unit->project->name}}</strong></p>

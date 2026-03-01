@@ -16,6 +16,24 @@
         </div>
     @endif
 
+    @if(session('warnings'))
+        @if(count(session('warnings')['duplicate_units']) ?? [] > 0 )
+            <div class="alert alert-error">
+                <strong>
+                    تم تخطي {{ count(session('warnings')['duplicate_units']) }} وحدة
+                    لأنها موجودة مسبقًا.
+                </strong>
+            </div>
+        @endif
+        @if(count(session('warnings')['missing_projects']) ?? []  > 0)
+        <div class="alert alert-error">
+            <strong>
+                تم تخطي {{ count(session('warnings')['missing_projects']) }} وحدة
+                لأن المشروع المرتبط بها غير موجود في النظام.
+            </strong>
+        </div>
+    @endif
+    @endif
     <div class="action-bar-nested">
         <div class="export-group">
             <div>

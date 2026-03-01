@@ -11,16 +11,9 @@
             <h3>تفاصيل الوحدة السكنية</h3>
             <div class="action-icons">
                 @if ($unit->status === 'available')
-                <button class="btn-sell-mini"
-                    data-unit-id="{{ $unit->id }}"
-                    data-unit-name="{{ $unit->type }} {{ $unit->unit_number }}"
-                    data-project-name="{{ $unit->project->name }}"
-                    data-price="{{ $unit->price }}"
-                    onclick="openSellUnitModal(this)" data-bs-target="#openSellUnitModal-{{ $unit->id }}">
-                    بيع
-                </button>
-                <x-unit-sell-modal :unit="$unit" :buyers="$buyers" :investors="$investors" :marketers="$marketers" />
-            @endif
+                    <a href='{{ route('unit.sell', $unit) }}' class="sell btn-sell-mini">بيع</a>
+                     <span class="divider">|</span>
+                @endif
                 <a href="{{route('edit_unit', $unit)}}" class="edit"><i class="fa-solid fa-pen-to-square"></i></a>
                 <span class="divider">|</span>
                 <a href="{{route('delete_unit', $unit)}}" class="delete"><i class="fa fa-trash"></i></a>

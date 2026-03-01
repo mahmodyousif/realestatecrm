@@ -126,8 +126,12 @@ class UnitsController extends Controller
         $import = new UnitsImport();
         Excel::import($import, $request->file('file'));
         $added = $import->addedCount;
-        
-        return redirect()->back()->with('success', "تم إضافة {$added} وحدة جديد بنجاح!");
-
+        $response = [
+            'warnings' => $import->warningMessages,
+        ];
+        if ($import->addedCount > 0) {
+            $response['success'] = "تم إضافة {$import->addedCount} وحدة جديدة بنجاح!";
+        }
+        return redirect()->back()->with($response);
     }
 }

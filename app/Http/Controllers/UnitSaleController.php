@@ -21,26 +21,46 @@ class UnitSaleController extends Controller
             ],
             'marketer_id' => ['nullable', 'exists:customers,id'],
             'investor_id' => ['nullable',Rule::exists('customers', 'id')->where('type', 'investor'),
-],
+            ],
             'sale_date' => ['required', 'date'],
             'payment_method' => ['required', 'string'],
             'unit_price' => ['required', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0', 'lte:total_price'],
-            'total_price' => ['nullable', 'numeric', 'min:0', 'lte:total_price'],
+            'total_price' => ['nullable', 'numeric', 'min:0'],
             'amount_paid' => ['nullable', 'numeric', 'min:0', 'lte:total_price'],
             'contract_number' => ['required', 'string', 'unique:unit_sales,contract_number'],
             'commission' => ['nullable', 'numeric', 'min:0'],        ],
-        [
-            'contract_number.unique' => 'رقم العقد مستخدم مسبقًا، يرجى إدخال رقم عقد آخر',
-            'contract_number.required' => 'رقم العقد مطلوب',
-        
-        ]
+            [
+                'contract_number.unique' => 'رقم العقد مستخدم مسبقًا، يرجى إدخال رقم عقد آخر',
+                'contract_number.required' => 'رقم العقد مطلوب',
+                'amount_paid.lte' => 'المبلغ المدفوع اعلى من سعر الوحدة قم بتعديل المبلغ المدفوع',
+                'discount.lte' => 'الخصم لا يمكن أن يكون أكبر من سعر الوحدة قم بتعديل الخصم',
+                'unit_price.min' => 'سعر الوحدة يجب أن يكون 0 أو أكثر',
+                'discount.min' => 'الخصم يجب أن يكون 0 أو أكثر',
+                'amount_paid.min' => 'المبلغ المدفوع يجب أن يكون 0 أو أكثر',
+                'total_price.min' => 'السعر الإجمالي يجب أن يكون 0 أو أكثر',
+                'unit_id.required' => 'رقم الوحدة مطلوب',
+                'sale_date.required' => 'تاريخ البيع مطلوب',
+                'payment_method.required' => 'طريقة الدفع مطلوبة',
+                'unit_id.exists' => 'رقم الوحدة غير موجود في النظام',
+              ]
+
     
     );
     
         
         if($validated['buyer_id'] == null && $validated['investor_id'] == null) {
             return back()->with('error',  'يجب اختيار مشتري أو مستثمر');
+        }
+
+        if($validated['amount_paid'] > $validated['unit_price']) {
+            return back()->with('error',  'الدفعة المدفوعة لا يمكن أن تكون أكبر من سعر الوحدة');
+        }
+
+        if($validated['amount_paid'] < $validated['unit_price'] && $validated['payment_method'] !== 'installment') {
+            return back()->with('error',  'المبلغ المدفوع اقل من قيمة الوحدة، الرجاء اختيار طريقة الدفع المناسبة');
+        } elseif($validated['amount_paid'] == $validated['unit_price'] && $validated['payment_method'] === 'installment') {
+            return back()->with('error',  'المبلغ المدفوع يساوي قيمة الوحدة، الرجاء اختيار طريقة الدفع المناسبة');
         }
         // إنشاء عملية البيع في unit_sales
         $unitSale = UnitSale::create([

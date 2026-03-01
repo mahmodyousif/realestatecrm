@@ -18,7 +18,11 @@ class UnitsImport implements ToModel, WithHeadingRow, WithChunkReading, WithVali
 
 
     public $addedCount = 0;   
-
+    public array $warningMessages = [
+        'duplicate_units' => [],
+        'missing_projects' => [],
+    ];
+    
 
     public function __construct()
     {
@@ -46,7 +50,7 @@ class UnitsImport implements ToModel, WithHeadingRow, WithChunkReading, WithVali
         return [
             'unit_number'  => 'required',
             'type'         => 'required',
-            'project_id' => 'required|string',
+            'project_id' => 'required',
             'area'         => 'required|numeric',
             'floor'        => 'required|numeric',
             'zone'         => 'required|numeric',
@@ -63,6 +67,10 @@ class UnitsImport implements ToModel, WithHeadingRow, WithChunkReading, WithVali
         $projectId = Project::where('name' , $projectName)->value('id') ;
 
         if(!$projectId){
+            $this->warningMessages['missing_projects'][] = [
+                'unit_number' => $row['unit_number'],
+                'project'     => $projectName,
+            ];
             return null ;
         }
 
@@ -75,7 +83,12 @@ class UnitsImport implements ToModel, WithHeadingRow, WithChunkReading, WithVali
    
                       ->exists();
         if ($existingUnit) {
-            return null; // تخطي هذا الصف لأنه موجود بالفعل
+            $this->warningMessages['duplicate_units'][] = [
+                'unit_number' => $row['unit_number'],
+                'type'        => $row['type'],
+                'project'     => $projectName,
+            ];
+            return null; // تخطي هذا الصف وعدم إضافته
         }
         
         $this->addedCount++;

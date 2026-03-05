@@ -25,12 +25,15 @@ class CompaniesController extends Controller
             $q->where('company_id', $id);
         })->sum('total_price');
 
+
         // مجموع المدفوعات الفعلية من جدول payments للوحدات التابعة للشركة
         $amountPaid = Payment::whereHas('unitSale.unit.project', function($q) use ($id) {
             $q->where('company_id', $id);
         })->sum('amount_paid');
 
-        
+        $totalCommission = UnitSale::whereHas('unit.project', function($q) use ($id) {
+            $q->where('company_id', $id);
+        })->sum('commission');
 
         // اجمالي المدفوع اليوم للشركة
         $amountPaidToday = Payment::whereHas('unitSale.unit.project', function($q) use ($id) {
@@ -75,6 +78,7 @@ class CompaniesController extends Controller
             'allProjects',
             'totalSalesPrice',
             'amountPaid',
+            'totalCommission',
             'remainingAmount' ,
             'amountPaidToday',
             'todaySalesCount' ,

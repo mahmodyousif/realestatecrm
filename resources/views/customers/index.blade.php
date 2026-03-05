@@ -14,14 +14,14 @@
 
 
 @if(session('success'))
-    <div class= "alert-success">
-        <i class="fas fa-check-circle"></i> {{ session('success') }}
+    <div class= "alert alert-success">
+        {{ session('success') }}
     </div>
 @endif
 
 
 @if (isset($errors) && count($errors) > 0)
-    <div class="alert-error">
+    <div class="alert alert-error">
         <ul>
             @foreach ($errors as $error)
                 <li>{{ $error }}</li>
@@ -35,7 +35,7 @@
         <div class="filters-grid-nested">
             <div class="filter-group-nested">
                 <label>الشركة</label>
-                <select name="company_id" id="companySelect"  class="searchable-select4">
+                <select name="company_id" id="companySelect" >
                     <option value="">جميع الشركات</option>
                     @foreach($companies as $company)
                         <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
@@ -46,7 +46,7 @@
             </div>
             <div class="filter-group-nested">
                 <label>المشروع</label>
-                <select name="project_id"  id="projectSelect" class="searchable-select4">
+                <select name="project_id"  id="projectSelect" >
                     <option value="">جميع المشاريع</option>
                     @foreach($allProjects as $project)
                         <option value="{{ $project->id }}" {{ request('project_id') == $project->id ? 'selected' : '' }}>

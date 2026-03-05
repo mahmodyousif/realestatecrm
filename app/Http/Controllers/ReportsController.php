@@ -139,8 +139,8 @@ class ReportsController extends Controller
         $projectReserved  = $projects->pluck('reserved_count')->map(fn ($v) => (int) $v)->toArray();
         $projectSold      = $projects->pluck('sold_count')->map(fn ($v) => (int) $v)->toArray();
 
-        $allProjects = Project::select('id', 'name')->get();
         $companies = Company::select('id', 'name')->get();
+        $allProjects = Project::where('company_id', $request->company_id)->get();
 
         return view('reports', compact(
             'data',

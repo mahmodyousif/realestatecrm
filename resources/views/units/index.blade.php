@@ -11,33 +11,50 @@
 <div class="dashboard-wrapper units-page">
     
     @if(session('success'))
-        <div class="alert-success ">
-            <i class="fas fa-check-circle"></i> {{ session('success') }}
+        <div class="alert alert-success ">
+             {{ session('success') }}
         </div>
     @endif
 
     @if(session('warnings'))
-        @if(count(session('warnings')['duplicate_units']) ?? [] > 0 )
+        {{-- special handling for unit import warnings --}}
+       @if(count(session('warnings')['duplicate_units'] ?? []) > 0)
+        <div class="alert alert-error">
+                تم تخطي {{ count(session('warnings')['duplicate_units'] ?? []) }} وحدة
+                لأنها موجودة مسبقًا.
+        </div>
+       @endif
+        @if(count(session('warnings')['missing_projects'] ?? []) > 0)
             <div class="alert alert-error">
-                <strong>
-                    تم تخطي {{ count(session('warnings')['duplicate_units']) }} وحدة
-                    لأنها موجودة مسبقًا.
-                </strong>
+                    تم تخطي {{ count(session('warnings')['missing_projects'] ?? []) }} وحدة
+                    لأن المشروع المرتبط بها غير موجود في النظام.
             </div>
         @endif
-        @if(count(session('warnings')['missing_projects']) ?? []  > 0)
-        <div class="alert alert-error">
-            <strong>
-                تم تخطي {{ count(session('warnings')['missing_projects']) }} وحدة
-                لأن المشروع المرتبط بها غير موجود في النظام.
-            </strong>
-        </div>
-    @endif
+
+        @if(count(session('warnings')['missing_units'] ?? []) > 0)
+            <div class="alert alert-error">
+                    تم تخطي {{ count(session('warnings')['missing_units'] ?? []) }} وحدة
+                    لأن الوحدة غير موجودة في النظام.
+            </div>
+        @endif
+
+        @if(count(session('warnings')['price_mismatch'] ?? []) > 0)
+            <div class="alert alert-error">
+                    تم تخطي {{ count(session('warnings')['price_mismatch'] ?? []) }} وحدة
+                    لأن السعر مختلف عن السعر المسجل بالنظام.
+            </div>
+        @endif
+
+        @if(count(session('warnings')['contract_isExisting'] ?? []) > 0)
+            <div class="alert alert-error">
+                    تم تخطي {{ count(session('warnings')['contract_isExisting'] ?? []) }} وحدة
+                    لأن رقم العقد مستخدم مسبقًا.
+            </div>
+        @endif
     @endif
     <div class="action-bar-nested">
         <div class="export-group">
             <div>
-
                 <a href="{{route('unit_export')}}" class="btn-export success">
                     <i class="fas fa-file-excel"></i> تصدير الوحدات
                 </a>
@@ -46,6 +63,9 @@
                 </a>
             </div>
             
+
+           <div class="import-group">
+
             <form action="{{ route('unit.import') }}" accept=".xlsx,.xls,.csv" method="POST" enctype="multipart/form-data" id="importForm">
                 @csrf
                 <input type="file" name="file" id="importInput" style="display: none;" onchange="submitImport()">
@@ -53,6 +73,15 @@
                     <i class="fas fa-cloud-upload-alt"></i> استيراد من Excel
                 </button>
             </form>
+            <form action="{{ route('unitSell.import') }}" accept=".xlsx,.xls,.csv" method="POST" enctype="multipart/form-data" id="soldForm">
+                @csrf
+                <input type="file" name="file" id="importSoldInput" style="display: none;" onchange="submitSoldImport()">
+                <button type="button" class="btn-import btn-accent-custom soldInputBtn" onclick="document.getElementById('importSoldInput').click()">
+                    <i class="fas fa-cloud-upload-alt"></i> استيراد المبيعات
+                </button>
+            </form>
+           </div>
+
         </div>
 
 
@@ -63,24 +92,23 @@
             <div class="filters-grid-nested">
                 <div class="filter-group-nested">
                     <label>الشركة</label>
-                    <select name="company_id" id="companySelect">
-                        <option value="">جميع الشركات</option>
-                        @foreach($companies as $company)
-                            <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
-                                {{ $company->name }}
-                            </option>
-                        @endforeach
-                    </select>
+                       <select name="company_id" id="companySelect">
+                            <option value="">جميع الشركات</option>
+                            @foreach($companies as $company)
+                                <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                    {{ $company->name }}
+                                </option>
+                            @endforeach
+                        </select>
                 </div>
                 <div class="filter-group-nested">
                     <label>المشروع</label>
-                    <select name="project_id"  id="projectSelect">
+                    <select name="project_id" id="projectSelect">
                         <option value="">جميع المشاريع</option>
                         @foreach($projects as $project)
                             <option value="{{ $project->id }}" {{ request('project_id') == $project->id ? 'selected' : '' }}>
                                 {{ $project->name }}
                             </option>
-                            
                         @endforeach
                     </select>
                 </div>

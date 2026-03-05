@@ -15,6 +15,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UsersController;
   
 
+
+
+    Route::get('/projects-by-company/{company}', [ProjectsController::class, 'getByCompany'])->name('projects.byCompany');
+
 Route::get('projects/create', [ProjectsController::class, 'create'])->name('projects.create');
 
 Route::middleware(['auth' , 'role:admin'])->group(function(){
@@ -42,7 +46,6 @@ Route::middleware(['auth' , 'role:admin'])->group(function(){
     Route::put('update_unit/{id}', [UnitsController::class, 'update'])->name('update_unit') ;
     Route::get('delete_unit/{id}', [UnitsController::class, 'delete'])->name('delete_unit') ;
     Route::post('add_unit', [UnitsController::class,'store'])->name('add_unit');
-
 
     // Projects Crud 
 
@@ -73,7 +76,8 @@ Route::middleware(['auth' , 'role:admin'])->group(function(){
     Route::POST('/projects/import' , [ProjectsController::class , 'import'])->name('projects.import'); 
     Route::POST('/units/import', [UnitsController::class , 'import'])->name('unit.import') ;
     Route::POST('/customers/import', [CustomersController::class , 'import'])->name('customers.import') ;
-}) ;
+    Route::POST('/units/import/unitsell' , [UnitsController::class , 'unitSellImport'])->name('unitSell.import');
+    }) ;
 
 
 
@@ -91,7 +95,7 @@ Route::middleware(['auth' , 'role:seller'])->group(function(){
     Route::get('/units/{unit}', [UnitsController::class, 'show'])->name('units.show');
     Route::get('unit.sell/{id}', [UnitsController::class, 'unitSell'])->name('unit.sell') ;
     Route::post('unit_sell',[UnitSaleController::class,'store'])->name('unit_sell');
-    
+
 }); 
 
 

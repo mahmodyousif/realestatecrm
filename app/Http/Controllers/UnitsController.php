@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\UnitSale;
 use App\Exports\UnitExport;
 use App\Imports\UnitsImport;
+use App\Imports\SoldUnitImport;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -28,8 +29,8 @@ class UnitsController extends Controller
 
         return view('units.index', [
             'data' => $data,
-            'projects' => Project::all(),
             'companies' =>Company::all(),
+            'projects' => Project::where('company_id', $request->company_id)->get(),
             'buyers' =>Customer::where('type','buyer')->get(),
             'marketers'=>Customer::where('type','marketer')->get(),
             'investors'=>Customer::where('type','investor')->get(),
@@ -132,6 +133,30 @@ class UnitsController extends Controller
         if ($import->addedCount > 0) {
             $response['success'] = "تم إضافة {$import->addedCount} وحدة جديدة بنجاح!";
         }
+        return redirect()->back()->with($response);
+    }
+
+    /**
+     * استيراد عمليات بيع الوحدات من ملف Excel
+     * لكل صف سيتم إنشاء سجل في unit_sales، إضافة دفعة كاملة ثم تحديث حالة الوحدة إلى مباعة
+     */
+    public function unitSellImport(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $import = new \App\Imports\SoldUnitImport();
+        Excel::import($import, $request->file('file'));
+
+        $response = [];
+        if ($import->addedCount > 0) {
+            $response['success'] = "تم تسجيل {$import->addedCount} عملية بيع بنجاح";
+        }
+        if (!empty($import->warningMessages)) {
+            $response['warnings'] = $import->warningMessages;
+        }
+
         return redirect()->back()->with($response);
     }
 }

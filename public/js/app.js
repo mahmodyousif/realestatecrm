@@ -2,6 +2,28 @@
 // مودالات المشاريع، الشركات، الوحدات، العملاء، المستخدمين
 // ============================
 
+
+  document.getElementById('companySelect').addEventListener('change', function() {
+    let companyId = this.value;
+    let projectSelect = document.getElementById('projectSelect');
+    
+    // نرسل طلب AJAX
+    fetch(`/projects-by-company/${companyId}`)
+        .then(response => response.json())
+        .then(data => {
+            // ننظف القائمة القديمة
+            projectSelect.innerHTML = '<option value="">جميع المشاريع</option>';
+            
+            // نضيف المشاريع الجديدة
+            data.forEach(project => {
+                let option = document.createElement('option');
+                option.value = project.id;
+                option.textContent = project.name;
+                projectSelect.appendChild(option);
+            });
+        })
+        .catch(err => console.error(err));
+});
 // --- مودال إضافة مشروع ---
 function openAddProjectModal() {
     document.getElementById('addProjectModal').style.display = 'flex';
@@ -107,6 +129,17 @@ function submitImport() {
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...';
         document.getElementById('importForm').submit();
+    }
+}
+
+function submitSoldImport() {
+    const fileInput = document.getElementById('importSoldInput');
+    const btn = document.querySelector('.soldInputBtn');
+    
+    if (fileInput.files.length > 0) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...';
+        document.getElementById('soldForm').submit();
     }
 }
 function submitImport2() {
@@ -506,31 +539,7 @@ function toggleDropdown() {
         }
 
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const companySelect = document.getElementById('companySelect');
-            const projectSelect = document.getElementById('projectSelect');
-        
-            if (!companySelect || !projectSelect) return;
-        
-            companySelect.addEventListener('change', function () {
-                const companyId = this.value;
-                projectSelect.innerHTML = '<option value="">جميع المشاريع</option>';
-        
-                if (!companyId) return;
-        
-                fetch(`/companies/${companyId}/projects`)
-                    .then(res => res.json())
-                    .then(projects => {
-                        projects.forEach(p => {
-                            const option = document.createElement('option');
-                            option.value = p.id;
-                            option.textContent = p.name;
-                            projectSelect.appendChild(option);
-                        });
-                    })
-                    .catch(err => console.error(err));
-            });
-        });
+       
         
         document.addEventListener('DOMContentLoaded', () => {
             const menu = document.getElementById('menu');
@@ -608,3 +617,10 @@ function toggleDropdown() {
 
             discountInput.addEventListener('input', calculateFinalPrice);
             window.addEventListener('load', calculateFinalPrice);
+
+
+          
+
+
+
+        

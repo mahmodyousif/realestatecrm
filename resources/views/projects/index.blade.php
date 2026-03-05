@@ -50,7 +50,7 @@
                 <div class="filters-grid-nested">
                     <div class="filter-group-nested">
                         <label>الشركة</label>
-                        <select name="company_id" id="companySelect"  class="searchable-select4">
+                        <select name="company_id" id="companySelect" >
                             <option value="">جميع الشركات</option>
                             @foreach($companies as $company)
                                 <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>
@@ -61,7 +61,7 @@
                     </div>
                     <div class="filter-group-nested">
                         <label>المشروع</label>
-                        <select name="project_id"  id="projectSelect" class="searchable-select4">
+                        <select name="project_id"  id="projectSelect"   >
                             <option value="">جميع المشاريع</option>
                             @foreach($data as $project)
                                 <option value="{{ $project->id }}" {{ request('project_id') == $project->id ? 'selected' : '' }}>
@@ -82,13 +82,6 @@
 {{-- </div> --}}
 </div>
 
-{{-- <!-- <form action="{{ route('unit.import') }}" accept=".xlsx,.xls,.csv" method="POST" enctype="multipart/form-data" id="importForm"> --}}
-    {{-- @csrf
-    <input type="file" name="file" id="importInput" style="display: none;" onchange="submitImport()">
-    <button type="button" class="btn-accent-custom" onclick="document.getElementById('importInput').click()">
-        <i class="fas fa-cloud-upload-alt"></i> استيراد من Excel
-    </button> --
-</form> --}}
 
 
 <div class="projects-grid">

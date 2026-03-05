@@ -27,6 +27,11 @@ class ProjectsController extends Controller
     }
 
 
+     public function getByCompany($companyId)
+    {
+        $projects = Project::where('company_id', $companyId)->get();
+        return response()->json($projects);
+    }
     
     public  function create() {
         return view('projects.create' , [

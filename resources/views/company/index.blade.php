@@ -162,6 +162,10 @@
             <div class="label">المبالغ المتبقية</div>
             <div class="value">{{ number_format($remainingAmount) }} <small>ر.س</small></div>
         </div>
+           <div class="fin-card yellow">
+            <div class="label">إجمالي العمولات</div>
+            <div class="value">{{ number_format($totalCommission) }} <small>ر.س</small></div>
+        </div>
     </div>
 
     <div class="performance-row">
@@ -223,9 +227,12 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="actions">
-                                        <button class="btn-icon edit"><i class="fas fa-edit"></i></button>
-                                        <button class="btn-icon view"><i class="fas fa-eye"></i></button>
+                                   <div class="unit-actions-nested">
+                                        <a href="{{route('project.show', $project)}}"  class="action-link view" title="عرض"><i class="fas fa-eye"></i></a>
+                                        @can('manager')
+                                            <a href="{{route('edit_project', $project)}}" class="action-link edit" title="تعديل"><i class="fas fa-edit"></i></a>
+                                        @endcan
+                                        
                                     </div>
                                 </td>
                             </tr>
@@ -271,10 +278,16 @@
                                 </td>
                                 <td class="price">{{ number_format($unit->price) }} ر.س</td>
                                 <td>
-                                    <div class="actions">
-                                        <button class="btn-icon edit"><i class="fas fa-edit"></i></button>
-                                        <button class="btn-icon view"><i class="fas fa-eye"></i></button>
-                                    </div>
+                                 <div class="unit-actions-nested">
+                                    <a href="{{route('units.show' ,$unit)}}" class="action-link view" title="عرض"><i class="fas fa-eye"></i></a>
+                                    @can('manager')
+                                        <a href="{{route('edit_unit', $unit)}}" class="action-link edit" title="تعديل"><i class="fas fa-edit"></i></a>
+                                    @endcan
+                                    
+                                    @if ($unit->status === 'available')
+                                        <a href="{{route('unit.sell', $unit)}}" class="btn-sell-mini">بيع</a>
+                                    @endif
+                                </div>
                                 </td>
                             </tr>
                         @endforeach

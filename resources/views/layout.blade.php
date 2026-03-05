@@ -11,7 +11,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-        <link rel="stylesheet" href="{{ asset('css/app2.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/app.css?v=1.0') }}">
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
         @stack('styles')
     </head>
@@ -98,6 +98,6 @@
         <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-        <script src="{{ asset('js/app.js') }}"></script>
+        <script src="{{ asset('js/app.js?v=1.0') }}"></script>
     </body>
     </html>

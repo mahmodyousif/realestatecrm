@@ -16,7 +16,6 @@
     </button>
     @if(session('success'))
         <div class="alert alert-success">
-            <i class="fa-solid fa-circle-check"></i>
             {{ session('success') }}
         </div>
     @endif
@@ -55,6 +54,9 @@
         </form>
     </div>
 
+    <script>
+
+</script>
     <div class="stats-grid">
         <div class="stat-card blue">
             <div class="card-icon"><i class="fa-solid fa-city"></i></div>

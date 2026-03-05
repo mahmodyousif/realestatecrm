@@ -936,9 +936,7 @@ ul {
     border-bottom: none;
 }
 
-.property-table tr:hover {
-    /* background-color: var(--hover-bg); */
-}
+
 
 .property-table tr.highlight-row {
     background-color: var(--highlight-bg);

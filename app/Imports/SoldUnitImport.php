@@ -151,10 +151,7 @@ class SoldUnitImport implements
 
             $totalPrice = $unitPrice - $discount;
                 
-                $saleDate = Carbon::createFromFormat(
-                    'd-m-Y',
-                    trim($row['sale_date'])
-                )->format('Y-m-d');
+                $saleDate = Carbon::parse(trim($row['sale_date']))->format('Y-m-d');
                 
 
             /** 6️⃣ إنشاء عملية البيع */

@@ -153,7 +153,22 @@ class SoldUnitImport implements
                 
                 $saleDate = Carbon::parse(trim($row['sale_date']))->format('Y-m-d');
                 
+                $paymentMethods = [
+                'كاش'         => 'cash',
+                'تقسيط'       => 'installment',
+                'رهن عقاري'   => 'mortgage',
+                'تحويل بنكي'  => 'transfer',
+            ];
 
+             $paymentMethod = $paymentMethods[trim($row['payment_method'])] ?? null;
+            if (!$paymentMethod) {
+                $this->warningMessages['invalid_payment_method'][] = [
+                    'unit_number' => $row['unit_number'],
+                    'project'     => $projectName,
+                    'value'       => $row['payment_method'] ?? null,
+                ];
+                $paymentMethod = 'cash'; // قيمة افتراضية
+            }
             /** 6️⃣ إنشاء عملية البيع */
 
             
@@ -163,7 +178,7 @@ class SoldUnitImport implements
                 'marketer_id'     => $marketerId,
                 'investor_id'     => $investorId ?? null,
                 'sale_date'       => $saleDate,
-                'payment_method'  => $row['payment_method'],
+                'payment_method'  => $paymentMethod,
                 'unit_price'      => $unitPrice,
                 'discount'        => $discount,
                 'total_price'     => $totalPrice,
@@ -175,7 +190,7 @@ class SoldUnitImport implements
             $sale->payments()->create([
                 'amount_paid'    => $totalPrice,
                 'payment_date'   => $saleDate,
-                'payment_method' => $row['payment_method'],
+                'payment_method' => $paymentMethod,
                 'reference_number' => 0,
                 'notes'          => 'دفعة كاملة (استيراد)',
             ]);

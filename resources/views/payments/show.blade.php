@@ -1,21 +1,76 @@
 @extends('layout') 
 
 @section('title')
-    <h1><i class="fas fa-user-tie"></i> {{$unitSale->buyer->name}}</h1>
+    <h1><i class="fas fa-user-tie"></i> {{$saleCustomer->customer->name ?? 'العميل'}}</h1>
 @endsection
 
 @section('content')
 
 <div class="paymentsPage">
+
+
+      <!-- ملخص الدفعات -->
+    @php
+        $totalPaid = $payments->sum('amount_paid');
+        $remaining = max(0, $saleCustomer->share_amount - $totalPaid);
+    @endphp
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 2rem;">
+        <div class="card" style="padding: 1.5rem;">
+            <p style="color: var(--text-muted); margin: 0 0 0.5rem 0;">إجمالي المبلغ المستحق</p>
+            <h3 style="margin: 0; color: var(--primary-color);">{{ number_format($saleCustomer->share_amount) }} ريال</h3>
+        </div>
+        <div class="card" style="padding: 1.5rem;">
+            <p style="color: var(--text-muted); margin: 0 0 0.5rem 0;">المبلغ المدفوع</p>
+            <h3 style="margin: 0; color: var(--success-color);">{{ number_format($totalPaid) }} ريال</h3>
+        </div>
+        <div class="card" style="padding: 1.5rem;">
+            <p style="color: var(--text-muted); margin: 0 0 0.5rem 0;">المبلغ المتبقي</p>
+            <h3 style="margin: 0; color: {{ $remaining > 0 ? 'var(--danger-color)' : 'var(--success-color)' }};">{{ number_format($remaining) }} ريال</h3>
+        </div>
+    
+    </div>
+    <!-- معلومات الوحدة والعملية -->
+    <div class="card" style="margin: 2rem 0 ;">
+        <div class="card-header">
+            <h2><i class="fas fa-info-circle"></i> معلومات العملية</h2>
+        </div>
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                <div>
+                    <label style="color: var(--text-muted); font-weight: 600;">الوحدة</label>
+                    <p style="margin: 0.5rem 0;">{{ $unitSale->unit->unit_number }} ({{ $unitSale->unit->type }})</p>
+                </div>
+                <div>
+                    <label style="color: var(--text-muted); font-weight: 600;">المشروع</label>
+                    <p style="margin: 0.5rem 0;">{{ $unitSale->unit->project->name }}</p>
+                </div>
+                <div>
+                    <label style="color: var(--text-muted); font-weight: 600;">العميل المشتري</label>
+                    <p style="margin: 0.5rem 0;">{{ $saleCustomer->customer->name }}</p>
+                </div>
+                <div>
+                    <label style="color: var(--text-muted); font-weight: 600;">نسبة التمليك</label>
+                    <p style="margin: 0.5rem 0;">{{ number_format($saleCustomer->share_percentage, 2) }}%</p>
+                </div>
+                <div>
+                    <label style="color: var(--text-muted); font-weight: 600;">مبلغ الحصة</label>
+                    <p style="margin: 0.5rem 0;">{{ number_format($saleCustomer->share_amount) }} ريال</p>
+                </div>
+                <div>
+                    <label style="color: var(--text-muted); font-weight: 600;">رقم العقد</label>
+                    <p style="margin: 0.5rem 0;">{{ $saleCustomer->contract_number }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- سجل الدفعات -->
     <div class="card">
         <div class="card-header">
             <h2>
-                <i class="fas fa-history"></i> سجل دفعات العميل: 
-                <span>{{$unitSale->buyer->name}}</span>
+                <i class="fas fa-history"></i> سجل الدفعات: 
+                <span>{{ $saleCustomer->customer->name }}</span>
             </h2>
-            <a href="{{route('paymentCustomer.export' , $unitSale->id)}}" class="export-btn">
-                <i class="fas fa-file-excel"></i> تصدير التقرير
-            </a>
         </div>
         
         <div class="table-container">
@@ -58,7 +113,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">
                             لا يوجد دفعات مسجلة لهذا العميل حتى الآن.
                         </td>
                     </tr>
@@ -67,6 +122,8 @@
             </table>
         </div>
     </div>
+
+  
 </div>
 
 @endsection

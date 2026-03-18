@@ -54,34 +54,49 @@ class CustomersController extends Controller
     }
 
     public function show($id){
-        $customer = Customer::with('purchases.unit', 'purchases.payments')
-        ->withSum('purchases as totalPrice', 'total_price')
-        ->withSum('payments as totalPaid', 'amount_paid')
-        ->withCount('purchases as purchases_count')
-        ->findOrFail($id);
+        $customer = Customer::with([
+        'saleCustomers.payments',
+        'saleCustomers.unitSale.unit',
+    ])
+    ->withSum('saleCustomers as totalPrice', 'share_amount')  // ✅ بدل saleCustomers.unitSale
+    ->withSum('payments as totalPaid', 'amount_paid')          // ✅ يشتغل لأن payments() موجودة في الموديل
+    ->withCount('saleCustomers as purchases_count')            // ✅ بدل purchases
+    ->findOrFail($id);
     
     $remaining = ($customer->totalPrice ?? 0) - ($customer->totalPaid ?? 0);
     
     return view('customers.show', compact('customer', 'remaining'));
     }
 
-    public function marketerShow($id){
-        $marketer = Customer::with('marketedSales.unit')
-            ->withSum('marketedSales as totalPrice', 'total_price')
-            ->withSum('sellers as totalPaid', 'amount_paid')
-            ->withCount('marketedSales as sales_count')
-            ->findOrFail($id);
-        $commission = UnitSale::where('marketer_id' , $id)->sum('commission') ;
-        $remaining = ($marketer->totalPrice ?? 0) - ($marketer->totalPaid ?? 0);
-        return view('customers.marketer_show', compact('marketer','commission', 'remaining'));
-    }
+   public function marketerShow($id) {
+    $marketer = Customer::with([
+        'marketedSales.unit',
+        'marketedSales.saleCustomers.payments',
+    ])
+    ->withSum('marketedSales as totalPrice', 'total_price')
+    ->withCount('marketedSales as sales_count')
+    ->findOrFail($id);
+
+    $commission = UnitSale::where('marketer_id', $id)->sum('commission');
+
+    $totalPaid = $marketer->marketedSales->sum(fn($sale) =>
+        $sale->saleCustomers->sum(fn($sc) =>
+            $sc->payments->sum('amount_paid')
+        )
+    );
+
+    $remaining           = ($marketer->totalPrice ?? 0) - $totalPaid;
+    $marketer->totalPaid = $totalPaid;
+
+    return view('customers.marketer_show', compact('marketer', 'commission', 'remaining'));
+}
 
     public function store(Request $request){
 
         $validated = $request->validate([
             'type' => 'required|in:buyer,investor,marketer',
             'name' => 'required|string|max:255',
-            'id_card' => 'nullable|string|size:10',
+            'id_card' => 'nullable|string',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string|max:255',
             'iban' => 'nullable|string|max:34',
@@ -93,10 +108,8 @@ class CustomersController extends Controller
             'type.in' => 'نوع العميل غير صالح',
             'name.required' => 'اسم العميل مطلوب',
             'name.string' => 'اسم العميل يجب أن يكون نصًا',
-            'iban.max' => 'رقم الآيبان لا يجب أن يتجاوز 34 حرفًا',
-            'id_card.size' => 'رقم الهوية يجب أن يكون 10 أرقام',
+            'iban.max' => 'رقم الحساب لا يجب أن يتجاوز 34 حرفًا',
             'email.email' => 'البريد الإلكتروني غير صالح',
-            
         ]
         
         

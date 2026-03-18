@@ -2,19 +2,17 @@
 // مودالات المشاريع، الشركات، الوحدات، العملاء، المستخدمين
 // ============================
 
-
-  document.getElementById('companySelect').addEventListener('change', function() {
+// تحديث قائمة المشاريع بناءً على الشركة المختارة
+document.getElementById('companySelect')?.addEventListener('change', function() {
     let companyId = this.value;
     let projectSelect = document.getElementById('projectSelect');
-    
-    // نرسل طلب AJAX
+
+    if (!projectSelect) return;
+
     fetch(`/projects-by-company/${companyId}`)
         .then(response => response.json())
         .then(data => {
-            // ننظف القائمة القديمة
             projectSelect.innerHTML = '<option value="">جميع المشاريع</option>';
-            
-            // نضيف المشاريع الجديدة
             data.forEach(project => {
                 let option = document.createElement('option');
                 option.value = project.id;
@@ -22,33 +20,40 @@
                 projectSelect.appendChild(option);
             });
         })
-        .catch(err => console.error(err));
+        .catch(err => console.error('Error fetching projects:', err));
 });
+
 // --- مودال إضافة مشروع ---
 function openAddProjectModal() {
-    document.getElementById('addProjectModal').style.display = 'flex';
+    const modal = document.getElementById('addProjectModal');
+    if (modal) modal.style.display = 'flex';
 }
 
 function closeAddProjectModal() {
-    document.getElementById('addProjectModal').style.display = 'none';
+    const modal = document.getElementById('addProjectModal');
+    if (modal) modal.style.display = 'none';
 }
 
 // --- مودال إضافة شركة ---
 function openAddCompany() {
-    document.getElementById("addCompanyModal").style.display = 'flex';
+    const modal = document.getElementById('addCompanyModal');
+    if (modal) modal.style.display = 'flex';
 }
 
 function closeAddCompanyModal() {
-    document.getElementById("addCompanyModal").style.display = 'none';
+    const modal = document.getElementById('addCompanyModal');
+    if (modal) modal.style.display = 'none';
 }
 
 // --- مودال إضافة وحدة ---
 function openAddUnitModal() {
-    document.getElementById('addUnitModal').style.display = 'block';
+    const modal = document.getElementById('addUnitModal');
+    if (modal) modal.style.display = 'block';
 }
 
 function closeAddUnitModal() {
-    document.getElementById('addUnitModal').style.display = 'none';
+    const modal = document.getElementById('addUnitModal');
+    if (modal) modal.style.display = 'none';
 }
 
 // --- مودال بيع الوحدة ---
@@ -58,65 +63,73 @@ function openSellUnitModal(button) {
     const projectName = button.dataset.projectName;
     const price = button.dataset.price;
 
+    const modal = document.getElementById('sellUnitModal');
+    if (!modal) return;
+
     document.getElementById('sale_unit_id').value = unitId;
     document.getElementById('sale_unit_name').innerText = unitName;
     document.getElementById('sale_project_name').innerText = projectName;
     document.getElementById('sale_total_price').value = price;
 
-    const today = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
-    document.querySelector('input[name="sale_date"]').value = today;
+    const today = new Date().toISOString().split('T')[0];
+    const saleDateInput = document.querySelector('input[name="sale_date"]');
+    if (saleDateInput) saleDateInput.value = today;
 
-    document.getElementById('sellUnitModal').style.display = 'flex';
+    modal.style.display = 'flex';
 }
 
 function closeSellUnitModal() {
-    document.getElementById('sellUnitModal').style.display = 'none';
+    const modal = document.getElementById('sellUnitModal');
+    if (modal) modal.style.display = 'none';
 }
 
 // --- مودال إضافة عميل ---
 function openAddClientModal() {
-    document.getElementById('addClientModal').style.display = 'flex';
+    const modal = document.getElementById('addClientModal');
+    if (modal) modal.style.display = 'flex';
 }
 
 function closeAddClientModal() {
-    document.getElementById('addClientModal').style.display = 'none';
+    const modal = document.getElementById('addClientModal');
+    if (modal) modal.style.display = 'none';
 }
 
 // --- مودال إضافة مستخدم جديد ---
 function openAddUserModal() {
-    document.getElementById('addUserModal').style.display = 'flex';
+    const modal = document.getElementById('addUserModal');
+    if (modal) modal.style.display = 'flex';
 }
 
 function closeAddUserModal() {
-    document.getElementById('addUserModal').style.display = 'none';
+    const modal = document.getElementById('addUserModal');
+    if (modal) modal.style.display = 'none';
 }
 
 // --- مودال الدفعات المالية ---
 function togglePaymentModal() {
     const modal = document.getElementById('paymentModal');
-    modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    if (modal) modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
 }
 
+// --- مودال تعديل المستخدم ---
+function openEditModal(el) {
+    const modal = document.getElementById('editUserModal');
+    if (!modal) return;
 
-document.addEventListener('DOMContentLoaded', () => {
-    const sidebar = document.querySelector('.sidebar');
-    const toggle = document.querySelector('.menu-toggle');
+    modal.style.display = 'flex';
 
-    if (!sidebar || !toggle) return;
+    document.getElementById('editName').value = el.dataset.name;
+    document.getElementById('editEmail').value = el.dataset.email;
+    document.getElementById('editRole').value = el.dataset.role;
 
-    toggle.addEventListener('click', (e) => {
-        if (window.innerWidth <= 768) {
-            e.stopPropagation();
-            sidebar.classList.toggle('mobile-open');
-        }
-    });
+    const form = document.getElementById('editUserForm');
+    if (form) form.action = `/users/${el.dataset.id}`;
+}
 
-    document.addEventListener('click', () => {
-        sidebar.classList.remove('mobile-open');
-    });
-});
-
-
+function closeEditModal() {
+    const modal = document.getElementById('editUserModal');
+    if (modal) modal.style.display = 'none';
+}
 
 // ============================
 // استيراد Excel
@@ -124,8 +137,8 @@ document.addEventListener('DOMContentLoaded', () => {
 function submitImport() {
     const fileInput = document.getElementById('importInput');
     const btn = document.querySelector('.btn-accent-custom');
-    
-    if (fileInput.files.length > 0) {
+
+    if (fileInput && fileInput.files.length > 0 && btn) {
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...';
         document.getElementById('importForm').submit();
@@ -135,18 +148,19 @@ function submitImport() {
 function submitSoldImport() {
     const fileInput = document.getElementById('importSoldInput');
     const btn = document.querySelector('.soldInputBtn');
-    
-    if (fileInput.files.length > 0) {
+
+    if (fileInput && fileInput.files.length > 0 && btn) {
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...';
         document.getElementById('soldForm').submit();
     }
 }
+
 function submitImport2() {
     const fileInput = document.getElementById('importInput2');
     const btn = document.querySelector('.btn-accent-custom');
-    
-    if (fileInput.files.length > 0) {
+
+    if (fileInput && fileInput.files.length > 0 && btn) {
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...';
         document.getElementById('importForm2').submit();
@@ -156,8 +170,8 @@ function submitImport2() {
 function submitImport3() {
     const fileInput = document.getElementById('importInput3');
     const btn = document.querySelector('.btn-accent-custom');
-    
-    if (fileInput.files.length > 0) {
+
+    if (fileInput && fileInput.files.length > 0 && btn) {
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...';
         document.getElementById('importForm3').submit();
@@ -169,28 +183,20 @@ function submitImport3() {
 // ============================
 window.addEventListener('click', function(event) {
     const modals = [
-        'addProjectModal', 'sellUnitModal', 'addCompanyModal',
-        'addUnitModal', 'addClientModal', 'addUserModal', 'paymentModal'
+        { id: 'addProjectModal', close: closeAddProjectModal },
+        { id: 'sellUnitModal', close: closeSellUnitModal },
+        { id: 'addCompanyModal', close: closeAddCompanyModal },
+        { id: 'addUnitModal', close: closeAddUnitModal },
+        { id: 'addClientModal', close: closeAddClientModal },
+        { id: 'addUserModal', close: closeAddUserModal },
+        { id: 'editUserModal', close: closeEditModal },
+        { id: 'paymentModal', close: togglePaymentModal }
     ];
 
-    modals.forEach(id => {
+    modals.forEach(({ id, close }) => {
         const modal = document.getElementById(id);
         if (event.target === modal) {
-            if (id === 'paymentModal') {
-                togglePaymentModal();
-            } else if (id === 'sellUnitModal') {
-                closeSellUnitModal();
-            } else if (id === 'addUnitModal') {
-                closeAddUnitModal();
-            } else if (id === 'addProjectModal') {
-                closeAddProjectModal();
-            } else if (id === 'addCompanyModal') {
-                closeAddCompanyModal();
-            } else if (id === 'addClientModal') {
-                closeAddClientModal();
-            } else if (id === 'addUserModal') {
-                closeAddUserModal();
-            }
+            close();
         }
     });
 });
@@ -198,38 +204,27 @@ window.addEventListener('click', function(event) {
 // ============================
 // Event Listeners للأزرار
 // ============================
-document.getElementById('openUserModal')?.addEventListener('click', openAddUserModal);
-
-// بيع الوحدة (كل الأزرار)
-document.querySelectorAll('.btn-sell').forEach(btn => {
-    btn.addEventListener('click', function() { openSellUnitModal(this); });
-});
-
-// نموذج بيع الوحدة
-document.getElementById('sellUnitForm')?.addEventListener('submit', function() {
-    closeSellUnitModal();
-});
-
-// نموذج إضافة مشروع
-document.getElementById('projectForm')?.addEventListener('submit', function() {
-    closeAddProjectModal();
-});
-
-// ============================
-// Select2 (بحث داخل الـ select) لو موجود
-// ============================
-
-
-
 document.addEventListener('DOMContentLoaded', function() {
-    if (typeof $ !== 'undefined' && $.fn.select2) {
-        // كل العناصر التي تحمل class "searchable-select" سيتم تحويلها لـ Select2
-        $('.searchable-select').select2({
-            width: '100%',
-            dir: 'rtl' // لتغيير اتجاه القائمة للعربي
-        });
-    }
+    // فتح مودال المستخدم
+    const openUserBtn = document.getElementById('openUserModal');
+    if (openUserBtn) openUserBtn.addEventListener('click', openAddUserModal);
+
+    // بيع الوحدة
+    document.querySelectorAll('.btn-sell').forEach(btn => {
+        btn.addEventListener('click', function() { openSellUnitModal(this); });
+    });
+
+    // إغلاق المودالات عند الإرسال
+    const sellForm = document.getElementById('sellUnitForm');
+    if (sellForm) sellForm.addEventListener('submit', closeSellUnitModal);
+
+    const projectForm = document.getElementById('projectForm');
+    if (projectForm) projectForm.addEventListener('submit', closeAddProjectModal);
 });
+
+// ============================
+// Select2 (بحث داخل الـ select)
+// ============================
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof $ !== 'undefined' && $.fn.select2) {
         $('.searchable-select').select2({
@@ -250,8 +245,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('.select2-search__field').placeholder = 'ابحث عن مشتري...';
         });
 
-        
-
         $('.searchable-select3').select2({
             width: '100%',
             dir: 'rtl',
@@ -259,6 +252,12 @@ document.addEventListener('DOMContentLoaded', function() {
             dropdownParent: $('#sellUnitModal')
         }).on('select2:open', function () {
             document.querySelector('.select2-search__field').placeholder = 'ابحث عن مسوق...';
+        });
+
+        $('.searchable-select4').select2({
+            width: '100%',
+            dir: 'rtl',
+            allowClear: false
         });
 
         $('.searchable-select5').select2({
@@ -269,7 +268,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }).on('select2:open', function () {
             document.querySelector('.select2-search__field').placeholder = 'ابحث عن مستثمر...';
         });
-
     }
 });
 
@@ -280,63 +278,180 @@ document.addEventListener('DOMContentLoaded', function() {
     const dropdownBtn = document.getElementById('dropdown-btn');
     const dropdownContent = document.getElementById('dropdown-content');
 
-    dropdownBtn?.addEventListener('mouseenter', function() {
-        dropdownContent.style.display = 'block';
+    if (dropdownBtn && dropdownContent) {
+        dropdownBtn.addEventListener('mouseenter', function() {
+            dropdownContent.style.display = 'block';
+        });
+
+        dropdownBtn.addEventListener('mouseleave', function() {
+            setTimeout(() => {
+                if (!dropdownContent.matches(':hover') && !dropdownBtn.matches(':hover')) {
+                    dropdownContent.style.display = 'none';
+                }
+            }, 100);
+        });
+    }
+});
+
+// ============================
+// إدارة القائمة الجانبية على الهواتف الذكية
+// ============================
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.querySelector('.sidebar');
+    const toggle = document.querySelector('.menu-toggle');
+
+    if (!sidebar || !toggle) return;
+
+    // تبديل القائمة عند النقر على الزر
+    toggle.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+            e.stopPropagation();
+            sidebar.classList.toggle('mobile-open');
+        }
     });
 
-    dropdownBtn?.addEventListener('mouseleave', function() {
-        setTimeout(() => {
-            if (!dropdownContent.matches(':hover') && !dropdownBtn.matches(':hover')) {
-                dropdownContent.style.display = 'none';
+    // إغلاق القائمة عند النقر خارجها
+    document.addEventListener('click', () => {
+        sidebar.classList.remove('mobile-open');
+    });
+
+    // إضافة حدث النقر على الشعار لتبديل القائمة
+    const logo = sidebar.querySelector('.logo');
+    if (logo && window.innerWidth <= 768) {
+        logo.style.cursor = 'pointer';
+        logo.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sidebar.classList.toggle('mobile-open');
+        });
+    }
+
+    // إغلاق القائمة عند النقر على أي رابط
+    const navLinks = sidebar.querySelectorAll('.nav-links a, .nav-links .dropdown-btn');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768 && !this.classList.contains('dropdown-btn')) {
+                setTimeout(() => {
+                    sidebar.classList.remove('mobile-open');
+                }, 200);
             }
-        }, 100);
+        });
+    });
+
+    // معالجة تغيير حجم النافذة
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('mobile-open');
+            }
+        }, 250);
     });
 });
 
+// ============================
+// تبديل الوضع الليلي
+// ============================
+function toggleTheme() {
+    const html = document.documentElement;
+    const icon = document.getElementById('theme-icon');
+    if (!icon) return;
 
-// مودل اضافة المستخدمين والتعديل
-document.addEventListener('DOMContentLoaded', () => {
-    const addUserModal = document.getElementById('addUserModal');
-    const openBtn = document.getElementById('openUserModal');
-
-    if (!addUserModal || !openBtn) return;
-
-    openBtn.addEventListener('click', () => {
-        addUserModal.style.display = 'flex';
-    });
-});
-
-
-function openEditModal(el) {
-    document.getElementById('editUserModal').style.display = 'flex';
-
-    document.getElementById('editName').value  = el.dataset.name;
-    document.getElementById('editEmail').value = el.dataset.email;
-    document.getElementById('editRole').value  = el.dataset.role;
-
-    document.getElementById('editUserForm').action =
-        `/users/${el.dataset.id}`;
-}
-
-function closeEditModal() {
-    document.getElementById('editUserModal').style.display = 'none';
-}
-
-
-// مودل الدفعات
-
-function toggleModal() {
-    const modal = document.getElementById('paymentModal');
-    modal.style.display = (modal.style.display === 'none' || modal.style.display === '') ? 'flex' : 'none';
-}
-
-window.onclick = function(event) {
-    const modal = document.getElementById('paymentModal');
-    // إذا كان الهدف المضغطوط عليه هو الـ Overlay نفسه وليس المحتوى الداخلي
-    if (event.target == modal) {
-        toggleModal();
+    if (html.getAttribute('data-theme') === 'dark') {
+        html.removeAttribute('data-theme');
+        icon.className = 'fa-solid fa-moon';
+        localStorage.setItem('theme', 'light');
+    } else {
+        html.setAttribute('data-theme', 'dark');
+        icon.className = 'fa-solid fa-sun';
+        localStorage.setItem('theme', 'dark');
     }
 }
+
+// تطبيق الثيم المحفوظ
+if (localStorage.getItem('theme') === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.className = 'fa-solid fa-sun';
+}
+
+// ============================
+// فتح القائمة المنسدلة للشركات
+// ============================
+function toggleDropdown(event) {
+    event.preventDefault();
+    const btn = event.currentTarget;
+    const menu = document.getElementById('company-menu');
+    if (menu) {
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        btn.classList.toggle('active');
+    }
+}
+
+// ============================
+// تحسين الـ Dropdown على الهواتف
+// ============================
+function toggleDropdownMobile() {
+    const dropdownBtn = event.currentTarget;
+    const dropdownContent = dropdownBtn.nextElementSibling;
+
+    if (dropdownContent && dropdownContent.classList.contains('dropdown-content')) {
+        if (dropdownContent.style.display === 'none') {
+            dropdownContent.style.display = 'block';
+            dropdownBtn.classList.add('active');
+        } else {
+            dropdownContent.style.display = 'none';
+            dropdownBtn.classList.remove('active');
+        }
+    }
+}
+
+// ============================
+// تحديد نوع العميل في صفحة بيع الوحدة
+// ============================
+document.addEventListener('DOMContentLoaded', function() {
+    const customerTypeSelect = document.querySelector('select[name="customerType"]');
+    if (!customerTypeSelect) return;
+
+    customerTypeSelect.addEventListener('change', function() {
+        const investorSelect = document.querySelector('#investor');
+        const marketerSelect = document.querySelector('#customer');
+
+        if (this.value === 'investor') {
+            if (investorSelect) investorSelect.style.display = 'flex';
+            if (marketerSelect) marketerSelect.style.display = 'none';
+        } else {
+            if (investorSelect) investorSelect.style.display = 'none';
+            if (marketerSelect) marketerSelect.style.display = 'flex';
+        }
+    });
+
+    // Initialize the form
+    const event = new Event('change');
+    customerTypeSelect.dispatchEvent(event);
+});
+
+// ============================
+// تحديث السعر الإجمالي عند الخصم
+// ============================
+document.addEventListener('DOMContentLoaded', function() {
+    const unitPriceInput = document.getElementById('unit_price');
+    const discountInput = document.getElementById('discount');
+    const totalPriceInput = document.getElementById('total_price');
+
+    if (!unitPriceInput || !discountInput || !totalPriceInput) return;
+
+    function calculateFinalPrice() {
+        const unitPrice = parseFloat(unitPriceInput.value) || 0;
+        const discount = parseFloat(discountInput.value) || 0;
+        const totalPrice = Math.max(unitPrice - discount, 0);
+        totalPriceInput.value = totalPrice.toFixed(2);
+    }
+
+    unitPriceInput.addEventListener('input', calculateFinalPrice);
+    discountInput.addEventListener('input', calculateFinalPrice);
+    window.addEventListener('load', calculateFinalPrice);
+});
 
 // ============================
 // الرسوم البيانية - ApexCharts
@@ -362,13 +477,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     title: { text: 'اليوم' }
                 },
                 yaxis: {
-                    title: { text: 'المبيعات (ريال)', colors: '#fff' }
+                    title: { text: 'المبيعات (ريال)' }
                 },
                 tooltip: {
-                    y: { formatter: function (val) { return new Intl.NumberFormat().format(val) + ' ريال'; } },
-                    style: {
-                        color: '#003d82'
-                    }
+                    y: { formatter: function (val) { return new Intl.NumberFormat().format(val) + ' ريال'; } }
                 },
                 dataLabels: { enabled: false },
                 fill: { opacity: 0.3 }
@@ -406,221 +518,260 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-
-
-
-
-
-        
-
 // ============================
-// إدارة القائمة الجانبية على الهواتف الذكية
+// إدارة بيع الوحدات - إضافة وإزالة المشترين
 // ============================
-
-// تفعيل/إخفاء القائمة الجانبية على الشاشات الصغيرة
-
+let buyerIndex = 1;
 
 document.addEventListener('DOMContentLoaded', function() {
-    const sidebar = document.querySelector('.sidebar');
-    
-    if (sidebar) {
-        // إضافة حدث النقر على الشعار لتبديل القائمة
-        const logo = sidebar.querySelector('.logo');
-        if (logo && window.innerWidth <= 768) {
-            logo.style.cursor = 'pointer';
-            logo.addEventListener('click', function(e) {
+    const addBuyerBtn = document.getElementById('add-buyer-btn');
+    if (addBuyerBtn) {
+        addBuyerBtn.addEventListener('click', addBuyer);
+    }
 
-                logo.addEventListener('click', (e) => {
-                    console.log('LOGO CLICKED');
-                    if (window.innerWidth <= 768) {
-                        e.stopPropagation();
-                        sidebar.classList.toggle('mobile-open');
-                    }
-                });
-                // تجنب الانتشار إذا كنا على سطح المكتب
-                if (window.innerWidth <= 768) {
-                    e.stopPropagation();
-                    sidebar.classList.toggle('mobile-open');
-                }
-            });
+    // تهيئة أحداث الخصم والسعر الأساسي
+    const discountInput = document.getElementById('discount');
+    const unitPriceInput = document.getElementById('unit_price');
+
+    if (discountInput) {
+        discountInput.addEventListener('input', calculateTotalPrice);
+    }
+    if (unitPriceInput) {
+        unitPriceInput.addEventListener('input', calculateTotalPrice);
+    }
+
+    // تهيئة Select2 للمشتري الأول
+    const firstBuyerRow = document.querySelector('.buyer-row');
+    if (firstBuyerRow) {
+        initializeSelect2(firstBuyerRow);
+    }
+
+    // معالجة تغيير نوع المشتري
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('customer-type-select')) {
+            handleCustomerTypeChange(e.target);
         }
-        
-        // إغلاق القائمة عند النقر على أي رابط
-        const navLinks = sidebar.querySelectorAll('.nav-links a, .nav-links .dropdown-btn');
-        navLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                if (window.innerWidth <= 768) {
-                    // لا تغلق القائمة الفرعية (dropdowns)
-                    if (!this.classList.contains('dropdown-btn')) {
-                        setTimeout(() => {
-                            sidebar.classList.remove('mobile-open');
-                        }, 200);
-                    }
-                }
-            });
+    });
+
+    // معالجة تغيير النسب المئوية
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('percentage-input')) {
+            calculateTotalPercentage();
+            calculateSaleValues();
+        }
+    });
+
+    // التحقق من النسب عند الإرسال
+    const sellForm = document.getElementById('sellUnitForm');
+    if (sellForm) {
+        sellForm.addEventListener('submit', function(e) {
+            const totalPercentage = calculateTotalPercentage();
+            if (totalPercentage !== 100) {
+                e.preventDefault();
+                alert('يجب أن تكون إجمالي النسب 100%');
+                return;
+            }
         });
     }
-    
-    // معالجة تغيير حجم النافذة
-    let resizeTimer;
-    window.addEventListener('resize', function() {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function() {
-            const sidebar = document.querySelector('.sidebar');
-            if (sidebar && window.innerWidth > 768) {
-                // إزالة الحالة على الشاشات الكبيرة
-                sidebar.classList.remove('mobile-open');
-            }
-        }, 250);
-    });
+
+    // تهيئة التاريخ والحسابات
+    const saleDateInput = document.getElementById('sale_date');
+    if (saleDateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        saleDateInput.value = today;
+    }
+
+    calculateTotalPrice();
+    updateRemoveButtons();
 });
 
+function addBuyer() {
+    const container = document.getElementById('buyers-container');
+ 
+    if (!container) return;
 
+    const newRow = document.createElement('div');
+    newRow.className = 'buyer-row';
+    newRow.setAttribute('data-index', buyerIndex);
 
-document.addEventListener('DOMContentLoaded', () => {
-    const sidebar = document.querySelector('.sidebar');
-    const toggle = document.querySelector('.menu-toggle');
+    // إنشاء خيارات العملاء
+    let buyerOptions = '<option value="">اختر عميل</option>';
+    if (typeof buyer !== 'undefined' && Array.isArray(buyer)) {
+        buyer.forEach(b => {
+            buyerOptions += `<option value="${b.id}">${b.name}</option>`;
+        });
+    }
 
-    if (!sidebar || !toggle) return;
+    // إنشاء خيارات المستثمرين
+    let investorOptions = '<option value="">اختر مستثمر</option>';
+    if (typeof investor !== 'undefined' && Array.isArray(investor)) {
+        investor.forEach(i => {
+            investorOptions += `<option value="${i.id}">${i.name}</option>`;
+        });
+    }
 
-    toggle.addEventListener('click', (e) => {
-        if (window.innerWidth <= 768) {
-            e.stopPropagation();
-            sidebar.classList.toggle('mobile-open');
+    newRow.innerHTML = `
+        <h4>المشتري ${buyerIndex + 1}</h4>
+        <div class="form-group">
+            <label><i class="fas fa-user-tag"></i> نوع المشتري</label>
+            <select name="customers[${buyerIndex}][type]" class="customer-type-select" required>
+                <option value="customer">مشتري مباشر</option>
+                <option value="investor">مستثمر</option>
+            </select>
+        </div>
+
+        <div class="form-group buyer-select" id="buyer-customer-${buyerIndex}">
+            <label><i class="fas fa-user"></i> العميل</label>
+            <select name="customers[${buyerIndex}][id]" class="searchable-select2">
+                ${buyerOptions}
+            </select>
+        </div>
+
+        <div class="form-group buyer-select" id="buyer-investor-${buyerIndex}" style="display: none;">
+            <label><i class="fas fa-hand-holding-usd"></i> المستثمر</label>
+            <select class="searchable-select5">
+                ${investorOptions}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-percentage"></i> نسبة البيع (%)</label>
+            <input type="number" name="customers[${buyerIndex}][share]" class="percentage-input" min="0" max="100" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-dollar-sign"></i> قيمة البيع</label>
+            <input type="number" class="sale-value-input" readonly>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-money-bill-wave"></i> المبلغ المدفوع</label>
+            <input type="number" name="customers[${buyerIndex}][amount_paid]" min="0" step="0.01">
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-file-contract"></i> رقم العقد</label>
+            <input type="text" name="customers[${buyerIndex}][contract_number]">
+        </div>
+
+        <button type="button" class="btn-remove-buyer" onclick="removeBuyer(this)">إزالة هذا المشتري</button>
+    `;
+
+    container.appendChild(newRow);
+    buyerIndex++;
+
+    updateRemoveButtons();
+    initializeSelect2(newRow);
+
+    // تشغيل حدث change على select نوع المشتري لتحديث العرض
+    const typeSelect = newRow.querySelector('.customer-type-select');
+    if (typeSelect) {
+        const event = new Event('change');
+        typeSelect.dispatchEvent(event);
+    }
+}
+
+function removeBuyer(button) {
+    const row = button.closest('.buyer-row');
+    if (row) {
+        row.remove();
+        updateRemoveButtons();
+        calculateTotalPercentage();
+        calculateSaleValues();
+        buyerIndex--;
+    }
+}
+
+function updateRemoveButtons() {
+    const rows = document.querySelectorAll('.buyer-row');
+    rows.forEach((row) => {
+        const removeBtn = row.querySelector('.btn-remove-buyer');
+        if (removeBtn) {
+            removeBtn.style.display = rows.length > 1 ? 'block' : 'none';
         }
     });
-});
-// تحسين الـ Dropdown على الهواتف
-function toggleDropdown() {
-    const dropdownBtn = event.currentTarget;
-    const dropdownContent = dropdownBtn.nextElementSibling;
-    
-    if (dropdownContent && dropdownContent.classList.contains('dropdown-content')) {
-        if (dropdownContent.style.display === 'none') {
-            dropdownContent.style.display = 'block';
-            dropdownBtn.classList.add('active');
-        } else {
-            dropdownContent.style.display = 'none';
-            dropdownBtn.classList.remove('active');
+}
+
+function calculateTotalPercentage() {
+    let total = 0;
+    document.querySelectorAll('.percentage-input').forEach(input => {
+        total += parseFloat(input.value) || 0;
+    });
+    const totalPercentageEl = document.getElementById('total-percentage');
+    if (totalPercentageEl) {
+        totalPercentageEl.textContent = total.toFixed(2);
+    }
+    return total;
+}
+
+function calculateSaleValues() {
+    const totalPrice = parseFloat(document.getElementById('total_price')?.value) || 0;
+    document.querySelectorAll('.buyer-row').forEach(row => {
+        const percentage = parseFloat(row.querySelector('.percentage-input')?.value) || 0;
+        const saleValue = (totalPrice * percentage) / 100;
+        const saleValueInput = row.querySelector('.sale-value-input');
+        if (saleValueInput) {
+            saleValueInput.value = saleValue.toFixed(2);
+        }
+    });
+}
+
+function calculateTotalPrice() {
+    const unitPrice = parseFloat(document.getElementById('unit_price')?.value) || 0;
+    const discount = parseFloat(document.getElementById('discount')?.value) || 0;
+    const totalPrice = Math.max(unitPrice - discount, 0);
+    const totalPriceInput = document.getElementById('total_price');
+    if (totalPriceInput) {
+        totalPriceInput.value = totalPrice.toFixed(2);
+        calculateSaleValues();
+    }
+}
+
+function handleCustomerTypeChange(selectElement) {
+    const row = selectElement.closest('.buyer-row');
+    if (!row) return;
+
+    const index = row.getAttribute('data-index');
+    const customerDiv = document.getElementById(`buyer-customer-${index}`);
+    const investorDiv = document.getElementById(`buyer-investor-${index}`);
+    const customerSelect = customerDiv ? customerDiv.querySelector('select') : null;
+    const investorSelect = investorDiv ? investorDiv.querySelector('select') : null;
+
+    if (selectElement.value === 'investor') {
+        if (customerDiv) customerDiv.style.display = 'none';
+        if (investorDiv) investorDiv.style.display = 'flex';
+        // إزالة name attribute من select العملاء وإضافته للمستثمرين
+        if (customerSelect) {
+            customerSelect.removeAttribute('name');
+            customerSelect.value = '';
+        }
+        if (investorSelect) {
+            investorSelect.setAttribute('name', `customers[${index}][id]`);
+        }
+    } else {
+        if (customerDiv) customerDiv.style.display = 'flex';
+        if (investorDiv) investorDiv.style.display = 'none';
+        // إزالة name attribute من select المستثمرين وإضافته للعملاء
+        if (investorSelect) {
+            investorSelect.removeAttribute('name');
+            investorSelect.value = '';
+        }
+        if (customerSelect) {
+            customerSelect.setAttribute('name', `customers[${index}][id]`);
         }
     }
 }
 
-// تبديل الوضع الليلي
-        function toggleTheme() {
-            const html = document.documentElement;
-            const icon = document.getElementById('theme-icon');
-            if (html.getAttribute('data-theme') === 'dark') {
-                html.removeAttribute('data-theme');
-                icon.className = 'fa-solid fa-moon';
-                localStorage.setItem('theme', 'light');
-            } else {
-                html.setAttribute('data-theme', 'dark');
-                icon.className = 'fa-solid fa-sun';
-                localStorage.setItem('theme', 'dark');
-            }
-        }
-
-        // حفظ الاختيار
-        if (localStorage.getItem('theme') === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            document.getElementById('theme-icon').className = 'fa-solid fa-sun';
-        }
-
-        // فتح القائمة المنسدلة
-        function toggleDropdown(event) {
-            event.preventDefault();
-            const btn = event.currentTarget;
-            const menu = document.getElementById('company-menu');
-            if (menu) {
-                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-                btn.classList.toggle('active');
-            }
-        }
-
-
-       
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            const menu = document.getElementById('menu');
-            if (!menu) return;
-        
-            menu.addEventListener('click', function() {
-                this.classList.toggle('open');
+function initializeSelect2(container) {
+    // إعادة تهيئة Select2 للعناصر الجديدة إذا كانت مكتبة Select2 محملة
+    if (typeof $ !== 'undefined' && $.fn.select2) {
+        const selects = container.querySelectorAll('.searchable-select2, .searchable-select5');
+        selects.forEach(select => {
+            $(select).select2({
+                width: '100%',
+                dir: 'rtl'
             });
         });
+    }
+}
 
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const sidebar = document.querySelector('.sidebar');
-            const toggle = document.querySelector('.menu-toggle');
-        
-            if (!sidebar || !toggle) return;
-        
-            toggle.addEventListener('click', (e) => {
-                if (window.innerWidth <= 768) {
-                    e.stopPropagation();
-                    sidebar.classList.toggle('mobile-open');
-                }
-            });
-        
-            document.addEventListener('click', () => {
-                sidebar.classList.remove('mobile-open');
-            });
-        });
-        
-
-        $(document).ready(function() {
-            $('.searchable-select4').select2({
-                // placeholder: "اختر المشروع",
-                allowClear: false,
-                width: '100%'
-            });
-        });
-
-
-        // تحديد نوع العميل في صفحة بيع الوحدة 
-        document.querySelector('select[name="customerType"]').addEventListener('change', function() {
-            const investorSelect = document.querySelector('#investor');
-            const marketerSelect = document.querySelector('#customer');
-            
-            if (this.value === 'investor') {
-                investorSelect.style.display = 'flex';
-                marketerSelect.style.display = 'none';
-            } else {
-                investorSelect.style.display = 'none';
-                marketerSelect.style.display = 'flex';
-            }
-        });
-
-        // Initialize the form with the correct visibility
-        document.addEventListener('DOMContentLoaded', function() {
-            const event = new Event('change');
-            document.querySelector('select[name="customerType"]').dispatchEvent(event);
-        });
-
-        const today = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
-        document.querySelector('input[name="sale_date"]').value = today;
-
-        // تحديث السعر الاجمالي عند الخصم
-
-            const unitPriceInput = document.getElementById('unit_price');
-            const discountInput = document.getElementById('discount');
-            const totalPriceInput = document.getElementById('total_price');
-
-            function calculateFinalPrice() {
-                const unitPrice = parseFloat(unitPriceInput.value) || 0;
-                const discount = parseFloat(discountInput.value) || 0;
-                const totalPrice = Math.max(unitPrice - discount, 0);
-                totalPriceInput.value = totalPrice.toFixed(2);
-            }
-
-            discountInput.addEventListener('input', calculateFinalPrice);
-            window.addEventListener('load', calculateFinalPrice);
-
-
-          
-
-
-
-        

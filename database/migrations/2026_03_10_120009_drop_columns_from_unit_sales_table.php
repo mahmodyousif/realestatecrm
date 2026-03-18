@@ -12,7 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('unit_sales', function (Blueprint $table) {
-            $table->string('contract_number', '55')->unique();
+
+         $table->dropForeign(['buyer_id']); 
+         $table->dropForeign(['investor_id']);
+            $table->dropColumn('buyer_id');
+            $table->dropColumn('investor_id');
         });
     }
 

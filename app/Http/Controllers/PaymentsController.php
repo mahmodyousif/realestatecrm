@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use PDO;
 use App\Models\Unit;
 use App\Models\Payment;
 use App\Models\Customer;
-use Carbon\Carbon;
-
 use App\Models\UnitSale;
+use App\Models\UnitSaleCustomer;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PaymentCustomerExport;
 
 class PaymentsController extends Controller
 {
+    // ───────────────────────────────────────────────
     // صفحة عرض الدفعات والتقارير المالية
-    public function index(Request $request) {
+    // ───────────────────────────────────────────────
+    public function index(Request $request)
+    {
         $from = $request->filled('from')
             ? Carbon::parse($request->from)->startOfDay()
             : null;
@@ -25,87 +27,158 @@ class PaymentsController extends Controller
             ? Carbon::parse($request->to)->endOfDay()
             : null;
 
+        // ── جلب عمليات البيع مع البيانات المرتبطة ──
+        $unitSales = UnitSale::with([
+            'saleCustomers.customer',
+            'saleCustomers.payments',
+            'marketer',
+            'unit.project',
+        ])
+        // ✅ إصلاح: استخدام sale_date بدلاً من created_at ليتطابق مع فلتر الإجماليات
+        ->when($from, fn($q) => $q->where('sale_date', '>=', $from))
+        ->when($to,   fn($q) => $q->where('sale_date', '<=', $to))
+        ->latest('sale_date')
+        ->get();
 
+        // ✅ إصلاح: استبدال foreach اليدوي بـ flatMap — أبسط وبدون queries إضافية
+        $saleCustomers = $unitSales->flatMap->saleCustomers;
 
-        $unitSales = UnitSale::with(['buyer', 'unit.project', 'payments'])
-                            ->when($from, fn ($q) => $q->where('created_at', '>=', $from))
-                            ->when($to, fn ($q) => $q->where('created_at', '<=', $to))
-                             ->latest()
-                             ->get();
+        // ── الوحدات المحجوزة التي لها بيع (للمتابعة) ──
+        $remainingUnits = Unit::with([
+            'unitSale' => fn($q) => $q->with(['saleCustomers.customer', 'saleCustomers.payments']),
+        ])
+        ->where('status', 'reserved')
+        ->orWhere('status', 'partially_paid')   // ✅ إضافة: تشمل partially_paid أيضاً
+        ->has('unitSale')
+        ->get();
 
-        $remainingUnits = Unit::with(['unitSale.buyer'])->where('status','reserved')->has('unitSale')->get() ; 
+        // ── الإجماليات (نفس فلتر sale_date) ──
+        $totalPrice = UnitSale::when($from, fn($q) => $q->where('sale_date', '>=', $from))
+            ->when($to,   fn($q) => $q->where('sale_date', '<=', $to))
+            ->sum('total_price');
 
-        // إجمالي المبيعات
-        $totalPrice = UnitSale::when($from, fn ($q) => $q->where('sale_date', '>=', $from))
-        ->when($to, fn ($q) => $q->where('sale_date', '<=', $to))
-        ->sum('total_price') ;
-        // إجمالي المدفوعات من جدول payments
-        $totalPaid = Payment
-        ::when($from, fn ($q) => $q->where('created_at', '>=', $from))
-        ->when($to, fn ($q) => $q->where('created_at', '<=', $to))
-        ->sum('amount_paid');
+        $totalPaid = Payment::when($from, fn($q) => $q->where('payment_date', '>=', $from))
+            ->when($to,   fn($q) => $q->where('payment_date', '<=', $to))
+            ->sum('amount_paid');
 
-        // المتبقي
         $remaining = $totalPrice - $totalPaid;
 
-        return view('payments.index', compact('unitSales' , 'remainingUnits', 'totalPrice', 'totalPaid', 'remaining'));
+        return view('payments.index', compact(
+            'unitSales',
+            'saleCustomers',
+            'remainingUnits',
+            'totalPrice',
+            'totalPaid',
+            'remaining'
+        ));
     }
 
+    // ───────────────────────────────────────────────
     // تسجيل دفعة جديدة
-    public function store(Request $request) {
+    // ───────────────────────────────────────────────
+    public function store(Request $request)
+    {
         $validated = $request->validate([
-            'unit_sale_id'    => 'required|exists:unit_sales,id',
-            'amount_paid'     => 'required|numeric|min:1',
-            'payment_date'    => 'required|date',
-            'payment_method'  => 'required|string',
-            'reference_number' => 'required|numeric|min:1' ,
-            'notes'           => 'nullable|string',
+            'unit_sale_customer_id' => 'required|exists:unit_sale_customers,id',
+            'amount_paid'           => 'required|numeric|min:1',
+            'payment_date'          => 'required|date',
+            'payment_method'        => 'required|string',
+            'reference_number'      => 'nullable|string',
+            'notes'                 => 'nullable|string',
         ]);
 
-        // إنشاء الدفعة في جدول payments
-        $payment = Payment::create([
-            'unit_sale_id'    => $validated['unit_sale_id'],
-            'amount_paid'     => $validated['amount_paid'],
-            'payment_date'    => $validated['payment_date'],
-            'payment_method'  => $validated['payment_method'],
-            'reference_number'=> $validated['reference_number'] ,
-            'notes'           => $validated['notes'] ?? null,
+        $saleCustomer = UnitSaleCustomer::findOrFail($validated['unit_sale_customer_id']);
+
+        // ✅ إصلاح: التحقق من أن الدفعة لا تتجاوز حصة الشريك
+        $alreadyPaid = $saleCustomer->payments()->sum('amount_paid');
+        $remaining   = $saleCustomer->share_amount - $alreadyPaid;
+
+        if ($validated['amount_paid'] > $remaining) {
+            return back()->with(
+                'error',
+                'المبلغ المدفوع (' . number_format($validated['amount_paid']) . ') يتجاوز المتبقي على هذا الشريك (' . number_format($remaining) . ')'
+            );
+        }
+
+        // ── إنشاء الدفعة ──
+        Payment::create([
+            'unit_sale_customer_id' => $validated['unit_sale_customer_id'],
+            'amount_paid'           => $validated['amount_paid'],
+            'payment_date'          => $validated['payment_date'],
+            'payment_method'        => $validated['payment_method'],
+            'reference_number'      => $validated['reference_number'] ?? null,
+            'notes'                 => $validated['notes'] ?? null,
         ]);
 
-        // تحديث حالة الوحدة بعد الدفعة
-        $unitSale = UnitSale::find($validated['unit_sale_id']);
-        $totalPaid = $unitSale->payments()->sum('amount_paid');
+        // ── تحديث حالة الوحدة بناءً على جميع الشركاء ──
+        $unitSale        = $saleCustomer->unitSale;
+        $unit            = $unitSale->unit;
+        $allSaleCustomers = $unitSale->saleCustomers;
 
-        $unit = $unitSale->unit;
-        if ($totalPaid >= $unitSale->total_price) {
+        $totalPaidAll  = 0;
+        $totalShareAll = 0;
+        $allFullyPaid  = true;
+
+        foreach ($allSaleCustomers as $sc) {
+            $paid           = $sc->payments()->sum('amount_paid');
+            $totalPaidAll  += $paid;
+            $totalShareAll += $sc->share_amount;
+
+            if ($paid < $sc->share_amount) {
+                $allFullyPaid = false;
+            }
+        }
+
+        // ✅ إصلاح: ثلاث حالات بدلاً من اثنتين
+        if ($allFullyPaid) {
             $unit->status = 'sold';
+        } elseif ($totalPaidAll > 0) {
+            $unit->status = 'partially_paid';
         } else {
             $unit->status = 'reserved';
         }
+
         $unit->save();
 
         return redirect()->back()->with('success', 'تم تسجيل الدفعة بنجاح');
     }
 
-    public function show($id) {
-        $payments = Payment::where('unit_sale_id', $id)
-        ->with(['unitSale.buyer'])
-        ->get();
+    // ───────────────────────────────────────────────
+    // عرض دفعات عميل معين
+    // ───────────────────────────────────────────────
+    public function show($id)
+    {
+        // ✅ إصلاح: جلب saleCustomer مباشرة بدلاً من الاعتماد على أول دفعة
+        // هذا يمنع تعطل الصفحة عندما لا توجد دفعات بعد
+        $saleCustomer = UnitSaleCustomer::with([
+            'unitSale.marketer',
+            'unitSale.unit.project',
+            'customer',
+            'payments',
+        ])->findOrFail($id);
 
-    $unitSale = $payments->first()?->unitSale;
-        return view('payments.show' ,compact('payments', 'unitSale')) ;
+        $unitSale = $saleCustomer->unitSale;
+        $payments = $saleCustomer->payments;
+
+        return view('payments.show', compact('payments', 'saleCustomer', 'unitSale'));
     }
 
+    // ───────────────────────────────────────────────
+    // تصدير دفعات العميل
+    // ───────────────────────────────────────────────
     public function exportCustomerPayments($id)
-{
+    {
+        $unitSale = UnitSale::with([
+            'unit',
+            'saleCustomers.customer',
+        ])->findOrFail($id);
 
-    $unitSale = UnitSale::with(['unit','buyer'])->findOrFail($id);
+        $customerName = $unitSale->customer_names;
+        $unitName     = $unitSale->unit->unit_number . ' ' . $unitSale->unit->type;
 
-    $customerName = $unitSale->buyer->name;
-    $unitName = $unitSale->unit->unit_number . " " . $unitSale->unit->type ;
-    return Excel::download(
-        new PaymentCustomerExport($id , $customerName , $unitName) ,
-        'customer_payments.xlsx'
-    );
-}
+        return Excel::download(
+            new PaymentCustomerExport($id, $customerName, $unitName),
+            'customer_payments.xlsx'
+        );
+    }
 }

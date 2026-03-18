@@ -25,17 +25,17 @@ class CompanyUnitsSheet implements FromCollection, WithHeadings, WithTitle, With
 
     public function collection()
     {
-        return UnitSale::with(
+        return UnitSale::with([
             'unit.project',
-            'buyer',
             'marketer',
-            'investor'
-            )->whereHas('unit.project', fn($q) =>
+            'payments',
+            'saleCustomers.customer'
+        ])->whereHas('unit.project', fn($q) =>
             $q->where('company_id', $this->companyId)
         )
-         ->get()
-         ->map(function ($unit) {
-             return [
+        ->get()
+        ->map(function ($unit) {
+            return [
                 $unit->unit->project->name,
                 $unit->unit->unit_number,
                 $unit->unit->type,
@@ -43,18 +43,18 @@ class CompanyUnitsSheet implements FromCollection, WithHeadings, WithTitle, With
                 $unit->unit->floor,
                 $unit->unit->rooms,
                 $unit->unit->zone,
-                $unit->buyer ? $unit->buyer->name : '-',
+                $unit->customer_names,
                 $unit->marketer ? $unit->marketer->name : '-',
-                $unit->investor ? $unit->investor->name : '-',
+                $unit->saleCustomers->pluck('share_percentage')->join(', ') . '%',
                 $unit->total_price,
                 $unit->payments()->sum('amount_paid'),
                 $unit->total_price - $unit->payments()->sum('amount_paid'),
-                $unit->contract_number,
+                $unit->contract_numbers,
                 $unit->commission,
-                $unit->buyer->iban ?? '-',
+                $unit->saleCustomers->first()?->customer?->iban ?? '-',
                 $unit->sale_date,
             ];
-         });
+        });
     }
 
     public function headings(): array
@@ -68,14 +68,14 @@ class CompanyUnitsSheet implements FromCollection, WithHeadings, WithTitle, With
             'عدد الغرف',
             'الزون',
             'اسم المشتري',
-            'المسوق الرئيسي' ,
-            'المستثمر الرئيسي' ,
+            'المسوق الرئيسي',
+            'الحصص (%)',
             'قيمة الوحدة',
             'المبلغ المدفوع',
             'المبلغ المتبقي',
             'رقم العقد',
             'قيمة العمولة',
-            'رقم حساب العميل' ,
+            'رقم حساب العميل',
             'تاريخ البيع',
         ];
     }

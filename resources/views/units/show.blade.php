@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-    <h1 style="color: var(--text-main)">🏠 {{ $unit->type . ' ' . $unit->unit_number }}</h1>
+    <h1 class="text-main">🏠 {{ $unit->type . ' ' . $unit->unit_number }}</h1>
 @endsection
 
 @section('content')
@@ -72,7 +72,7 @@
             @if($unit->unitSale)
 
                 <tr >
-                     <th colspan="2" style="text-align: center; font-weight: bold; color:">تفاصيل البيع</th>
+                     <th colspan="2" class="table-header-centered">تفاصيل البيع</th>
                 </tr>
 
                 <tr class="highlight-row">
@@ -95,38 +95,41 @@
             
                 <tr class="highlight-row">
                     <th><i class="fas fa-clock"></i> المبلغ المتبقي</th>
-                    <td style="color: var(--danger-color)">{{number_format($remaining)}} ريال</td>
+                    <td class="text-danger">{{number_format($remaining)}} ريال</td>
                 </tr>
             
 
                 <tr>
-                    <th><i class="fas fa-user"></i> المشتري</th>
+                    <th><i class="fas fa-users"></i> المشترون</th>
                     <td>
-                        {{
-                            $unit->unitSale->buyer->name  ?? '-'
-                        }}
+                        @if($unit->unitSale && $unit->unitSale->saleCustomers->count() > 0)
+                            <div class="customers-list">
+                                @foreach($unit->unitSale->saleCustomers as $saleCustomer)
+                                    <div class="customer-item">
+                                        <strong>{{ $saleCustomer->customer->name }}</strong>
+                                        <br>
+                                        <small>
+                                            الحصة: {{ $saleCustomer->share_percentage }}% |
+                                            العقد: {{ $saleCustomer->contract_number }} |
+                                            المبلغ: {{ number_format($saleCustomer->share_amount) }} ريال
+                                        </small>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            {{ $unit->unitSale->buyer->name ?? '-' }}
+                        @endif
                     </td>
                 </tr>
 
-                
-                <tr>
-                    <th><i class="fas fa-user-tie"></i> المستثمر</th>
-                    <td>{{$unit->unitSale->investor->name ?? '-'}}</td>
-                </tr>
                 <tr>
                     <th><i class="fas fa-user-tie"></i> المسوق الرئيسي</th>
                     <td>{{$unit->unitSale->marketer->name ?? '-'}}</td>
                 </tr>
-                
-    
+
                 <tr>
                     <th><i class="fas fa-money-bill-wave"></i> قيمة العمولة</th>
                     <td>{{number_format($unit->unitSale->commission) ?? 0 }} ر.س</td>
-                </tr>
-                
-                <tr>
-                    <th><i class="fas fa-user"></i> رقم العقد</th>
-                    <td>{{$unit->unitSale->contract_number ?? '-'}}</td>
                 </tr>
             @endif
 

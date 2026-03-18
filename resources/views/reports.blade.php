@@ -144,21 +144,6 @@
     </div>
 
 
- 
-
-    {{-- @if(request('from'))
-    <div class="summary-grid mini">
-        <div class="summary-card">
-            <p>وحدات مباعة في الفترة</p>
-            <div class="amount small">{{ number_format($unitSalesCountInDate) }} وحدة</div>
-        </div>
-        <div class="summary-card">
-            <p>إجمالي المدفوع في الفترة</p>
-            <div class="amount small">{{ number_format($PaymentInDate) }} ريال</div>
-        </div>
-    </div>
-    @endif --}}
-
     <div class="data-card">
         <div class="card-header">
             <h2><i class="fas fa-list-ul"></i> تقرير المبيعات التفصيلي</h2>
@@ -180,8 +165,6 @@
                 </thead>
                 <tbody>
                     @foreach($data as $unit)
-
-
                     @php
                         if($unit->unit->status === 'sold') {
                             $status = 'مباعة';
@@ -202,7 +185,7 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="{{route('units.show' ,$unit->unit->id)}}" class="btn-primary">تفاصيل الوحدة</a>
+                                <a href="{{route('units.show' ,$unit->unit->id)}}"class="action-link view" title="عرض"><i class="fas fa-eye"></i></a>
                             </td>
                         </tr>
                     @endforeach

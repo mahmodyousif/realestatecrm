@@ -4,7 +4,6 @@
     <div class="page-header">
         <h1>💰 إدارة الدفعات المالية</h1>
         <p>تابع جميع عمليات الدفع، أضف دفعات جديدة، واطلع على التقارير المالية</p>
-        
     </div>
 @endsection
 
@@ -54,7 +53,7 @@
     <div class="card">
         <div class="card-header">
             <h2>سجل دفعات العملاء</h2>
-            <button class="add-btn" onclick="toggleModal()">
+            <button class="add-btn" onclick="togglePaymentModal()">
                 <i class="fas fa-plus"></i> تسجيل دفعة جديدة
             </button>
         </div>
@@ -66,9 +65,8 @@
                         <th>رقم العقد</th>
                         <th>الوحدة</th>
                         <th>اسم العميل</th>
-                        <th>قيمة الوحدة</th>
-                        <th>قيمة الخصم</th>
-                        <th>السعر النهائي</th>
+                        <th>حصة العميل %</th>
+                        <th>قيمة الحصة</th>
                         <th>المدفوع</th>
                         <th>المتبقي</th>
                         <th>الحالة</th>
@@ -76,30 +74,43 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($unitSales as $unit)
-                    <tr class="{{ $unit->remaining > 0 ? 'pending-payment' : 'completed-payment' }}">
-                        <td><strong>#{{ $unit->contract_number }}</strong></td>
-                        <td>{{ $unit->unit->type }} - {{ $unit->unit->unit_number }}</td>
-                        <td>{{ $unit->buyer->name ?? '-' }}</td>
-                        <td>{{ number_format($unit->unit_price) }} ريال</td>
-                        <td>{{ number_format($unit->discount) }} ريال</td>
-                        <td style="color: var(--primary-color); font-weight: 700;">{{ number_format($unit->total_price) }} ريال</td>
-                        <td style="color: var(--success-color); font-weight: 700;">{{ number_format($unit->payments()->sum('amount_paid')) }} ريال</td>
-                        <td style="color: var(--danger-color); font-weight: 700;">{{ number_format($unit->remaining) }}</td>
+                    @forelse($saleCustomers as $saleCustomer)
+                    <tr class="{{ $saleCustomer->payments()->sum('amount_paid') >= $saleCustomer->share_amount ? 'completed-payment' : 'pending-payment' }}">
+                        <td><strong>#{{ $saleCustomer->contract_number }}</strong></td>
                         <td>
-                            @if($unit->remaining > 0)
-                                <span class="badge" style="background: var(--warning-light); color: var(--warning-dark);">يوجد أقساط</span>
+                            {{ $saleCustomer->unitSale->unit->type ?? '' }} - 
+                            {{ $saleCustomer->unitSale->unit->unit_number ?? '' }}
+                        </td>
+                        <td>{{ $saleCustomer->customer->name ?? '-' }}</td>
+                        <td>{{ number_format($saleCustomer->share_percentage, 2) }}%</td>
+                        <td class="text-primary font-bold">
+                            {{ number_format($saleCustomer->share_amount) }} ريال
+                        </td>
+                        <td class="text-success font-bold">
+                            {{ number_format($saleCustomer->payments()->sum('amount_paid')) }} ريال
+                        </td>
+                        <td class="text-danger font-bold">
+                            {{ number_format($saleCustomer->share_amount - $saleCustomer->payments()->sum('amount_paid')) }} ريال
+                        </td>
+                        <td>
+                            @if($saleCustomer->payments()->sum('amount_paid') >= $saleCustomer->share_amount)
+                                <span class="badge badge-success">مكتمل</span>
                             @else
-                                <span class="badge" style="background: var(--success-light); color: var(--success-dark);">مكتمل</span>
+                                <span class="badge badge-warning">يوجد أقساط</span>
                             @endif
                         </td>
                         <td>
-                            <a href="{{route('payments.show' , $unit->id ) }}" class="btn-sm" style="color: var(--primary-color); text-decoration: none;">
-                                <i class="fas fa-eye"></i> التفاصيل
+                            <a href="{{route('payments.show' , $saleCustomer->id ) }}"class="action-link view" title="عرض"><i class="fas fa-eye"></i>
                             </a>
                         </td>
                     </tr>
-                    @endforeach 
+                    @empty
+                    <tr>
+                        <td colspan="9" class="empty-cell">
+                            لا توجد عمليات بيع
+                        </td>
+                    </tr>
+                    @endforelse 
                 </tbody>
             </table>
         </div>
@@ -125,14 +136,20 @@
        
             <div class="form-group">
                 <label>الوحدة والعميل (المستحقة)</label>
-                <select name="unit_sale_id" required>
+                <select name="unit_sale_customer_id" required>
                     <option value="">اختر العملية...</option>
-                    @foreach($remainingUnits as $sale)
-                        <option value="{{ $sale->unitSale->id }}">
-                            {{ $sale->unit_number }} |
-                            {{ $sale->unitSale->buyer->name ?? '-' }}
-                            (المتبقي: {{ number_format($sale->unitSale->remaining) }})
-                        </option>
+                    @foreach($saleCustomers as $saleCustomer)
+                        @php
+                            $paid = $saleCustomer->payments()->sum('amount_paid');
+                            $remaining = $saleCustomer->share_amount - $paid;
+                        @endphp
+                        @if($remaining > 0)
+                            <option value="{{ $saleCustomer->id }}">
+                                {{ $saleCustomer->unitSale->unit->unit_number ?? '' }} | 
+                                {{ $saleCustomer->customer->name ?? '-' }} 
+                                (المتبقي: {{ number_format($remaining) }})
+                            </option>
+                        @endif
                     @endforeach
                 </select>
             </div>
@@ -168,7 +185,7 @@
             </div>
      </div>
             <div class="form-actions">
-                <button type="button" class="btn-cancel" onclick="toggleModal()">
+                <button type="button" class="btn-cancel" onclick="togglePaymentModal()">
                     إلغاء
                 </button>
                 <button type="submit" class="btn-save">

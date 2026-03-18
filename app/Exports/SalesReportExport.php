@@ -16,19 +16,36 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
 {
     public function collection()
     {
-        $units = Unit::with(['project', 'unitSale.payments', 'unitSale.buyer'])
-            ->where('status', '!=', 'available')
-            ->get();
+        $units = Unit::with([
+            'project',
+            'unitSale' => function($query) {
+                $query->with([
+                    'payments',
+                    'saleCustomers.customer',
+                    'marketer'
+                ]);
+            }
+        ])->where('status', '!=', 'available')
+        ->get();
 
         $counter = 1;
         return $units->map(function($unit) use (&$counter) {
             $unitPrice = $unit->price ?? 0;
             $totalPaid = $unit->unitSale?->payments->sum('amount_paid') ?? 0;
-            $remainingAmount = $unit->unitSale->total_price - $totalPaid;
-            $buyerName = $unit->unitSale?->buyer?->name ?? '-';
+            $remainingAmount = ($unit->unitSale?->total_price ?? $unitPrice) - $totalPaid;
+            
+            // الحصول على أسماء جميع العملاء (يدعم البيع المتعدد)
+            $buyerName = $unit->unitSale?->customer_names ?? '-';
+            
             $marketerName = $unit->unitSale?->marketer?->name ?? '-';
             $saleDate = $unit->unitSale?->sale_date ?? '-';
             $status = $unit->status == 'sold' ? 'مباعة' : 'محجوزة';
+            
+            // أرقام العقود كقائمة
+            $contractNumbers = $unit->unitSale?->contract_numbers ?? '-';
+            
+            // رقم حساب أول عميل (للتوافق مع النظام القديم)
+            $ibanNumber = $unit->unitSale?->saleCustomers->first()?->customer?->iban ?? '-';
 
             return [
                 'الرقم التسلسلي' => $counter++, 
@@ -46,10 +63,10 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
                 'المتبقي' => $remainingAmount,
                 'المشتري' => $buyerName,
                 'المسوق الرئيسي' => $marketerName, 
-                'رقم العقد' => $unit->unitSale?->contract_number,
-                'قيمة العمولة' => $unit->unitSale?->commission , 
+                'رقم العقد' => $contractNumbers,
+                'قيمة العمولة' => $unit->unitSale?->commission, 
                 'تاريخ البيع' => $saleDate,
-                'رقم حساب العميل' => $unit->unitSale?->buyer->iban ?? '-',
+                'رقم حساب العميل' => $ibanNumber,
                 'الحالة' => $status,
             ];
         });

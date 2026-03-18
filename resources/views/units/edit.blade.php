@@ -1,19 +1,19 @@
 @extends('layout')
 
 @section('title')
-    <h1 style="color: var(--text-main)">📝 تعديل بيانات الوحدة</h1>
+    <h1 class="text-main">📝 تعديل بيانات الوحدة</h1>
 @endsection
 
 @section('content')
 <div class="container edit-section">
     @if(session('success'))
-        <div class="alert alert-success" style="background: var(--success-light); color: var(--success-dark); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+        <div class="alert-unified success">
             <i class="fas fa-check-circle"></i> {{ session('success') }}
         </div>
     @endif
 
     <form id="clientForm" method="POST" action="{{route('update_unit' , $unit->id)}}">
-        @csrf
+    ئ    @csrf
         @method('PUT')
 
         <div class="form-group full-width">

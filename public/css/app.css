@@ -3476,7 +3476,6 @@ textarea {
     font-style: normal;
 }
 
-
 .stat-card {
     background: var(--bg-card);
     padding: 25px;
@@ -3511,4 +3510,204 @@ textarea {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+/* صفحة معاينة مشروع معين  */
+    .preview-container {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+    .preview-container .header {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+    }
+    .preview-container .company-name {
+        font-size: 24px;
+        color: #333;
+    }
+    .preview-container .project-name {
+        font-size: 24px;
+        color: #fff;
+        background: #333333;
+        width: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 0 50px 0 0 ;
+    }
+
+    .preview-container .preview-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing:  10px;
+        font-weight: bold;
+
+    }
+    .preview-container .preview-table tr {
+        margin-bottom: 10px
+    }
+    .preview-container .preview-table tr, .preview-table td {
+        padding: 8px;
+        text-align: center;
+        border-radius: 8px; 
+        border:  1px solid #ddd;
+        transition: 0.3s 
+    }
+
+    .preview-container .preview-table td.unit-number {
+        border: 3px solid #96969691;
+    }
+
+    .preview-container .preview-table td.unit-price {
+        background-color: #333333; 
+        color: #fff;
+    }
+    
+    .preview-container .preview-table tr:hover{
+        background-color: #969696; 
+        color: #fff; 
+        border: 2px solid #000000
+    }
+
+
+
+    .preview-container .building-wrapper {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        direction: rtl;
+        padding: 12px;
+    }
+
+    .preview-container .building-grid {
+        display: flex;
+        flex-direction: column; /* الدور الأول في الأسفل */
+    }
+
+    .preview-container .floor-row {
+        display: flex;
+        align-items: stretch;
+        background: #fff;
+        gap: 30px
+    }
+
+    .preview-container .floor-label {
+        background: #1a1a1a;
+        color: #fff;
+        min-width: 70px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 10px;
+        text-align: center;
+        gap: 2px;
+        border-bottom: 2px solid;
+        font-size: 12px
+    }
+
+    .preview-container .floor-label .floor-title { 
+        font-size: 18px; 
+        font-weight: bold
+    }
+
+
+
+    .preview-container .units-container {
+        display: flex;
+        flex: 1;
+        border-bottom: 2px solid ;
+    }
+
+    .preview-container .unit-cell {
+        flex: 1;
+        padding: 10px 6px;
+        text-align: center;
+        font-size: 13px;
+        color: #fff;
+        margin: 10px; 
+        border-radius: 8px ;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px
+    }
+
+    /* حالات الوحدة */
+    .preview-container .unit-cell.sold      { background: #b91c1c; }
+    .preview-container .unit-cell.available { background: #888888; }
+    .preview-container .unit-cell.reserved  { background: #10b981; }
+
+    /* Legend */
+    .preview-container .legend {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .preview-container .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: bold;
+    }
+
+    .preview-container .legend-dot {
+        width: 28px;
+        height: 18px;
+        border-radius: 3px;
+    }
+
+    .preview-container .floor-label:last-child {
+        border-radius: 10px
+    }
+
+    .preview-container .building-wrapper .floor-row:first-child .floor-label {
+    border-top-right-radius: 20px;
+    border-top-left-radius: 20px;
+}
+   .preview-container .building-wrapper .floor-row:last-child .floor-label {
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+    .preview-container .legend-dot.sold      { background: #b91c1c; }
+    .preview-container .legend-dot.available { background: #888888; }
+    .preview-container .legend-dot.reserved  { background: #10b981; }
+
+   @media print {
+    html, body {
+        width: 1024px !important;
+        margin: 0 auto !important;
+        zoom: 0.75; 
+    }
+    .sidebar, .navbar, .user-actions, .theme-toggle, .btn-primary, .menu-toggle, header {
+        display: none !important;
+    }
+
+    @page {
+        margin: 1cm; 
+    }
+
+ 
+    body {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .main-wrapper, .content-area {
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    #print-section {
+        box-shadow: none !important;
+        border: none !important;
+    }
 }

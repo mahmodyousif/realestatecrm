@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('unit_sales', function (Blueprint $table) {
             $table->decimal('discount', 8, 2)->default(0)->after('unit_price');
-            $table->decimal('total_price', 8, 2)->default(0)->after('discount');
+            $table->unsignedBigInteger('total_price')->default(0)->after('discount');
         });
     }
 

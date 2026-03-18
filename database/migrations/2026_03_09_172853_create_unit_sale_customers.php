@@ -9,18 +9,15 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('payments', function (Blueprint $table) {
+        Schema::create('unit_sale_customers', function (Blueprint $table) {
             $table->id();
-            
             $table->foreignId('unit_sale_id')->constrained('unit_sales')->onDelete('cascade');
-
-            $table->unsignedBigInteger('amount_paid'); 
-            $table->date('payment_date');        
-            $table->string('payment_method');
-            $table->string('reference_number'); 
-            $table->text('notes')->nullable();     // ملاحظات
+            $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
+            $table->string('contract_number')->unique();
+            $table->decimal('share_percentage', 15, 2);
+            $table->unsignedBigInteger('share_amount');
             $table->timestamps();
         });
     }
@@ -30,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payments');
+        Schema::dropIfExists('unit_sale_customers');
     }
 };

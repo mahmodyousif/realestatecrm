@@ -20,7 +20,12 @@ class UnitSalesExport implements FromCollection , WithMapping , WithHeadings , W
     */
     public function collection()
     {
-        return UnitSale::with(['unit' , 'buyer' , 'marketer' ,'payments'])->get();
+        return UnitSale::with([
+            'unit',
+            'marketer',
+            'payments',
+            'saleCustomers.customer'            
+        ])->get();
     }
     private int $counter = 0;
 
@@ -40,15 +45,15 @@ class UnitSalesExport implements FromCollection , WithMapping , WithHeadings , W
             $unit->unit->floor,
             $unit->unit->rooms,
             $unit->unit->zone,
-            $unit->buyer?->name ?? 'غير مباعة',
+            $unit->customer_names ?? 'غير مباعة',
             $unit->marketer?->name ?? 'تم البيع عبر الشركة',
             $price,
             $amount_paid,
             $remaining ?? 0 ,
             $unit->commission ?? 0,
-            $unit->contract_number,
+            $unit->contract_numbers ?? '-',
             $unit->sale_date,
-            $unit->buyer->iban ?? '-',
+            $unit->saleCustomers->first()?->customer?->iban ?? '-',
             $unit->created_at?->format('Y-m-d')
         ];
     }

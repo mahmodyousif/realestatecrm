@@ -16,7 +16,6 @@ use App\Http\Controllers\UsersController;
   
 
 
-
     Route::get('/projects-by-company/{company}', [ProjectsController::class, 'getByCompany'])->name('projects.byCompany');
 
 Route::get('projects/create', [ProjectsController::class, 'create'])->name('projects.create');
@@ -52,11 +51,11 @@ Route::middleware(['auth' , 'role:admin'])->group(function(){
     Route::get('projects' , [ProjectsController::class,'index'])->name("projects") ;
     Route::post('add_project', [ProjectsController::class, 'add_project']) ->name('add_project');
     Route::get('/projects/{project}', [ProjectsController::class, 'show'])->name('project.show');
+    Route::get('projects/{id}/preview', [ProjectsController::class, 'preview'])->name('project.preview') ;
     Route::get('edit_project/{id}', [ProjectsController::class, 'edit'])->name('edit_project') ;
     Route::put('update_project/{id}', [ProjectsController::class, 'update'])->name('update_project') ;
     Route::get('delete_project/{id}', [ProjectsController::class, 'delete'])->name('delete_project') ;
-
-
+    Route::get('/projects/{id}/export-pdf', [ProjectsController::class, 'exportPdf'])->name('projects.export-pdf');
     // EXPORTS 
 
     Route::get('/units/export', [UnitsController::class, 'export'])->name('unit_export');
@@ -76,16 +75,10 @@ Route::middleware(['auth' , 'role:admin'])->group(function(){
     Route::POST('/projects/import' , [ProjectsController::class , 'import'])->name('projects.import'); 
     Route::POST('/units/import', [UnitsController::class , 'import'])->name('unit.import') ;
     Route::POST('/customers/import', [CustomersController::class , 'import'])->name('customers.import') ;
-    Route::POST('/units/import/unitsell' , [UnitsController::class , 'unitSellImport'])->name('unitSell.import');
+   Route::post('/units/import/unitsell', [UnitSaleController::class, 'unitSellImport'])
+    ->name('unitSell.import');
+   
     }) ;
-
-
-
-
-
-
-
-// الشركات 
 
 
 // الوحدات

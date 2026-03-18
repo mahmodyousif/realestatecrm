@@ -15,12 +15,9 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class UnitExport implements FromCollection , WithMapping , WithHeadings , WithStyles , ShouldAutoSize
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
     public function collection()
     {
-        return Unit::with(['project.company' , 'unitSale.buyer' , 'unitSale.marketer' ,'unitSale.payments'])->get();
+        return Unit::with(['project.company', 'unitSale.marketer', 'unitSale.payments', 'unitSale.buyer', 'unitSale.customers', 'unitSale.saleCustomers'])->get();
     }
 
     public function map($unit): array
@@ -40,14 +37,15 @@ class UnitExport implements FromCollection , WithMapping , WithHeadings , WithSt
            $unit->floor ,
            $unit->rooms , 
            $unit->zone , 
-           $unit->unitSale?->buyer?->name ?? 'غير مباعة' ,
+           $unit->unitSale?->customer_names ?? 'غير مباعة' ,
            $unit->unitSale?->marketer?->name ?? 'غير مباعة' ,
            $price, 
            $unit->unitSale?->discount ?? 0,
            $unit->unitSale?->total_price ?? $price,
            $amount_paid , 
            $remaining ,
-           $unit->unitSale?->contract_number,
+           $unit->unitSale?->contract_numbers ?? '-',
+           
            $unit->unitSale?->commission,
            $unit->unitSale?->buyer->iban ?? '-',
            $unit->unitSale?->sale_date,

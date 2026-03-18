@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('projects', function (Blueprint $table) {
         
-            $table->decimal('price', 15, 2)->nullable()->after('name');
+            $table->unsignedBigInteger('price')->nullable()->after('name');
         });
     }
 

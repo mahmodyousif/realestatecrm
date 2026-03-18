@@ -56,7 +56,11 @@ class UnitsController extends Controller
     }
 
     public function show($id){
-        $unit = Unit::with('unitSale')->with('buyer')->findOrFail($id);
+        $unit = Unit::with([
+            'unitSale' => function($query) {
+                $query->with(['saleCustomers.customer', 'marketer', 'payments']);
+            }
+        ])->findOrFail($id);
         $totalPrice = $unit->unitSale?->total_price ?? 0;
         $totalPaid  = $unit->unitSale?->payments->sum('amount_paid') ?? 0;
         $remaining  = $totalPrice - $totalPaid;
@@ -140,23 +144,5 @@ class UnitsController extends Controller
      * استيراد عمليات بيع الوحدات من ملف Excel
      * لكل صف سيتم إنشاء سجل في unit_sales، إضافة دفعة كاملة ثم تحديث حالة الوحدة إلى مباعة
      */
-    public function unitSellImport(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|file|mimes:xlsx,xls,csv',
-        ]);
-
-        $import = new \App\Imports\SoldUnitImport();
-        Excel::import($import, $request->file('file'));
-
-        $response = [];
-        if ($import->addedCount > 0) {
-            $response['success'] = "تم تسجيل {$import->addedCount} عملية بيع بنجاح";
-        }
-        if (!empty($import->warningMessages)) {
-            $response['warnings'] = $import->warningMessages;
-        }
-
-        return redirect()->back()->with($response);
-    }
+   
 }

@@ -108,7 +108,7 @@ class ProjectInfoExport implements WithMultipleSheets
                     return $this->project->units->map(function($unit) {
                         $paid = $unit->unitSale ? $unit->unitSale->payments->sum('amount_paid') : 0;
                         $remaining = $unit->price - $paid;
-                        $buyer = $unit->unitSale ? $unit->unitSale->buyer->name : '-'; 
+                        $buyer = $unit->unitSale ? $unit->unitSale->customer_names : '-'; 
                         $marketer = $unit->unitSale ? $unit->unitSale->marketer?->name : '-'; 
                         return [
                             $unit->type,
@@ -117,8 +117,8 @@ class ProjectInfoExport implements WithMultipleSheets
                             $unit->floor,
                             $unit->rooms,
                             number_format($unit->price) . ' ريال',
-                            $buyer ,
-                            $marketer , 
+                            $buyer,
+                            $marketer, 
                             number_format($paid) . ' ريال',     
                             number_format($remaining) . ' ريال',
                             $unit->status === 'sold' ? 'مباعة' : ($unit->status === 'reserved' ? 'محجوزة' : 'متاحة'),

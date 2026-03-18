@@ -27,7 +27,7 @@ class CompaniesController extends Controller
 
 
         // مجموع المدفوعات الفعلية من جدول payments للوحدات التابعة للشركة
-        $amountPaid = Payment::whereHas('unitSale.unit.project', function($q) use ($id) {
+        $amountPaid = Payment::whereHas('unitSaleCustomer.unitSale.unit.project', function($q) use ($id) {
             $q->where('company_id', $id);
         })->sum('amount_paid');
 
@@ -36,7 +36,7 @@ class CompaniesController extends Controller
         })->sum('commission');
 
         // اجمالي المدفوع اليوم للشركة
-        $amountPaidToday = Payment::whereHas('unitSale.unit.project', function($q) use ($id) {
+        $amountPaidToday = Payment::whereHas('unitSaleCustomer.unitSale.unit.project', function($q) use ($id) {
             $q->where('company_id', $id);
         })->whereDate('created_at' , today())->sum('amount_paid');
 
@@ -47,7 +47,7 @@ class CompaniesController extends Controller
         })->whereDate('created_at', today())->count();
         
         // المبلغ المدفوع للشركة هذا الشهر 
-        $currentMonthSalesPayment = Payment::whereHas('unitSale.unit.project', function($q) use ($id) {
+        $currentMonthSalesPayment = Payment::whereHas('unitSaleCustomer.unitSale.unit.project', function($q) use ($id) {
             $q->where('company_id', $id) ;
         })->whereMonth('created_at' , now()->month)->whereYear('created_at' , now()->year)->sum('amount_paid');
 

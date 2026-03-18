@@ -11,6 +11,8 @@
         <a href="{{ route('projects.info.export', $project->id) }}" class="btn-export">
             <i class="fas fa-file-export"></i> تصدير تقرير المشروع
         </a>
+        <a href="{{route('project.preview', $project)}}"  class="btn btn-primary">معاينة</a>
+
     </div>
 
     <div class="summary-grid">
@@ -146,7 +148,13 @@
                                 <td>{{$unit->area}} م²</td>
                                 <td>{{$unit->floor}}</td>
                                 <td>{{number_format($unitPrice)}}</td> 
-                                <td>{{$unit->unitSale?->buyer?->name ?? '-'}}</td>
+                                <td>
+                                    @if($unit->unitSale && $unit->unitSale->saleCustomers->count() > 0)
+                                        {{ $unit->unitSale->customer_names }}
+                                    @else
+                                        {{ $unit->unitSale?->buyer?->name ?? '-' }}
+                                    @endif
+                                </td>
                                 <td>{{$unit->unitSale?->marketer?->name ?? '-'}}</td>
                                 <td class="income">{{number_format($amountPaid)}}</td> 
                                 <td class="expense">{{number_format($remaining)}}</td> 

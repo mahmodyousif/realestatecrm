@@ -29,7 +29,13 @@ class ReportsController extends Controller
         // =======================
         // 2️⃣ Base Query (مهم جدًا)
         // =======================
-        $baseUnitSalesQuery = UnitSale::with(['unit.project', 'payments', 'buyer'])
+        $baseUnitSalesQuery = UnitSale::with([
+            'unit.project',
+            'unit.project.company',
+            'saleCustomers.customer',
+            'payments',
+            'buyer'
+        ])
             ->when($request->project_id, fn ($q) =>
                 $q->whereHas('unit.project', fn ($q2) =>
                     $q2->where('id', $request->project_id)
@@ -51,18 +57,19 @@ class ReportsController extends Controller
         $totalPrice = (clone $baseUnitSalesQuery)->sum('total_price');
 
         // =======================
-        // 4️⃣ المدفوعات
+        // 4️⃣ المدفوعات (للنظام الجديد: عبر UnitSaleCustomer)
         // =======================
-        $basePaymentQuery = Payment::when($request->project_id, fn ($q) =>
-                $q->whereHas('unitSale.unit.project', fn ($q2) =>
-                    $q2->where('id', $request->project_id)
-                )
-            )
-            ->when($request->company_id, fn ($q) =>
-                $q->whereHas('unitSale.unit.project', fn ($q2) =>
-                    $q2->where('company_id', $request->company_id)
-                )
-            )
+        $basePaymentQuery = Payment::with('unitSaleCustomer.unitSale.unit.project')
+            ->when($request->project_id || $request->company_id, function ($q) use ($request) {
+                $q->whereHas('unitSaleCustomer.unitSale.unit.project', function ($q2) use ($request) {
+                    if ($request->project_id) {
+                        $q2->where('id', $request->project_id);
+                    }
+                    if ($request->company_id) {
+                        $q2->where('company_id', $request->company_id);
+                    }
+                });
+            })
             ->when($from, fn ($q) => $q->where('created_at', '>=', $from))
             ->when($to, fn ($q) => $q->where('created_at', '<=', $to));
 
@@ -140,7 +147,9 @@ class ReportsController extends Controller
         $projectSold      = $projects->pluck('sold_count')->map(fn ($v) => (int) $v)->toArray();
 
         $companies = Company::select('id', 'name')->get();
-        $allProjects = Project::where('company_id', $request->company_id)->get();
+        $allProjects = Project::when($request->company_id, fn ($q) =>
+            $q->where('company_id', $request->company_id)
+        )->select('id', 'name', 'company_id')->get();
 
         return view('reports', compact(
             'data',

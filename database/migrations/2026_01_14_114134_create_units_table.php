@@ -20,7 +20,7 @@ return new class extends Migration
             $table->smallInteger('floor');
             $table->unsignedBigInteger('price');
             $table->string('status', 20)->default('available');
-            $table->smallInteger('zone');
+            $table->string('zone', 10);
             $table->smallInteger('rooms');
             $table->timestamps();
 

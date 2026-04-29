@@ -654,7 +654,7 @@ function addBuyer() {
             <input type="text" name="customers[${buyerIndex}][contract_number]">
         </div>
 
-        <button type="button" class="btn-remove-buyer" onclick="removeBuyer(this)">إزالة هذا المشتري</button>
+        <button type="button" class="btn-remove-buyer btn remove-buyer" onclick="removeBuyer(this)">إزالة هذا المشتري</button>
     `;
 
     container.appendChild(newRow);

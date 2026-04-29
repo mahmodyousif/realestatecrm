@@ -45,6 +45,15 @@ class DashboardController extends Controller
             }) ;
         })->count();
 
+
+        $partiallyPaidCount= Unit::where('status', 'partially_paid')->when($request->project_id, fn($q) => $q->where('project_id', $request->project_id))
+        ->when($request->company_id, function($q) use ($request){
+            $q->whereHas('project', function($query) use ($request){
+                $query->where('company_id' , $request->company_id) ;
+            }) ;
+        })->count();
+
+
         $reservedUnitsCount = Unit::where('status', 'reserved')->when($request->project_id, fn($q) => $q->where('project_id', $request->project_id))
         ->when($request->company_id, function($q) use ($request){
             $q->whereHas('project', function($query) use ($request){
@@ -107,6 +116,7 @@ class DashboardController extends Controller
             'unitsCount' ,
             'availableUnitsCount' ,
             'soldUnitsCount' ,
+            'partiallyPaidCount' ,
             'reservedUnitsCount' ,
             'totalPaid' ,
             'totalRemaining'   ,

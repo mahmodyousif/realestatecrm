@@ -75,6 +75,7 @@ class ProjectsController extends Controller
         $soldUnitsCount = $project->units->where('status', 'sold')->count();
         $reservedUnitsCount = $project->units->where('status', 'reserved')->count();
         $availableUnitsCount = $project->units->where('status', 'available')->count();
+        $partiallyPaidCount = $project->units->where('status', 'partially_paid')->count();
         $totalPaid = $project->units->sum(function ($unit) {
             return $unit->unitSale ? $unit->unitSale->payments->sum('amount_paid') : 0;
         });
@@ -83,7 +84,7 @@ class ProjectsController extends Controller
         $totalSoldPrice = $soldUnits->sum('price');
 
         $totalRemaining = $totalSoldPrice  - $totalPaid;
-        return view('projects.show', compact('project', 'soldUnitsCount', 'reservedUnitsCount', 'availableUnitsCount',  'totalPrice', 'totalPaid', 'totalSoldPrice',  'totalRemaining'));
+        return view('projects.show', compact('project', 'soldUnitsCount', 'reservedUnitsCount', 'availableUnitsCount', 'partiallyPaidCount', 'totalPrice', 'totalPaid', 'totalSoldPrice', 'totalRemaining'));
     }
 
     public function preview($id)

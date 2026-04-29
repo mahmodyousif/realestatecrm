@@ -46,6 +46,10 @@
         </div>
 
         <div class="summary-card">
+            <h3>وحدات مباعة بيع جزئي</h3>
+            <div class="amount">{{$partiallyPaidCount}}</div>
+        </div>
+        <div class="summary-card">
             <h3>وحدات محجوزة</h3>
             <div class="amount">{{$reservedUnitsCount}}</div>
         </div>
@@ -134,11 +138,13 @@
                                 $statusClass = match($unit->status) {
                                     'sold' => 'sold',
                                     'reserved' => 'reserved',
+                                    'partially_paid' => 'partially-paid',
                                     default => 'available'
                                 };
                                 $statusLabel = match($unit->status) {
                                     'sold' => 'مباعة',
                                     'reserved' => 'محجوزة',
+                                    'partially_paid' => 'بيع جزئي',
                                     default => 'متاحة'
                                 };
                             @endphp 

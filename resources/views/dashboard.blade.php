@@ -86,6 +86,14 @@
         </div>
 
         <div class="stat-card orange">
+            <div class="card-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+            <div class="card-info">
+                <h3>الوحدات المباعة بيع جزئي</h3>
+                <h1 class="count">{{ $partiallyPaidCount }}</h1>
+                <span class="trend">قيد المعالجة</span>
+            </div>
+        </div>
+        <div class="stat-card orange">
             <div class="card-icon"><i class="fa-solid fa-key"></i></div>
             <div class="card-info">
                 <h3>الوحدات المحجوزة</h3>

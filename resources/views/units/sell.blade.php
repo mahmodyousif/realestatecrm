@@ -148,13 +148,13 @@
                         <input type="text" name="customers[0][contract_number]">
                     </div>
 
-                    <button type="button" class="btn-remove-buyer" style="display: none;"
+                    <button type="button" class="btn add-btn remove-buyer" style="display: none;"
                         onclick="removeBuyer(this)">إزالة هذا المشتري</button>
                 </div>
             </div>
 
             <div class="form-group">
-                <button type="button" id="add-buyer-btn" class="btn-add">إضافة مشتري آخر</button>
+                <button type="button" id="add-buyer-btn" class="btn add-btn add-buyer">إضافة مشتري آخر</button>
             </div>
 
             <div class="form-group">

@@ -105,7 +105,7 @@ class UnitSaleController extends Controller
                         'payment_date' => $validated['sale_date'],
                         'payment_method' => $validated['payment_method'],
                         'reference_number' => 0,
-                        'notes' => 'دفعة شريك',
+                        'notes' => 'دفعة أولى',
                     ]);
                 }
             }

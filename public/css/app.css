@@ -3711,3 +3711,18 @@ textarea {
         border: none !important;
     }
 }
+
+
+.add-buyer{
+    background-color: #3b82f6 !important;
+    color: #fff !important  ;
+    text-align: center;
+    width: fit-content;
+}
+
+.remove-buyer{
+    background-color: #ef4444 !important;
+    color: #fff !important  ;
+    text-align: center;
+    width: fit-content;
+}

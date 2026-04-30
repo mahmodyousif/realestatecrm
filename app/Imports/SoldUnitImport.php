@@ -28,17 +28,18 @@ class SoldUnitImport implements
     use Importable, SkipsFailures;
 
     public int $addedCount = 0;
+
     public array $warningMessages = [
         'duplicate_units'        => [],
         'missing_projects'       => [],
         'missing_units'          => [],
-        'price_mismatch'         => [],   // السعر في الإكسل ≠ السعر في النظام
-        'overpaid'               => [],   // إجمالي الدفعات يتجاوز السعر الكلي
+        'price_mismatch'         => [],
+        'overpaid'               => [],
         'contract_isExisting'    => [],
         'invalid_payment_method' => [],
         'share_not_100'          => [],
         'invalid_customer_type'  => [],
-        'missing_customer'       => [],   // ✅ جديد: عميل غير موجود في النظام
+        'missing_customer'       => [],
     ];
 
     public function __construct()
@@ -52,9 +53,7 @@ class SoldUnitImport implements
                 'اسم المشتري'             => 'buyer',
                 'نوع المشتري'             => 'buyer_type',
                 'رقم العقد'               => 'contract_number',
-                // ✅ إصلاح: كل قيمة في سطر مستقل بدلاً من الفاصلة
-                'الحصة'                   => 'share_percentage',
-                'الحصة %'                 => 'share_percentage',
+                'الحصة', 'الحصة %'        => 'share_percentage',
                 'المبلغ المدفوع'          => 'amount_paid',
                 'المسوق الرئيسي'          => 'marketer',
                 'قيمة الوحدة'             => 'unit_price',
@@ -72,64 +71,57 @@ class SoldUnitImport implements
 
     public function collection(Collection $rows)
     {
-        // ✅ إصلاح: فلترة الصفوف الفارغة قبل التجميع
-        $rows = $rows->filter(fn($row) => !empty(trim($row['project'] ?? '')) && !empty(trim($row['unit_number'] ?? '')));
+        $rows = $rows->filter(fn($row) =>
+            !empty(trim($row['project'] ?? '')) &&
+            !empty(trim($row['unit_number'] ?? ''))
+        );
 
         $grouped = $rows->groupBy(function ($row) {
             return implode('||', [
-                trim($row['project']     ?? ''),
+                trim($row['project'] ?? ''),
                 trim($row['unit_number'] ?? ''),
-                trim($row['type']        ?? ''),
-                trim($row['floor']       ?? ''),
+                trim($row['type'] ?? ''),
+                trim($row['floor'] ?? ''),
             ]);
         });
 
-        foreach ($grouped as $key => $unitRows) {
+        foreach ($grouped as $unitRows) {
             $this->processUnitRows($unitRows);
         }
     }
 
     private function processUnitRows(Collection $unitRows): void
     {
-        $firstRow    = $unitRows->first();
-        $projectName = trim($firstRow['project']     ?? '');
+        $firstRow = $unitRows->first();
+
+        $projectName = trim($firstRow['project'] ?? '');
         $unitNumber  = trim($firstRow['unit_number'] ?? '');
 
-        // ── التحقق من المشروع ──
+        // ── المشروع ──
         $project = Project::where('name', $projectName)->first();
         if (!$project) {
-            $this->warningMessages['missing_projects'][] = [
-                'unit_number' => $unitNumber,
-                'project'     => $projectName,
-            ];
+            $this->warningMessages['missing_projects'][] = compact('unitNumber', 'projectName');
             return;
         }
 
-        // ── التحقق من الوحدة ──
+        // ── الوحدة ──
         $unit = Unit::where('unit_number', $unitNumber)
-            ->where('type',       trim($firstRow['type']  ?? ''))
-            ->where('floor',      trim($firstRow['floor'] ?? ''))
+            ->where('type', trim($firstRow['type'] ?? ''))
+            ->where('floor', trim($firstRow['floor'] ?? ''))
             ->where('project_id', $project->id)
             ->first();
 
         if (!$unit) {
-            $this->warningMessages['missing_units'][] = [
-                'unit_number' => $unitNumber,
-                'project'     => $projectName,
-            ];
+            $this->warningMessages['missing_units'][] = compact('unitNumber', 'projectName');
             return;
         }
 
-        // ── التحقق من أن الوحدة لم تُباع مسبقاً ──
         if ($unit->status === 'sold' || $unit->unitSale()->exists()) {
-            $this->warningMessages['duplicate_units'][] = [
-                'unit_number' => $unitNumber,
-                'project'     => $projectName,
-            ];
+            $this->warningMessages['duplicate_units'][] = compact('unitNumber', 'projectName');
             return;
         }
 
-        // ── التحقق من تطابق السعر (سعر الإكسل مقابل سعر النظام فقط) ──
+        // ── السعر ──
         $unitPrice = (float) ($firstRow['unit_price'] ?? 0);
         if ($unit->price != $unitPrice) {
             $this->warningMessages['price_mismatch'][] = [
@@ -141,10 +133,13 @@ class SoldUnitImport implements
             return;
         }
 
-        // ── التحقق من تكرار أرقام العقود ──
+        // ── العقود ──
         foreach ($unitRows as $row) {
             $contractNumber = trim($row['contract_number'] ?? '');
-            if ($contractNumber && UnitSaleCustomer::where('contract_number', $contractNumber)->exists()) {
+
+            if ($contractNumber &&
+                UnitSaleCustomer::where('contract_number', $contractNumber)->exists()
+            ) {
                 $this->warningMessages['contract_isExisting'][] = [
                     'unit_number'     => $unitNumber,
                     'project'         => $projectName,
@@ -154,33 +149,42 @@ class SoldUnitImport implements
             }
         }
 
-        // ── بناء مصفوفة الشركاء ──
+        // ── العملاء ──
         $customers = [];
-        foreach ($unitRows as $row) {
-            $buyerName  = trim($row['buyer']      ?? '');
-            $buyerType  = trim($row['buyer_type'] ?? 'customer');
-            $share      = (float) ($row['share_percentage'] ?? 0);
-            $amountPaid = (float) ($row['amount_paid']      ?? 0);
-            $contract   = trim($row['contract_number']      ?? '');
 
-            // ── التحقق من نوع المشتري ──
-            if (!in_array($buyerType, ['customer', 'investor'])) {
+        foreach ($unitRows as $row) {
+
+            $buyerName = trim($row['buyer'] ?? '');
+            $buyerTypeRaw = trim($row['buyer_type'] ?? '');
+
+            // ✔ تحويل عربي → إنجليزي
+            $buyerTypeMap = [
+                'مشتري'   => 'buyer',
+                'مسوق'     => 'marketer',
+                'مستثمر'   => 'investor',
+            ];
+
+            $buyerType = $buyerTypeMap[$buyerTypeRaw] ?? strtolower($buyerTypeRaw);
+
+            $allowedTypes = ['buyer', 'marketer', 'investor'];
+
+            if (!in_array($buyerType, $allowedTypes)) {
                 $this->warningMessages['invalid_customer_type'][] = [
                     'unit_number' => $unitNumber,
                     'project'     => $projectName,
                     'buyer'       => $buyerName,
-                    'type_given'  => $buyerType,
+                    'type_given'  => $buyerTypeRaw,
                 ];
                 return;
             }
 
             // ── البحث عن العميل ──
             $customer = Customer::whereRaw('LOWER(name) = ?', [mb_strtolower($buyerName)])
+                ->when($buyerType === 'buyer', fn($q) => $q->where('type', 'buyer'))
                 ->when($buyerType === 'investor', fn($q) => $q->where('type', 'investor'))
-                ->when($buyerType === 'customer', fn($q) => $q->where('type', 'buyer'))
+                ->when($buyerType === 'marketer', fn($q) => $q->where('type', 'marketer'))
                 ->first();
 
-            // ✅ إصلاح: إيقاف المعالجة إن لم يُوجد العميل بدلاً من إدخال null
             if (!$customer) {
                 $this->warningMessages['missing_customer'][] = [
                     'unit_number' => $unitNumber,
@@ -194,14 +198,15 @@ class SoldUnitImport implements
             $customers[] = [
                 'id'              => $customer->id,
                 'type'            => $buyerType,
-                'share'           => $share,
-                'amount_paid'     => $amountPaid,
-                'contract_number' => $contract,
+                'share'           => (float) ($row['share_percentage'] ?? 0),
+                'amount_paid'     => (float) ($row['amount_paid'] ?? 0),
+                'contract_number' => trim($row['contract_number'] ?? ''),
             ];
         }
 
-        // ── التحقق من أن مجموع الحصص = 100 ──
+        // ── مجموع الحصص ──
         $totalShare = array_sum(array_column($customers, 'share'));
+
         if (abs($totalShare - 100) > 0.01) {
             $this->warningMessages['share_not_100'][] = [
                 'unit_number' => $unitNumber,
@@ -211,58 +216,50 @@ class SoldUnitImport implements
             return;
         }
 
-        // ── الأسعار ──
-        $discount   = (float) ($firstRow['discount']   ?? 0);
+        // ── الأسعار النهائية ──
+        $discount   = (float) ($firstRow['discount'] ?? 0);
         $totalPrice = $unitPrice - $discount;
         $commission = (float) ($firstRow['commission'] ?? 0);
         $saleDate   = $this->transformDate($firstRow['sale_date'] ?? null);
 
-        // ── طريقة الدفع ──
+        // ── الدفع ──
         $paymentMethods = [
             'كاش'        => 'cash',
             'تقسيط'      => 'installment',
             'رهن عقاري'  => 'mortgage',
             'تحويل بنكي' => 'transfer',
         ];
+
         $paymentMethod = $paymentMethods[trim($firstRow['payment_method'] ?? '')] ?? null;
 
-        // ✅ إصلاح: إيقاف المعالجة عند طريقة دفع غير صالحة بدلاً من افتراض 'cash'
         if (!$paymentMethod) {
             $this->warningMessages['invalid_payment_method'][] = [
                 'unit_number' => $unitNumber,
                 'project'     => $projectName,
-                'value'       => $firstRow['payment_method'] ?? null,
             ];
             return;
         }
 
-        // ── المسوق ──
-        $marketerName = trim($firstRow['marketer'] ?? '');
-        $marketerId   = $marketerName
-            ? Customer::whereRaw('LOWER(name) = ?', [mb_strtolower($marketerName)])->first()?->id
-            : null;
-
-        // ── التحقق من إجمالي المدفوعات ──
-        // ✅ إصلاح: استخدام مصفوفة منفصلة 'overpaid' بدلاً من 'price_mismatch'
+        // ── الدفع الكلي ──
         $totalPaid = array_sum(array_column($customers, 'amount_paid'));
+
         if ($totalPaid > $totalPrice) {
             $this->warningMessages['overpaid'][] = [
                 'unit_number' => $unitNumber,
                 'project'     => $projectName,
-                'total_paid'  => $totalPaid,
-                'total_price' => $totalPrice,
             ];
             return;
         }
 
-        // ── إنشاء البيع داخل transaction ──
+        // ── حفظ البيانات ──
         DB::transaction(function () use (
-            $unit, $customers, $unitPrice, $discount, $totalPrice,
-            $commission, $saleDate, $paymentMethod, $marketerId, $totalPaid
+            $unit, $customers, $unitPrice, $discount,
+            $totalPrice, $commission, $saleDate,
+            $paymentMethod, $totalPaid
         ) {
+
             $sale = UnitSale::create([
                 'unit_id'        => $unit->id,
-                'marketer_id'    => $marketerId,
                 'sale_date'      => $saleDate,
                 'payment_method' => $paymentMethod,
                 'unit_price'     => $unitPrice,
@@ -271,35 +268,33 @@ class SoldUnitImport implements
                 'commission'     => $commission,
             ]);
 
-            foreach ($customers as $customerData) {
-                $shareAmount = $totalPrice * ($customerData['share'] / 100);
+            foreach ($customers as $c) {
 
-                $custRecord = UnitSaleCustomer::create([
+                $shareAmount = $totalPrice * ($c['share'] / 100);
+
+                $record = UnitSaleCustomer::create([
                     'unit_sale_id'     => $sale->id,
-                    'customer_id'      => $customerData['id'],
-                    'contract_number'  => $customerData['contract_number'],
-                    'share_percentage' => $customerData['share'],
+                    'customer_id'      => $c['id'],
+                    'contract_number'  => $c['contract_number'],
+                    'share_percentage' => $c['share'],
                     'share_amount'     => $shareAmount,
                 ]);
 
-                if (!empty($customerData['amount_paid']) && $customerData['amount_paid'] > 0) {
-                    $custRecord->payments()->create([
-                        'amount_paid'      => $customerData['amount_paid'],
-                        'payment_date'     => $saleDate,
-                        'payment_method'   => $paymentMethod,
+                if ($c['amount_paid'] > 0) {
+                    $record->payments()->create([
+                        'amount_paid'    => $c['amount_paid'],
+                        'payment_date'   => $saleDate,
+                        'payment_method' => $paymentMethod,
                         'reference_number' => 0,
-                        'notes'            => 'دفعة شريك (استيراد)',
+                        'notes'          => 'دفعة استيراد',
                     ]);
                 }
             }
 
-            if ($totalPaid == $totalPrice) {
-                $unit->status = 'sold';
-            } elseif ($totalPaid > 0) {
-                $unit->status = 'partially_paid';
-            } else {
-                $unit->status = 'reserved';
-            }
+            $unit->status = ($totalPaid == 0)
+                ? 'reserved'
+                : (($totalPaid >= $totalPrice) ? 'sold' : 'partially_paid');
+
             $unit->save();
 
             $this->addedCount++;
@@ -315,7 +310,7 @@ class SoldUnitImport implements
         }
 
         try {
-            return Carbon::parse(trim($value))->format('Y-m-d');
+            return Carbon::parse($value)->format('Y-m-d');
         } catch (\Exception $e) {
             return now()->format('Y-m-d');
         }

@@ -29,7 +29,14 @@
         </ul>
     </div>
 @endif
-
+<div class="search-box">
+    <label for="customerSearch">الوصول السريبع</label>
+    <div class="search-group">
+        <i class="icon fa fa-search"></i>
+        <input type="text" id="customerSearch" class="customerSearch" placeholder="ابحث عن عميل...">
+    </div>
+    <div id="dropdownResults" class="searchDropdown"></div>
+</div>
 <div class="filters-card-nested">
     <form method="GET" action="">
         <div class="filters-grid-nested">
@@ -226,6 +233,62 @@ window.onclick = function(event) {
         closeAddClientModal();
     }
 }
+
+
+
+
+
+
+
+
+const input = document.getElementById('customerSearch');
+const dropdown = document.getElementById('dropdownResults');
+
+let timeout = null;
+
+input.addEventListener('keyup', function () {
+    let query = this.value;
+
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+
+        if (query.length < 3) {
+            dropdown.innerHTML = '';
+            return;
+        }
+
+        fetch(`/customers/search?q=${query}`)
+            .then(res => res.json())
+            .then(data => {
+
+                let html = '';
+
+                if (data.length === 0) {
+                    html = '<div class="item">لا يوجد نتائج</div>';
+                }
+
+                data.forEach(customer => {
+                    html += `
+                        <div class="item" onclick="goToCustomer(${customer.id})">
+                            <strong>${customer.name}</strong>
+                            <small>${customer.phone}</small>
+                        </div>
+                    `;
+                });
+
+                dropdown.innerHTML = html;
+            });
+
+    }, 300);
+});
+
+function goToCustomer(id) {
+    window.location.href = `/customers/${id}`;
+}
 </script>
 
+<style>
+   
+</style>
 @endsection

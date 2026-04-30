@@ -709,7 +709,7 @@ ul {
 }
 
 .filter-form .input-group label,
-.filter-group-nested label {
+.filter-group-nested label , .search-box label {
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--text-light);
@@ -2389,6 +2389,7 @@ ul {
     gap: 20px;
     color: var(--text-light);
     font-size: 0.9rem;
+    flex-wrap: wrap;
 }
 
 .contact-links i {
@@ -3725,4 +3726,74 @@ textarea {
     color: #fff !important  ;
     text-align: center;
     width: fit-content;
+}
+
+
+/* Start Customer Search Styles */
+
+ .search-box {
+    position: relative;   
+    padding: 25px;
+    border-radius: 10px;
+    background: var(--bg-card);
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+.search-group {
+    position: relative;
+}
+.search-box .search-group .icon {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    font-size: 1rem;
+}
+.search-box input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: var(--text-main);
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 5px rgba(67, 24, 255, 0.5);
+}
+
+
+.searchDropdown{
+    margin-top: 10px;
+    position: absolute;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.item:hover {
+    background: #f1f1f1;
+}
+
+/* end Customer Search Styles */ 
+
+input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 5px rgba(67, 24, 255, 0.5);
 }

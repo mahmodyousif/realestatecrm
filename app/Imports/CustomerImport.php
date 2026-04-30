@@ -65,10 +65,10 @@ class CustomerImport  implements ToModel, WithHeadingRow, WithChunkReading
        
 
         $id_card = isset($row['id_card']) ? trim($row['id_card']) : null;
-        if($id_card && !preg_match('/^\d{10}$/', $id_card)) {
-            $this->errors[] = "رقم الهوية غير صالح للعميل: " . $name;
-            $id_card = null; // الصف يضاف بدون رقم هوية
-        }
+        // if($id_card && !preg_match('/^\d{10}$/', $id_card)) {
+        //     $this->errors[] = "رقم الهوية غير صالح للعميل: " . $name;
+        //     $id_card = null; // الصف يضاف بدون رقم هوية
+        // }
     
 
         $this->addedCount++;

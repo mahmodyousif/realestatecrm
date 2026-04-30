@@ -53,7 +53,7 @@ class UnitsImport implements ToModel, WithHeadingRow, WithChunkReading, WithVali
             'project_id' => 'required',
             'area'         => 'required|numeric',
             'floor'        => 'required|numeric',
-            'zone'         => 'required|numeric',
+            'zone'         => 'required',
             'rooms'        => 'required|numeric',
             'price'        => 'required|numeric',
             'status'       => 'required',

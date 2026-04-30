@@ -178,4 +178,27 @@ class CustomersController extends Controller
         ->with('errors', $errors);
 
     }
+
+
+    public function search(Request $request)
+{
+    $q = $request->q;
+
+    if (!$q || strlen($q) < 3) {
+        return response()->json([]);
+    }
+
+    $customers = Customer::where(function($query) use ($q) {
+            $query->where('name', 'LIKE', "%{$q}%")
+                  ->orWhere('phone', 'LIKE', "%{$q}%")
+                  ->orWhere('id_card', 'LIKE', "%{$q}%")
+                  ->orWhere('iban', 'LIKE', "%{$q}%");
+        })
+
+        ->select('id', 'name', 'phone')
+        ->limit(5)
+        ->get();
+
+    return response()->json($customers);
+}
 }

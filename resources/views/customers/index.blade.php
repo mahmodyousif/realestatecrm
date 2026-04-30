@@ -288,7 +288,5 @@ function goToCustomer(id) {
 }
 </script>
 
-<style>
-   
-</style>
+
 @endsection

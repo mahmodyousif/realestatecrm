@@ -3641,6 +3641,7 @@ textarea {
     .preview-container .unit-cell.sold      { background: #b91c1c; }
     .preview-container .unit-cell.available { background: #888888; }
     .preview-container .unit-cell.reserved  { background: #10b981; }
+    .preview-container .unit-cell.partially_paid  { background: #f59e0b; }
 
     /* Legend */
     .preview-container .legend {
@@ -3680,6 +3681,8 @@ textarea {
     .preview-container .legend-dot.sold      { background: #b91c1c; }
     .preview-container .legend-dot.available { background: #888888; }
     .preview-container .legend-dot.reserved  { background: #10b981; }
+    .preview-container .legend-dot.partially_paid  { background: #f59e0b; }
+
 
    @media print {
     html, body {

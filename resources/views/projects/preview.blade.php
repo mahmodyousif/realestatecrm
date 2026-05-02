@@ -56,9 +56,10 @@
         </div>
 
     <div class="legend">
-        <span class="legend-item"><span class="legend-dot sold"></span>مباع</span>
         <span class="legend-item"><span class="legend-dot available"></span>متاح</span>
         <span class="legend-item"><span class="legend-dot reserved"></span>محجوز</span>
+        <span class="legend-item"><span class="legend-dot partially_paid"></span>بيع جزئي</span>
+        <span class="legend-item"><span class="legend-dot sold"></span>مباع</span>
     </div>
 
 </div>

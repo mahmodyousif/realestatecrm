@@ -268,11 +268,17 @@ input.addEventListener('keyup', function () {
                     html = '<div class="item">لا يوجد نتائج</div>';
                 }
 
+                const dataMap = {
+                    'buyer': 'مشتري',
+                    'investor': 'مستثمر',
+                    'marketer': 'مسوق'
+                };
                 data.forEach(customer => {
                     html += `
                         <div class="item" onclick="goToCustomer(${customer.id})">
                             <strong>${customer.name}</strong>
                             <small>${customer.phone}</small>
+                            <div class="item-type">${dataMap[customer.type] || 'غير معروف'}</div>
                         </div>
                     `;
                 });

@@ -195,7 +195,7 @@ class CustomersController extends Controller
                   ->orWhere('iban', 'LIKE', "%{$q}%");
         })
 
-        ->select('id', 'name', 'phone')
+        ->select('id', 'name', 'phone','type')
         ->limit(5)
         ->get();
 

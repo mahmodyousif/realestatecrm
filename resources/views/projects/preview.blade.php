@@ -23,7 +23,7 @@
             </div>
         </div>
 
-        <table class="table table-bordered preview-table">
+        {{-- <table class="table table-bordered preview-table">
             @foreach($project->units as $unit)
             <tr>
                 <td class="unit-number">نموذج <span>{{$unit->unit_number}}</span></td>
@@ -33,7 +33,7 @@
                 <td class="unit-price">{{number_format($unit->price)}} ريال</td>
             </tr>
             @endforeach
-        </table>
+        </table> --}}
 
 
     <div class="building-wrapper" dir="rtl">
@@ -46,9 +46,11 @@
                 </div>    
                 <div class="units-container">
                     @foreach ($units as $unit)
-                    <div class="unit-cell {{ $unit->status }}">
-                        <span class="unit-name">{{ $unit->type . ' ' . $unit->unit_number }}</span>
-                    </div>
+                        <div class="unit-cell {{ $unit->status }}">
+                            <a href="{{route('units.show', $unit->id)}}" class="unit-name">
+                                {{ $unit->type . ' ' . $unit->unit_number }}
+                            </a>
+                        </div>
                     @endforeach
                 </div>
             </div>

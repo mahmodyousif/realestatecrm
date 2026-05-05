@@ -63,6 +63,7 @@ class UnitSale extends Model {
     public function getTotalPaidAttribute()
     {
         return $this->payments()->sum('amount_paid');
+        
     }
 
     // المتبقي ديناميكي

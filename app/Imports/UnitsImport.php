@@ -73,14 +73,14 @@ class UnitsImport implements ToModel, WithHeadingRow, WithChunkReading, WithVali
             ];
             return null ;
         }
+        $zone = trim((string) $row['zone']);
 
         $existingUnit = Unit::where('unit_number', trim($row['unit_number']))
                         ->where('type', trim($row['type']))
                         ->where('project_id', $projectId)
                         ->where('floor', (int) $row['floor'])
-                        ->where('zone', (int) $row['zone'])
+                        ->where('zone', $zone)
                         ->where('rooms', (int) $row['rooms'])
-   
                       ->exists();
         if ($existingUnit) {
             $this->warningMessages['duplicate_units'][] = [
@@ -106,7 +106,7 @@ class UnitsImport implements ToModel, WithHeadingRow, WithChunkReading, WithVali
             'project_id'  => $projectId,
             'area'        => (float) $row['area'],
             'floor'       => (int) $row['floor'],
-            'zone'        => (int) $row['zone'],
+            'zone'        => $zone,
             'rooms'       => (int) $row['rooms'],
             'price'       => (float) $row['price'],
             'status'      => $status,

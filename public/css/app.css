@@ -3624,18 +3624,24 @@ textarea {
     }
 
     .preview-container .unit-cell {
-        flex: 1;
-        padding: 10px 6px;
-        text-align: center;
-        font-size: 13px;
-        color: #fff;
-        margin: 10px; 
-        border-radius: 8px ;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px
+    flex: 1;
+    margin: 10px;
+    border-radius: 8px;
+    display: flex;
+    font-size: 14px;
+    color: #fff;
     }
+
+   .preview-container .unit-cell a.unit-name {
+    flex: 1;                 /* مهم جدًا */
+    display: flex;           /* بدل block */
+    align-items: center;     /* توسيط عمودي */
+    justify-content: center; /* توسيط أفقي */
+    width: 100%;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+}
 
     /* حالات الوحدة */
     .preview-container .unit-cell.sold      { background: #b91c1c; }
@@ -3714,6 +3720,17 @@ textarea {
         box-shadow: none !important;
         border: none !important;
     }
+
+         a {
+        text-decoration: none !important;
+        color: black !important;
+        display: none !important;
+    }
+
+    a[href]:after {
+        content: "" !important;
+    }
+
 }
 
 
@@ -3731,7 +3748,29 @@ textarea {
     width: fit-content;
 }
 
+.unit-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 4px;
+}
 
+.unit-details span {
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.fully-paid {
+    background-color: var(--success-light);
+    text-align: center;
+    width: fit-content;
+}
+.partially-paid {
+    background-color:  var(--warning-light-alpha);
+    text-align: center;
+    width: fit-content;
+}
 /* Start Customer Search Styles */
 
  .search-box {

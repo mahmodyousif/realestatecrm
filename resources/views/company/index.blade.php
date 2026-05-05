@@ -162,9 +162,14 @@
             <div class="label">المبالغ المتبقية</div>
             <div class="value">{{ number_format($remainingAmount) }} <small>ر.س</small></div>
         </div>
-           <div class="fin-card yellow">
+        <div class="fin-card yellow">
             <div class="label">إجمالي العمولات</div>
             <div class="value">{{ number_format($totalCommission) }} <small>ر.س</small></div>
+        </div>
+
+         <div class="fin-card yellow">
+            <div class="label">المبلغ الصافي بعد العمولات</div>
+            <div class="value">{{ number_format( $amountPaid - $totalCommission) }} <small>ر.س</small></div>
         </div>
     </div>
 

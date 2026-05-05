@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\UnitSalesExport;
+use App\Models\Customer;
 use App\Models\Unit;
 use App\Models\UnitSale;
 use App\Models\UnitSaleCustomer;
@@ -133,30 +134,78 @@ class UnitSaleController extends Controller
     
 
 
+    public function edit($id)
+    {
+        $sale = UnitSale::with(['unit.project' ,'saleCustomers.customer'])->findOrFail($id);
+        $buyers = Customer::where('type','buyer')->get();
+        $investors = Customer::where('type','investor')->get();  
+        $marketers = Customer::where('type','marketer')->get();
+        return view('units.edit_sell', compact('sale', 'buyers', 'investors','marketers'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $sale = UnitSale::findOrFail($id);
+
+        $validated = $request->validate([
+            'sale_date' => ['required', 'date'],
+            'payment_method' => ['required', 'string'],
+            'unit_price' => ['required', 'numeric', 'min:0'],
+            'discount' => ['nullable', 'numeric', 'min:0', 'lte:total_price'],
+            'total_price' => ['nullable', 'numeric', 'min:0'],
+            'commission' => ['nullable', 'numeric', 'min:0'],
+        ], [
+            'discount.lte' => 'الخصم لا يمكن أن يكون أكبر من سعر الوحدة قم بتعديل الخصم',
+            'unit_price.min' => 'سعر الوحدة يجب أن يكون 0 أو أكثر',
+            'discount.min' => 'الخصم يجب أن يكون 0 أو أكثر',
+            'total_price.min' => 'السعر الإجمالي يجب أن يكون 0 أو أكثر',
+            'sale_date.required' => 'تاريخ البيع مطلوب',
+            'payment_method.required' => 'طريقة الدفع مطلوبة',
+        ]);
+
+        $sale->update($validated);
+
+        return redirect()->route('units')->with('success', 'تم تحديث عملية البيع بنجاح');
+    }
+
+    public function destroy($id)
+    {
+        $sale = UnitSale::findOrFail($id);
+        $unit = $sale->unit;
+        $sale->delete();
+
+        // إعادة تعيين حالة الوحدة إلى "متاحة" بعد حذف عملية البيع
+        if ($unit) {
+            $unit->status = 'available';
+            $unit->save();
+        }
+
+        return back()->with('success', 'تم حذف عملية البيع بنجاح');
+    }
     public function unitSellImport(Request $request)
-{
-    $request->validate([
-        'file' => 'required|file|mimes:xlsx,xls,csv',
-    ]);
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
 
-    $import = new \App\Imports\SoldUnitImport();
-    Excel::import($import, $request->file('file'));
+        $import = new \App\Imports\SoldUnitImport();
+        Excel::import($import, $request->file('file'));
 
-    $response = [];
+        $response = [];
 
-    if ($import->addedCount > 0) {
-        $response['success'] = "تم تسجيل {$import->addedCount} عملية بيع بنجاح";
-    } else {
-        $response['error'] = 'لم يتم تسجيل أي عملية بيع';
-    }
+        if ($import->addedCount > 0) {
+            $response['success'] = "تم تسجيل {$import->addedCount} عملية بيع بنجاح";
+        } else {
+            $response['error'] = 'لم يتم تسجيل أي عملية بيع';
+        }
 
-    // ✅ فلترة المصفوفات الفارغة فقط
-    $warnings = array_filter($import->warningMessages);
-    if (!empty($warnings)) {
-        $response['warnings'] = $warnings;
-    }
+        // ✅ فلترة المصفوفات الفارغة فقط
+        $warnings = array_filter($import->warningMessages);
+        if (!empty($warnings)) {
+            $response['warnings'] = $warnings;
+        }
 
-    return redirect()->back()->with($response);
+        return redirect()->back()->with($response);
 }
     public function export()
     {

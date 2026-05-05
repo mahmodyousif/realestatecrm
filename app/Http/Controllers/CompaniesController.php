@@ -18,7 +18,9 @@ class CompaniesController extends Controller
             'units as available_units_count' => fn($q) => $q->where('units.status', 'available'),
             'units as sold_units_count'      => fn($q) => $q->where('units.status', 'sold'),
             'units as reserved_units_count'  => fn($q) => $q->where('units.status', 'reserved'),
-        ])->withCount('projects')->findOrFail($id);
+            'units as partially_paid_units_count' => fn($q) => $q->where('units.status', 'partially_paid'),
+       
+            ])->withCount('projects')->findOrFail($id);
 
         // مجموع السعر الإجمالي للوحدات التابعة للشركة
         $totalSalesPrice = UnitSale::whereHas('unit.project', function($q) use ($id) {

@@ -55,7 +55,7 @@
                         <a href="{{ route('units') }}" class="{{ request()->routeIs('units') ? 'active' : '' }}"><i
                                 class="fa-solid fa-house-chimney icon"></i> <span>الوحدات</span></a>
                     
-                        <a href="{{route('managment')}}" class="{{ request()->routeIs('managment') ? 'active' : '' }}"><i
+                        <a href="{{route('management')}}" class="{{ request()->routeIs('management') ? 'active' : '' }}"><i
                                 class="fa-solid fa-file-contract icon"></i> <span>إدارة عمليات البيع</span></a>
                     @endcan
 

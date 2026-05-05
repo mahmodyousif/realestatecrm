@@ -5,7 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ManagmentController;
+use App\Http\Controllers\ManagementController;
 use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\ProjectsController;
 use App\Http\Controllers\ReportsController ;
@@ -89,7 +89,7 @@ Route::middleware(['auth' , 'role:seller'])->group(function(){
     Route::get('/units/{unit}', [UnitsController::class, 'show'])->name('units.show');
     Route::get('unit.sell/{id}', [UnitsController::class, 'unitSell'])->name('unit.sell') ;
     Route::post('unit_sell',[UnitSaleController::class,'store'])->name('unit_sell');
-    Route::get('managment' , [ManagmentController::class , 'index'])->name('managment') ;
+    Route::get('management' , [ManagementController::class , 'index'])->name('management') ;
     Route::get('edit_sell/{id}', [UnitSaleController::class, 'edit'])->name('edit_sell') ;
     Route::put('update_sell/{id}', [UnitSaleController::class, 'update'])->name('update_sell') ;
     Route::get('delete_sell/{id}', [UnitSaleController::class, 'destroy'])->name('delete_sell') ;

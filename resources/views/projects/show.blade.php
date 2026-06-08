@@ -24,6 +24,10 @@
             <h3>إجمالي قيمة الوحدات</h3>
             <div class="amount profit">{{number_format($totalPrice)}} ريال</div>
         </div>
+        <div class="summary-card">
+            <h3>إجمالي الوحدات المضافة</h3>
+            <div class="amount profit">{{number_format($allUnitsCount)}} وحدة</div>
+        </div>
 
         <div class="summary-card">
             <h3>إجمالي المبيعات (عقود)</h3>

@@ -17,7 +17,7 @@ class DashboardController extends Controller
         $projects = Project::with('units')
         ->when($request->company_id, function($q) use ($request){
             $q->where('company_id' , $request->company_id) ;
-        })->latest()->take(10)->get(); 
+        })->latest()->take(5)->get(); 
 
         $projectsCount = Project::when($request->company_id, function($q) use ($request){
             $q->where('company_id' , $request->company_id) ;

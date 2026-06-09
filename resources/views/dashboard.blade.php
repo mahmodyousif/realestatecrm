@@ -38,11 +38,10 @@
                     <label>المشروع</label>
                     <select name="project_id"  id="projectSelect">
                         <option value="">جميع المشاريع</option>
-                        @foreach($projects as $project)
+                        @foreach($projectOptions as $project)
                             <option value="{{ $project->id }}" {{ request('project_id') == $project->id ? 'selected' : '' }}>
                                 {{ $project->name }}
                             </option>
-                            
                         @endforeach
                     </select>
                 </div>

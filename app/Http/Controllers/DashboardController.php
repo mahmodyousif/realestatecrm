@@ -14,6 +14,10 @@ class DashboardController extends Controller
         $totalPaid = Payment::sum('amount_paid') ; 
         $totalRemaining = $totalPrice - $totalPaid ; 
 
+        $projectOptions = Project::when($request->company_id, function($q) use ($request){
+            $q->where('company_id' , $request->company_id) ;
+        })->get();
+
         $projects = Project::with('units')
         ->when($request->company_id, function($q) use ($request){
             $q->where('company_id' , $request->company_id) ;
@@ -112,6 +116,7 @@ class DashboardController extends Controller
 
         return view('dashboard', compact(
             'projects' ,
+            'projectOptions',
             'projectsCount' ,
             'unitsCount' ,
             'availableUnitsCount' ,

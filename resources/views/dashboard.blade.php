@@ -21,7 +21,7 @@
     @endif
 
     <div class="filters-card-nested">
-        <form method="GET" action="">
+        <form id="dashboardFilterForm" method="GET" action="">
             <div class="filters-grid-nested">
                 <div class="filter-group-nested">
                     <label>الشركة</label>
@@ -54,8 +54,27 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterForm = document.getElementById('dashboardFilterForm');
+            const companySelect = document.getElementById('companySelect');
+            const projectSelect = document.getElementById('projectSelect');
 
-</script>
+            companySelect.addEventListener('change', function () {
+                if (companySelect.value === '') {
+                    projectSelect.value = '';
+                }
+            });
+
+            filterForm.addEventListener('submit', function () {
+                if (companySelect.value === '') {
+                    companySelect.removeAttribute('name');
+                }
+                if (projectSelect.value === '') {
+                    projectSelect.removeAttribute('name');
+                }
+            });
+        });
+    </script>
     <div class="stats-grid">
         <div class="stat-card blue">
             <div class="card-icon"><i class="fa-solid fa-city"></i></div>

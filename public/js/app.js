@@ -9,6 +9,7 @@ document.getElementById('companySelect')?.addEventListener('change', function() 
 
     if (!projectSelect) return;
 
+    
     fetch(`/projects-by-company/${companyId}`)
         .then(response => response.json())
         .then(data => {

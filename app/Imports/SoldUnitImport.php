@@ -274,7 +274,7 @@ class SoldUnitImport implements
         DB::transaction(function () use (
             $unit, $customers, $unitPrice, $discount,
             $totalPrice, $commission, $saleDate,
-            $paymentMethod, $totalPaid
+            $paymentMethod, $totalPaid, $marketer
         ) {
 
             $sale = UnitSale::create([

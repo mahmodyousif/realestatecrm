@@ -75,6 +75,7 @@ class CustomersController extends Controller
     ])
     ->withSum('marketedSales as totalPrice', 'total_price')
     ->withCount('marketedSales as sales_count')
+    ->where('type', 'marketer')
     ->findOrFail($id);
 
     $commission = UnitSale::where('marketer_id', $id)->sum('commission');

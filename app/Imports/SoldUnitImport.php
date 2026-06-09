@@ -40,6 +40,7 @@ class SoldUnitImport implements
         'share_not_100'          => [],
         'invalid_customer_type'  => [],
         'missing_customer'       => [],
+        'missing_marketer'       => [],
     ];
 
     public function __construct()
@@ -222,6 +223,24 @@ class SoldUnitImport implements
         $commission = (float) ($firstRow['commission'] ?? 0);
         $saleDate   = $this->transformDate($firstRow['sale_date'] ?? null);
 
+        $marketerName = trim($firstRow['marketer'] ?? '');
+        $marketer = null;
+
+        if ($marketerName !== '') {
+            $marketer = Customer::whereRaw('LOWER(name) = ?', [mb_strtolower($marketerName)])
+                ->where('type', 'marketer')
+                ->first();
+
+            if (!$marketer) {
+                $this->warningMessages['missing_marketer'][] = [
+                    'unit_number'   => $unitNumber,
+                    'project'       => $projectName,
+                    'marketer'      => $marketerName,
+                ];
+                return;
+            }
+        }
+
         // ── الدفع ──
         $paymentMethods = [
             'كاش'        => 'cash',
@@ -260,6 +279,7 @@ class SoldUnitImport implements
 
             $sale = UnitSale::create([
                 'unit_id'        => $unit->id,
+                'marketer_id'    => $marketer?->id,
                 'sale_date'      => $saleDate,
                 'payment_method' => $paymentMethod,
                 'unit_price'     => $unitPrice,

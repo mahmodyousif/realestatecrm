@@ -3,25 +3,30 @@
 // ============================
 
 // تحديث قائمة المشاريع بناءً على الشركة المختارة
-document.getElementById('companySelect')?.addEventListener('change', function() {
+document.getElementById('companySelect')?.addEventListener('change', function () {
     let companyId = this.value;
     let projectSelect = document.getElementById('projectSelect');
 
     if (!projectSelect) return;
 
-    
-    fetch(`/projects-by-company/${companyId}`)
-        .then(response => response.json())
+    let url = '/projects-by-company';
+
+    if (companyId) {
+        url += `?company_id=${companyId}`;
+    }
+
+    fetch(url)
+        .then(res => res.json())
         .then(data => {
             projectSelect.innerHTML = '<option value="">جميع المشاريع</option>';
+
             data.forEach(project => {
                 let option = document.createElement('option');
                 option.value = project.id;
                 option.textContent = project.name;
                 projectSelect.appendChild(option);
             });
-        })
-        .catch(err => console.error('Error fetching projects:', err));
+        });
 });
 
 // --- مودال إضافة مشروع ---

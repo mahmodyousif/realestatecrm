@@ -275,7 +275,7 @@ input.addEventListener('keyup', function () {
                 };
                 data.forEach(customer => {
                     html += `
-                        <div class="item" onclick="goToCustomer(${customer.id})">
+                        <div class="item" onclick="goToCustomer(${customer.id}, '${customer.type}')">
                             <strong>${customer.name}</strong>
                             <small>${customer.phone}</small>
                             <div class="item-type">${dataMap[customer.type] || 'غير معروف'}</div>
@@ -289,7 +289,12 @@ input.addEventListener('keyup', function () {
     }, 300);
 });
 
-function goToCustomer(id) {
+function goToCustomer(id, type) {
+    if (type === 'marketer') {
+        window.location.href = `/marketers/${id}`;
+        return;
+    }
+
     window.location.href = `/customers/${id}`;
 }
 </script>

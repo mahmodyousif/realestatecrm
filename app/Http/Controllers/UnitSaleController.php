@@ -117,16 +117,16 @@ class UnitSaleController extends Controller
 
         // حساب إجمالي المدفوعات من البيانات المرسلة
         $totalPaid = array_sum(array_column($validated['customers'], 'amount_paid'));
-
-        if ($totalPaid >= $validated['total_price']) {
-          $unit->status = 'sold';
-        } elseif ($totalPaid > 10000) {
-            $unit->status = 'partially_paid';
-        } elseif ($totalPaid > 0) {
-            $unit->status = 'reserved';
-        } else {
-            $unit->status = 'available';
+        if($totalPaid >= $totalPrice){
+            $unit->status = 'sold';
+            } elseif($totalPaid > 0 && $totalPaid < 25000){
+                $unit->status = 'reserved';
+            } elseif ($totalPaid >= 25000 && $totalPaid < $totalPrice) {
+                $unit->status = 'partially_paid';
+            } else {
+                $unit->status = 'available';
         }
+
         $unit->save();
     
         return redirect()->route('units')->with('success', 'تم اجراء عملية بيع بنجاح');

@@ -140,12 +140,12 @@
 
                     <div class="form-group">
                         <label><i class="fas fa-money-bill-wave"></i> المبلغ المدفوع</label>
-                        <input type="number" name="customers[0][amount_paid]" min="0" step="0.01">
+                        <input type="number" name="customers[0][amount_paid]" min="0" step="0.01" required>
                     </div>
 
                     <div class="form-group">
                         <label><i class="fas fa-file-contract"></i> رقم العقد</label>
-                        <input type="text" name="customers[0][contract_number]">
+                        <input type="text" name="customers[0][contract_number]" required> 
                     </div>
 
                     <button type="button" class="btn add-btn remove-buyer" style="display: none;"

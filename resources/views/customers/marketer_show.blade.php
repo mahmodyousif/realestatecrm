@@ -110,7 +110,7 @@
                         </td>
                         
                         <td><span class="buyer-name">{{ $sale->commission ?? '-' }} ر.س</span></td>
-                        <td><span class="buyer-name">{{ $sale->buyer->name ?? '-' }}</span></td>
+                        <td><span class="buyer-name">{{ $sale->saleCustomers->first()->customer->name ?? '-' }}</span></td>
                         <td><span class="price-bold">{{ number_format($sale->total_price) }} ريال</span></td>
                         {{-- <td>
                             <div class="payment-progress-mini">

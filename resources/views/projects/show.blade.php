@@ -124,10 +124,11 @@
                             <th>رقم الوحدة</th>
                             <th>المساحة</th>
                             <th>الطابق</th>
-                            <th>السعر</th>
                             <th>المشتري</th>
                             <th>المسوق</th>
+                            <th>السعر</th>
                             <th>المدفوع</th>
+                            <th>الخصم</th>
                             <th>المتبقي</th>
                             <th>الحالة</th>
                         </tr>
@@ -135,29 +136,37 @@
                     <tbody>
                         @foreach($project->units as $unit)
                             @php
-                                $amountPaid = $unit->unitSale?->payments->sum('amount_paid') ?? 0;
-                                $unitPrice = $unit->price ?? 0;
-                                $remaining = $unitPrice - $amountPaid;
-                                
-                                $statusClass = match($unit->status) {
+                                $sale = $unit->unitSale;
+
+                                $amountPaid = $sale?->payments?->sum('amount_paid') ?? 0;
+
+                                $salePrice = $sale?->price ?? $unit->price;
+
+                                $discount = $sale?->discount ?? 0;
+
+                                $netPrice = $salePrice - $discount;
+
+                                $remaining = $netPrice - $amountPaid;
+
+                                $statusClass = match($sale?->status) {
                                     'sold' => 'sold',
                                     'reserved' => 'reserved',
                                     'partially_paid' => 'partially-paid',
                                     default => 'available'
                                 };
-                                $statusLabel = match($unit->status) {
+
+                                $statusLabel = match($sale?->status) {
                                     'sold' => 'مباعة',
                                     'reserved' => 'محجوزة',
                                     'partially_paid' => 'بيع جزئي',
                                     default => 'متاحة'
                                 };
-                            @endphp 
+                            @endphp
                             <tr>
                                 <td>{{$unit->type}}</td>
                                 <td><strong>{{$unit->unit_number}}</strong></td>
                                 <td>{{$unit->area}} م²</td>
                                 <td>{{$unit->floor}}</td>
-                                <td>{{number_format($unitPrice)}}</td> 
                                 <td>
                                     @if($unit->unitSale && $unit->unitSale->saleCustomers->count() > 0)
                                         {{ $unit->unitSale->customer_names }}
@@ -166,7 +175,9 @@
                                     @endif
                                 </td>
                                 <td>{{$unit->unitSale?->marketer?->name ?? '-'}}</td>
+                                <td>{{ number_format($salePrice) }}</td>
                                 <td class="income">{{number_format($amountPaid)}}</td> 
+                                <td>{{ number_format($discount) }}</td>
                                 <td class="expense">{{number_format($remaining)}}</td> 
                                 <td>
                                     <span class="status-badge {{$statusClass}}">{{$statusLabel}}</span>

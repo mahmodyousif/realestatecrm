@@ -25,9 +25,9 @@ class CustomersController extends Controller
                     $qq->where('company_id', $companyId);
                 })
                 // المستثمرين
-                ->orWhereHas('investor.unit.project', function($qq) use ($companyId) {
-                    $qq->where('company_id', $companyId);
-                })
+                ->orWhereHas('saleCustomers.unitSale.unit.project', function($qq) use ($companyId) {
+    $qq->where('company_id', $companyId);
+})
                 // البائعين
                 ->orWhereHas('marketedSales.unit.project', function($qq) use ($companyId) {
                     $qq->where('company_id', $companyId);
@@ -39,9 +39,9 @@ class CustomersController extends Controller
                 $q->whereHas('purchases.unit.project', function($qq) use ($projectId) {
                     $qq->where('id', $projectId);
                 })
-                ->orWhereHas('investor.unit.project', function($qq) use ($projectId) {
-                    $qq->where('id', $projectId);
-                })
+                ->orWhereHas('saleCustomers.unitSale.unit.project', function($qq) use ($projectId) {
+    $qq->where('id', $projectId);
+})
                 ->orWhereHas('marketedSales.unit.project', function($qq) use ($projectId) {
                     $qq->where('id', $projectId);
                 });
@@ -71,6 +71,7 @@ class CustomersController extends Controller
    public function marketerShow($id) {
     $marketer = Customer::with([
         'marketedSales.unit',
+         'marketedSales.saleCustomers.customer',
         'marketedSales.saleCustomers.payments',
     ])
     ->withSum('marketedSales as totalPrice', 'total_price')

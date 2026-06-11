@@ -3629,7 +3629,7 @@ textarea {
     border-radius: 8px;
     display: flex;
     font-size: 14px;
-    color: #fff;
+    color: #fff !important;
     }
 
    .preview-container .unit-cell a.unit-name {
@@ -3721,15 +3721,12 @@ textarea {
         border: none !important;
     }
 
-         a {
+    a {
         text-decoration: none !important;
-        color: black !important;
-        display: none !important;
+        color: #fff !important;
     }
 
-    a[href]:after {
-        content: "" !important;
-    }
+  
 
 }
 

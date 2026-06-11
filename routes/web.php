@@ -18,7 +18,9 @@ use Illuminate\Support\Facades\Route;
 
 
     Route::get('/projects-by-company/{company}', [ProjectsController::class, 'getByCompany'])->name('projects.byCompany');
-
+    Route::get('/projects-all', function () {
+        return \App\Models\Project::select('id', 'name')->get();
+    });
 Route::get('projects/create', [ProjectsController::class, 'create'])->name('projects.create');
 
 Route::middleware(['auth' , 'role:admin'])->group(function(){

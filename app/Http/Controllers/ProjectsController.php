@@ -81,12 +81,29 @@ class ProjectsController extends Controller
             return $unit->unitSale ? $unit->unitSale->payments->sum('amount_paid') : 0;
         });
 
-        $totalPrice = $project->units->sum('price');
-        $totalSoldPrice = $soldUnits->sum('price');
+        // $totalPrice = $project->units->sum('price');
+        // $totalSoldPrice = $soldUnits->sum('price');
+        // $discountAmount = $soldUnits->sum(function ($unit) {
+        //     return $unit->unitSale ? $unit->unitSale->discount : 0;
+        // });
+        // $totalSoldPrice -= $discountAmount;
+        // $totalRemaining = $totalSoldPrice  - $totalPaid;
 
-        $totalRemaining = $totalSoldPrice  - $totalPaid;
-        return view('projects.show', compact('project' , 'allUnitsCount', 'soldUnitsCount', 'reservedUnitsCount', 'availableUnitsCount', 'partiallyPaidCount', 'totalPrice', 'totalPaid', 'totalSoldPrice', 'totalRemaining'));
-    }
+
+        $totalPrice = $project->units->sum('price');
+
+        $totalSoldPrice = $soldUnits->sum(function ($unit) {
+            $sale = $unit->unitSale;
+
+            if (!$sale) return 0;
+
+            return ($sale->price ?? $unit->price) - ($sale->discount ?? 0);
+        });
+
+        $totalRemaining = $totalSoldPrice - $totalPaid;
+            return view('projects.show', compact('project' , 'allUnitsCount', 'soldUnitsCount', 'reservedUnitsCount', 'availableUnitsCount', 'partiallyPaidCount', 'totalPrice', 'totalPaid', 'totalSoldPrice', 'totalRemaining',
+        ));
+        }
 
     public function preview($id)
     {

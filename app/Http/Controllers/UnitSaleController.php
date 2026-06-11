@@ -176,7 +176,7 @@ class UnitSaleController extends Controller
 
         // إعادة تعيين حالة الوحدة إلى "متاحة" بعد حذف عملية البيع
         if ($unit) {
-            $unit->status = 'available';
+            $unit->update(['status' => 'available']);
             $unit->save();
         }
 

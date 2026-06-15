@@ -105,6 +105,11 @@
                 <div class="table-frame">
                     <x-customer-table :customers="$data->where('type','buyer')" />              
                 </div>
+
+                <div class="pagination-wrapper">
+                    {{ $data->links('pagination.custom') }}
+                </div>
+                
             </div>
 
     </div>
@@ -119,11 +124,15 @@
     
             <div class="table-frame">
                 <x-customer-table :customers="$data->where('type','investor')" />
-
+            </div>
+            <div class="pagination-wrapper">
+                {{ $data->links('pagination.custom') }}
             </div>
         </div>
     </div>
-
+<a href="{{ route('customers.export') }}" class="btn btn-success">
+    تصدير العملاء
+</a>
     <div id="marketers" class="tab-content" style="display: none;">
         <div class="main-content-card">
             <div class="card-title-area">
@@ -133,6 +142,9 @@
     
             <div class="table-frame">
                 <x-customer-table :customers="$data->where('type','marketer')" />
+            </div>
+            <div class="pagination-wrapper">
+                {{ $data->links('pagination.custom') }}
             </div>
 </div>
     </div>

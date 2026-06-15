@@ -1453,6 +1453,13 @@ ul {
     text-decoration: none;
     border: none;
 }
+
+tr .action-link.unit_sell_delete {
+    background-color: var(--danger-color);
+    border: none;
+    color: #fff;
+    width: 100%;
+}
 .unit-card-nested .unit-footer-nested .action-link {
     width: 40px;
     height: 40px;

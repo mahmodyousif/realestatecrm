@@ -34,7 +34,7 @@
     </div>
     <div class="form-group">
         <label>رقم الهوية / السجل التجاري</label>
-        <input type="text" placeholder="رقم الهوية أو السجل التجاري"value="{{$customer->id_card}}" required="" name="id_card"/>
+        <input type="text" placeholder="رقم الهوية أو السجل التجاري"value="{{$customer->id_card}}" name="id_card"/>
     </div>
     <div class="form-group">
         <label>رقم الجوال</label>

@@ -37,7 +37,7 @@ class CompanyStatsSheet implements FromCollection, WithHeadings, WithTitle, Shou
             $q->where('company_id', $this->companyId)
         )->sum('total_price');
 
-        $paid = Payment::whereHas('unitSale.unit.project', fn($q) =>
+        $paid = Payment::whereHas('unitSaleCustomer.unitSale.unit.project', fn($q) =>
             $q->where('company_id', $this->companyId)
         )->sum('amount_paid');
 

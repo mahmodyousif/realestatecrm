@@ -32,8 +32,23 @@
             <a href="{{ route('customers.exportFull', $customer->id) }}" class="btn-export">
                 <i class="fas fa-file-export"></i> تصدير تقرير العميل
             </a>
-        </div>
+         <a href="{{ route('customer.edit', $customer) }}" class="action-link edit" title="تعديل"><i class="fas fa-edit"></i></a>
+                    <form action="{{ route('customer.destroy', $customer) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                                class="action-link delete"
+                                title="حذف"
+                                onclick="return confirm('هل أنت متأكد من حذف هذا العميل؟ لا يمكن التراجع عن العملية');">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
     {{-- الإحصائيات السريعة --}}
+       
+        </div>
+
+        
+       
     <div class="dashboard-stats-grid">
         <div class="mini-stat-card">
             <div class="icon-wrap accent-bg"><i class="fas fa-home"></i></div>

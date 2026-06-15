@@ -10,8 +10,8 @@
 @section('content')
 
 
-
 <div class="main-content-card">
+    
         <div class="card-title-area">
             <h2><i class="fas fa-handshake"></i> جدول عمليات البيع</h2>
             <p>عرض جميع العمليات وحالتها المالية والإدارية</p>
@@ -62,11 +62,12 @@
                         <td>{{number_format($unit->remaining)}}</td>
                         <td>{{ $unit->unit->unitSale->sale_date }}</td>
                         <td>
-                            @if ($unit->status === 'sold')          مباعة
-                            @elseif ($unit->status === 'reserved')   محجوزة
-                            @elseif ($unit->status === 'partially_paid') دفع جزئي
+                            @if ($unit->unit->status === 'sold')          مباعة
+                            @elseif ($unit->unit->status === 'reserved')   محجوزة
+                            @elseif ($unit->unit->status === 'partially_paid') دفع جزئي
                             @else جاهزة للبيع
-                            @endif
+                            @endif 
+                      
                         </td>
                         <td>
                             <div class="unit-actions-nested">
@@ -98,3 +99,5 @@
 
 
 @endsection
+
+

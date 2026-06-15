@@ -10,7 +10,7 @@ class ManagementController extends Controller
 {
     public function index()
     {
-        $data = UnitSale::with('unit.project.company','payments','customers')->paginate(10)->appends(request()->query());; 
+        $data = UnitSale::with('unit.project.company','payments','customers')->paginate(5)->appends(request()->query()) ; 
         return view('units.management', compact('data')) ;
     }
 }

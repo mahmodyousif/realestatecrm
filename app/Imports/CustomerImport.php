@@ -16,14 +16,11 @@ class CustomerImport  implements ToModel, WithHeadingRow, WithChunkReading
     
      public $addedCount = 0;
      public $errors = [];
-    protected $existingCustomers;
-
+    
     public function __construct()
     {
-        // جلب العملاء الموجودين مسبقًا مرة واحدة
-        $this->existingCustomers = Customer::select('name', 'phone')->get()->map(function($customer) {
-            return trim($customer->name) . '_' . trim($customer->phone);
-        })->toArray();
+    
+
         HeadingRowFormatter::extend('custom', function ($value) {
             return match (trim($value)) {
                 'نوع العميل'            => 'type',
@@ -38,18 +35,18 @@ class CustomerImport  implements ToModel, WithHeadingRow, WithChunkReading
             };
         });
         HeadingRowFormatter::default('custom');
-    }   
+    }
+    
+    
     public function model(array $row)
     {
 
         $name  = trim($row['name'] ?? '');
         $phone = trim($row['phone'] ?? '');
         $type = trim($row['type'] ?? '');
-        $key = $name . '_' . $phone;
+        $key = $name . '_' . $phone . '_' . $type; // مفتاح فريد يجمع الاسم، الهاتف، والنوع
 
-            if(in_array($key, $this->existingCustomers)) {
-                return null; // تجاهل العملاء الذين لديهم نفس الاسم ورقم الهاتف
-        }
+        
         if(empty($name)|| empty($type)) {
             return null; 
         }
@@ -62,13 +59,16 @@ class CustomerImport  implements ToModel, WithHeadingRow, WithChunkReading
             $type = 'buyer' ; 
         }
 
-       
+        $existingCustomer = Customer::where('name', $name)
+            ->where('phone', $phone)
+            ->where('type', $type)
+            ->exists();
+
+            if($existingCustomer) {
+                return null; // الصف لا يضاف
+            }
 
         $id_card = isset($row['id_card']) ? trim($row['id_card']) : null;
-        // if($id_card && !preg_match('/^\d{10}$/', $id_card)) {
-        //     $this->errors[] = "رقم الهوية غير صالح للعميل: " . $name;
-        //     $id_card = null; // الصف يضاف بدون رقم هوية
-        // }
     
 
         $this->addedCount++;

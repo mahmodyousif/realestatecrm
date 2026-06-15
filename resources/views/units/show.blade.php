@@ -72,8 +72,9 @@
             @if($unit->unitSale)
 
                 <tr >
-                     <th colspan="2" class="table-header-centered">تفاصيل البيع</th>
-                </tr>
+                     <th class="table-header-centered">تفاصيل البيع</th>
+               </tr>
+
 
                 <tr class="highlight-row">
                     <th><i class="fas fa-cash-register"></i> قيمة الخصم</th>
@@ -131,6 +132,21 @@
                     <th><i class="fas fa-money-bill-wave"></i> قيمة العمولة</th>
                     <td>{{number_format($unit->unitSale->commission) ?? 0 }} ر.س</td>
                 </tr>
+
+                 <tr>
+                    <th><i class="fas fa-calendar-alt"></i> تاريخ البيع</th>
+                    <td>{{ $unit->unitSale->sale_date }}</td>
+                </tr>
+
+                <tr>
+                    <th>الاجراء</th>
+                    <td>
+                        <a href="{{ route('delete_sell', $unit->unitSale) }}"  class="action-link unit_sell_delete" title="حذف" onclick="return confirm('هل أنت متأكد من حذف عملية البيع هذه ؟')">
+                            حذف عملية البيع 
+                        </a>
+                    </td>
+                </tr>
+               
             @endif
 
           

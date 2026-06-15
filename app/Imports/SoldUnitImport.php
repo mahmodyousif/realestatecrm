@@ -261,7 +261,7 @@ class SoldUnitImport implements
 
         // ── الدفع الكلي ──
         $totalPaid = array_sum(array_column($customers, 'amount_paid'));
-
+            
         if ($totalPaid > $totalPrice) {
             $this->warningMessages['overpaid'][] = [
                 'unit_number' => $unitNumber,
@@ -311,10 +311,15 @@ class SoldUnitImport implements
                 }
             }
 
-            $unit->status = ($totalPaid == 0)
-                ? 'reserved'
-                : (($totalPaid >= $totalPrice) ? 'sold' : 'partially_paid');
-
+           if($totalPaid >= $totalPrice){
+            $unit->status = 'sold';
+            } elseif($totalPaid > 0 && $totalPaid < 25000){
+                $unit->status = 'reserved';
+            } elseif ($totalPaid >= 25000 && $totalPaid < $totalPrice) {
+                $unit->status = 'partially_paid';
+            } else {
+                $unit->status = 'available';
+        }
             $unit->save();
 
             $this->addedCount++;

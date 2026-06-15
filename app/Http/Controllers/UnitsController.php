@@ -25,7 +25,7 @@ class UnitsController extends Controller
         ->when($request->project_id, fn($q) => $q->where('project_id', $request->project_id))
         ->when($request->status, fn($q) => $q->where('status', $request->status))
         ->when($request->floor, fn($q) => $q->where('floor', $request->floor))
-        ->paginate(10)->appends(request()->query());;
+        ->paginate(10)->appends(request()->query()) ;
 
         return view('units.index', [
             'data' => $data,
@@ -144,5 +144,5 @@ class UnitsController extends Controller
      * استيراد عمليات بيع الوحدات من ملف Excel
      * لكل صف سيتم إنشاء سجل في unit_sales، إضافة دفعة كاملة ثم تحديث حالة الوحدة إلى مباعة
      */
-   
+
 }

@@ -14,9 +14,9 @@ use App\Http\Controllers\UnitsController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
   
+    Route::get('/customers/export', [CustomersController::class, 'export'])
+    ->name('customers.export');
     Route::get('/customers/search', [CustomersController::class, 'search']);
-
-
     Route::get('/projects-by-company/{company}', [ProjectsController::class, 'getByCompany'])->name('projects.byCompany');
     Route::get('/projects-all', function () {
         return \App\Models\Project::select('id', 'name')->get();

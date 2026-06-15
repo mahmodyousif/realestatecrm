@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\CustomerExport;
 use App\Exports\CustomerFullExport;
+use App\Exports\CustomersExport;
 use App\Exports\MarketerExport;
 use App\Imports\CustomerImport;
 use App\Models\Company;
@@ -47,7 +48,7 @@ class CustomersController extends Controller
                 });
             });
         })
-        ->get();
+        ->paginate(10)->appends(request()->query());
         $allProjects = Project::all();
         $companies = Company::all();    
         return view('customers.index' , compact('data', 'allProjects', 'companies')) ;
@@ -182,9 +183,12 @@ class CustomersController extends Controller
 
     }
 
-
+    public function export()
+    {
+        return Excel::download(new CustomersExport, 'customers.xlsx');
+    }
     public function search(Request $request)
-{
+    {
     $q = $request->q;
 
     if (!$q || strlen($q) < 3) {

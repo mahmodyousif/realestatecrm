@@ -65,14 +65,21 @@ class DashboardController extends Controller
             }) ;
         })->count();
 
-        $latestUnitSold = Unit::with('project')->where('status' , 'sold')
-        ->when($request->project_id, fn($q) => $q->where('project_id', $request->project_id))
-        ->when($request->company_id, function($q) use ($request){
-            $q->whereHas('project', function($query) use ($request){
-                $query->where('company_id' , $request->company_id) ;
-            }) ;
-        })
-        ->latest()->take(5)->get() ;
+
+        $latestUnitSold = UnitSale::with('unit.project')
+            ->when($request->project_id, function ($q) use ($request) {
+                $q->whereHas('unit', function ($query) use ($request) {
+                    $query->where('project_id', $request->project_id);
+                });
+            })
+            ->when($request->company_id, function ($q) use ($request) {
+                $q->whereHas('unit.project', function ($query) use ($request) {
+                    $query->where('company_id', $request->company_id);
+                });
+            })
+            ->orderByDesc('sale_date')
+            ->take(5)
+            ->get();
 
         $projectCountThisMonth = Project::when($request->company_id, function($q) use ($request){
             $q->where('company_id' , $request->company_id) ;

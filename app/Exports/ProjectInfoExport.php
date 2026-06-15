@@ -52,6 +52,7 @@ class ProjectInfoExport implements WithMultipleSheets
                     // عد الوحدات حسب الحالة
                     $soldUnitsCount = $units->where('status', 'sold')->count();
                     $reservedUnitsCount = $units->where('status', 'reserved')->count();
+                    $partiallyPaidUnitsCount =$units->where('status','partially_paid')->count();
                     $availableUnitsCount = $units->where('status', 'available')->count();
                 
                 
@@ -70,6 +71,7 @@ class ProjectInfoExport implements WithMultipleSheets
                             'عدد الوحدات المباعة' , 
                             'عدد الوحدات المحجوزة' ,
                             'عدد الوحدات المتاحة' ,
+                            'عدد الوحدات المدفوعة جزئياً'
 
                         ] ,
 
@@ -85,7 +87,8 @@ class ProjectInfoExport implements WithMultipleSheets
                             number_format($totalRemaining) . ' ريال' ,
                             $soldUnitsCount . ' وحدة' , 
                             $reservedUnitsCount . ' وحدة' , 
-                            $availableUnitsCount . ' وحدة'
+                            $availableUnitsCount . ' وحدة', 
+                            $partiallyPaidUnitsCount . ' وحدة'
                         ] ,
                     ] ;
                 }
@@ -117,6 +120,8 @@ class ProjectInfoExport implements WithMultipleSheets
                         $remaining = $salePrice - $paid;
                         $buyer = $unit->unitSale ? $unit->unitSale->customer_names : '-'; 
                         $marketer = $unit->unitSale ? $unit->unitSale->marketer?->name : '-'; 
+                        $contractNumber = $unit->unitSale?->contract_numbers ?? '-';
+                        
                         return [
                             $unit->type,
                             $unit->unit_number,
@@ -129,22 +134,24 @@ class ProjectInfoExport implements WithMultipleSheets
                             number_format($salePrice) . ' ريال',  
                             number_format($sale ? ($sale->discount ?? 0) : 0) . ' ريال',   
                             number_format($remaining) . ' ريال',
-                            $unit->status === 'sold' ? 'مباعة' : ($unit->status === 'reserved' ? 'محجوزة' : 'متاحة'),
-                        ];
+                            $contractNumber,
+                            $unit->status === 'sold' ? 'مباعة' : ($unit->status === 'reserved' ? 'محجوزة': ($unit->status === 'partially_paid' ? 'مدفوعة جزئياً' : 'متاحة')),
+
+                            ];
                     })->toArray();
                 }
 
                 public function headings(): array
                 {
-                    return ['نوع الوحدة','رقم الوحدة','المساحة','الطابق','عدد الغرف','السعر' ,'المشتري','المسوق' ,'المدفوع' ,'الخصم' ,'المتبقي' ,'الحالة'];
+                    return ['نوع الوحدة','رقم الوحدة','المساحة','الطابق','عدد الغرف','السعر' ,'المشتري','المسوق' ,'المدفوع' ,'الخصم' ,'المتبقي' ,'رقم العقد','الحالة'];
                 }
 
                 public function title(): string { return 'الوحدات'; }
 
                 public function styles(Worksheet $sheet)
                 {
-                    $sheet->getStyle('A:L')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                    $sheet->getStyle('A1:L1')->applyFromArray([
+                    $sheet->getStyle('A:M')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                    $sheet->getStyle('A1:M1')->applyFromArray([
                         'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
                         'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF2196F3']],
                         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],

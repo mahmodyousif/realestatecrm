@@ -79,11 +79,18 @@
     </div>
 
     <div class="export-group">
+        <div class="">
 
-        <button class="add-btn" onclick="openAddClientModal()">
-            <i class="fas fa-plus"></i> إضافة عميل جديد
-        </button>
+            <button class="add-btn" onclick="openAddClientModal()">
+                <i class="fas fa-plus"></i> إضافة عميل جديد
+            </button>
+             <a href="{{ route('customers.export') }}" class="btn btn-export">
+            <i class="fas fa-file-export"></i>
+           تصدير العملاء
+        </a>
+        </div>
         
+       
         <form action="{{ route('customers.import') }}" accept=".xlsx,.xls,.csv" method="POST" enctype="multipart/form-data" id="importForm3">
             @csrf
             <input type="file" name="file" id="importInput3" style="display: none;" onchange="submitImport3()">
@@ -130,9 +137,7 @@
             </div>
         </div>
     </div>
-<a href="{{ route('customers.export') }}" class="btn btn-success">
-    تصدير العملاء
-</a>
+
     <div id="marketers" class="tab-content" style="display: none;">
         <div class="main-content-card">
             <div class="card-title-area">

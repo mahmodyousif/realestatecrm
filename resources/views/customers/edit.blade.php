@@ -38,7 +38,7 @@
     </div>
     <div class="form-group">
         <label>رقم الجوال</label>
-        <input type="tel" placeholder="05xxxxxxxx" value="{{$customer->phone}}" required="" name="phone"/>
+        <input type="tel" placeholder="05xxxxxxxx" value="{{$customer->phone}}"  name="phone"/>
     </div>
     <div class="form-group">
         <label>البريد الإلكتروني</label>

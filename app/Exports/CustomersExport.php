@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\customer;
+use App\Models\Customer;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -18,7 +18,7 @@ class CustomersExport implements FromCollection , WithHeadings , WithStyles , Sh
     */
     public function collection() 
     {
-        return customer::select('type', 'name', 'id_card', 'phone', 'email', 'address')
+        return Customer::select('type', 'name', 'id_card', 'phone', 'email', 'address')
         ->get()
         ->map(function ($customer) {
 

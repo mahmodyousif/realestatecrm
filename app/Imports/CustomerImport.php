@@ -60,7 +60,6 @@ class CustomerImport  implements ToModel, WithHeadingRow, WithChunkReading
         }
 
         $existingCustomer = Customer::where('name', $name)
-            ->where('phone', $phone)
             ->where('type', $type)
             ->exists();
 

@@ -29,7 +29,7 @@ class CustomersController extends Controller
                 ->orWhereHas('saleCustomers.unitSale.unit.project', function($qq) use ($companyId) {
     $qq->where('company_id', $companyId);
 })
-                // البائعين
+                // المسوقين
                 ->orWhereHas('marketedSales.unit.project', function($qq) use ($companyId) {
                     $qq->where('company_id', $companyId);
                 });
@@ -48,7 +48,8 @@ class CustomersController extends Controller
                 });
             });
         })
-        ->paginate(10)->appends(request()->query());
+        ->orderBy('customers.id', 'desc')
+        ->get();
         $allProjects = Project::all();
         $companies = Company::all();    
         return view('customers.index' , compact('data', 'allProjects', 'companies')) ;
@@ -118,8 +119,21 @@ class CustomersController extends Controller
         
         
         ) ;
-        Customer::create($validated) ;
-        return redirect()->route('customers')->with('success', 'تم إضافة العميل بنجاح');
+        $validated['name']  = trim($validated['name']);
+        $validated['type']  = trim($validated['type']);
+          $existingCustomer = Customer::where('name', $validated['name'])
+            ->where('type', $validated['type'])
+            ->exists();
+
+            if($existingCustomer) {
+              return redirect()->back()
+                ->withErrors(['general' => 'هذا العميل موجود مسبقًا بنفس النوع'])
+                ->withInput();
+            }
+
+            Customer::create($validated) ;
+            return redirect()->route('customers')->with('success', 'تم إضافة العميل بنجاح');
+
     }
 
     public function edit($id) {
@@ -191,6 +205,7 @@ class CustomersController extends Controller
     {
     $q = $request->q;
 
+    $type = $request->type; 
     if (!$q || strlen($q) < 3) {
         return response()->json([]);
     }
@@ -201,9 +216,10 @@ class CustomersController extends Controller
                   ->orWhere('id_card', 'LIKE', "%{$q}%")
                   ->orWhere('iban', 'LIKE', "%{$q}%");
         })
-
+        ->when($type, function($query) use ($type) {
+            $query->where('type', $type);
+        })
         ->select('id', 'name', 'phone','type')
-        ->limit(5)
         ->get();
 
     return response()->json($customers);

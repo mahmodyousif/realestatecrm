@@ -29,11 +29,34 @@
         </ul>
     </div>
 @endif
+
+<style>
+
+</style>
 <div class="search-box">
     <label for="customerSearch">الوصول السريبع</label>
     <div class="search-group">
         <i class="icon fa fa-search"></i>
         <input type="text" id="customerSearch" class="customerSearch" placeholder="ابحث عن عميل...">
+     
+    </div>
+
+       <div class="type-group">
+
+            <div class="radio-group">
+                <input type="radio" name="type" id="buyer" value="buyer"> 
+                <label for="buyer">مشتري</label>
+            </div>
+            
+            <div class="radio-group">
+                <input type="radio" name="type" id="investor" value="investor">
+                <label for="investor">مستثمر</label>
+        </div>
+        
+        <div class="radio-group">
+            <input type="radio" name="type" id="marketer" value="marketer">
+            <label for="marketer">مسوق</label>
+        </div>
     </div>
     <div id="dropdownResults" class="searchDropdown"></div>
 </div>
@@ -110,12 +133,14 @@
                 </div>
         
                 <div class="table-frame">
-                    <x-customer-table :customers="$data->where('type','buyer')" />              
+                    <x-customer-table :customers="$data->where('type','buyer')" />      
+                
+                        
                 </div>
 
-                <div class="pagination-wrapper">
+                {{-- <div class="pagination-wrapper">
                     {{ $data->links('pagination.custom') }}
-                </div>
+                </div> --}}
                 
             </div>
 
@@ -132,9 +157,9 @@
             <div class="table-frame">
                 <x-customer-table :customers="$data->where('type','investor')" />
             </div>
-            <div class="pagination-wrapper">
+            {{-- <div class="pagination-wrapper">
                 {{ $data->links('pagination.custom') }}
-            </div>
+            </div> --}}
         </div>
     </div>
 
@@ -148,9 +173,9 @@
             <div class="table-frame">
                 <x-customer-table :customers="$data->where('type','marketer')" />
             </div>
-            <div class="pagination-wrapper">
+            {{-- <div class="pagination-wrapper">
                 {{ $data->links('pagination.custom') }}
-            </div>
+            </div> --}}
 </div>
     </div>
 <div id="addClientModal" class="modal">
@@ -182,12 +207,12 @@
                 
                 <div class="form-group">
                     <label>الهوية / السجل</label>
-                    <input type="text" placeholder="10XXXXXXXX" required name="id_card">
+                    <input type="text" placeholder="10XXXXXXXX"  name="id_card">
                 </div>
                 
                 <div class="form-group">
                     <label>رقم الجوال</label>
-                    <input type="tel" placeholder="05XXXXXXXX" required name="phone">
+                    <input type="tel" placeholder="05XXXXXXXX"  name="phone">
                 </div>
                 
                 <div class="form-group" >
@@ -275,7 +300,15 @@ input.addEventListener('keyup', function () {
             return;
         }
 
-        fetch(`/customers/search?q=${query}`)
+        let type = document.querySelector('input[name="type"]:checked');
+        type = type ? type.value : '';
+
+        document.querySelectorAll('input[name="type"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+        input.dispatchEvent(new Event('keyup'));
+            });
+        });
+        fetch(`/customers/search?q=${query}&type=${type}`)
             .then(res => res.json())
             .then(data => {
 

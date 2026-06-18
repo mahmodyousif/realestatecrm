@@ -108,7 +108,7 @@ class ProjectsController extends Controller
     public function preview($id)
     {
         $project = Project::with(['units' => function ($query) {
-            $query->orderBy('floor', 'desc')->orderBy('id', 'desc');
+            $query->orderBy('floor', 'desc')->orderBy('unit_number', 'desc');
         }])->findOrFail($id);
         $unitsByFloor = $project->units->groupBy('floor');
         return view('projects.preview', compact('project', 'unitsByFloor'));
@@ -118,7 +118,7 @@ class ProjectsController extends Controller
     {
         $project = Project::find($id);
         return view('projects.edit', compact('project'));
-    }
+    }git
 
     public function update($id, Request $request)
     {

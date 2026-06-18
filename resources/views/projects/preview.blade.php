@@ -47,7 +47,7 @@
                 <div class="units-container">
                     @foreach ($units as $unit)
                         <div class="unit-cell {{ $unit->status }}">
-                            <a href="{{route('units.show', $unit->id)}}" class="unit-name">
+                            <a href="{{route('units.show', $unit->id)}}" class="unit-name links-to-units" >
                                 {{ $unit->type . ' ' . $unit->unit_number }}
                             </a>
                         </div>
@@ -68,10 +68,21 @@
 <script>
 
 function generatePDF() {
+    let links = document.querySelectorAll('.links-to-units');
+    links.forEach(link => {
+        link.dataset.href = link.href;
+        link.removeAttribute('href');
+    });
     const originalTitle = document.title;
     document.title = "تقرير مشروع {{ $project->name }}";
     window.print();
     document.title = originalTitle;
-}   
+    links.forEach(link => {
+        if(link.dataset.href) {
+            link.href = link.dataset.href;
+} 
+});  
+    }
+
 </script>
 @endsection

@@ -56,13 +56,25 @@ class UnitsController extends Controller
     }
 
     public function show($id){
+        // $unit = Unit::with([
+        //     'unitSale' => function($query) {
+        //         $query->with(['saleCustomers.customer', 'marketer', 'payments']);
+        //     }
+        // ])->findOrFail($id);
         $unit = Unit::with([
-            'unitSale' => function($query) {
-                $query->with(['saleCustomers.customer', 'marketer', 'payments']);
-            }
+            'unitSale.saleCustomers.customer',
+            'unitSale.saleCustomers.marketer',
+            'unitSale.saleCustomers.payments',
+            'unitSale.unit'
         ])->findOrFail($id);
+
         $totalPrice = $unit->unitSale?->total_price ?? 0;
-        $totalPaid  = $unit->unitSale?->payments->sum('amount_paid') ?? 0;
+
+        $totalPaid = $unit->unitSale?->saleCustomers
+            ->sum(function ($saleCustomer) {
+                return $saleCustomer->payments->sum('amount_paid');
+            }) ?? 0;
+
         $remaining  = $totalPrice - $totalPaid;
         $buyers = Customer::where('type', 'buyer')->get();
         $marketers = Customer::where('type', 'marketer')->get();

@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CompanyReportExport;
 use App\Models\Company;
 use App\Models\Payment;
-use App\Models\UnitSale;
 use App\Models\Project;
+use App\Models\UnitSale;
+use App\Models\UnitSaleCustomer;
 use Illuminate\Http\Request;
-use App\Exports\CompanyReportExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class CompaniesController extends Controller
@@ -33,9 +34,9 @@ class CompaniesController extends Controller
             $q->where('company_id', $id);
         })->sum('amount_paid');
 
-        $totalCommission = UnitSale::whereHas('unit.project', function($q) use ($id) {
+        $totalCommission = UnitSaleCustomer::whereHas('unitSale.unit.project', function($q) use ($id) {
             $q->where('company_id', $id);
-        })->sum('commission');
+        })->sum('commission_amount');
 
         // اجمالي المدفوع اليوم للشركة
         $amountPaidToday = Payment::whereHas('unitSaleCustomer.unitSale.unit.project', function($q) use ($id) {

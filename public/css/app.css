@@ -1533,6 +1533,12 @@ tr .action-link.unit_sell_delete {
     flex-direction: column;
     gap: 2.5rem;
 }
+.customer-item ul  {
+    padding: 0 !important;
+    margin: 10px 20px ;
+    list-style-type: square;
+}
+
 
 
 /* ==========================================================================
@@ -3638,6 +3644,7 @@ textarea {
     font-size: 14px;
     color: #fff !important;
     }
+
 
    .preview-container .unit-cell a.unit-name , .preview-container .unit-cell span {
     flex: 1;                

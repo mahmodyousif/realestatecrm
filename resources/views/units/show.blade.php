@@ -72,7 +72,7 @@
             @if($unit->unitSale)
 
                 <tr >
-                     <th class="table-header-centered">تفاصيل البيع</th>
+                     <th class="table-header-centered" >تفاصيل البيع</th>
                </tr>
 
 
@@ -103,18 +103,46 @@
                 <tr>
                     <th><i class="fas fa-users"></i> المشترون</th>
                     <td>
+
+
                         @if($unit->unitSale && $unit->unitSale->saleCustomers->count() > 0)
                             <div class="customers-list">
+                                
                                 @foreach($unit->unitSale->saleCustomers as $saleCustomer)
+
+                                @php
+                                   $shareAmount = $saleCustomer->share_amount ;
+                                   $customerPaid =  $saleCustomer->payments->sum('amount_paid');
+                                   $customerRemaining =  $shareAmount - $customerPaid ;
+                                @endphp
                                     <div class="customer-item">
                                         <strong>{{ $saleCustomer->customer->name }}</strong>
-                                        <br>
-                                        <small>
-                                            الحصة: {{ $saleCustomer->share_percentage }}% |
-                                            العقد: {{ $saleCustomer->contract_number }} |
-                                            المبلغ: {{ number_format($saleCustomer->share_amount) }} ريال
-                                        </small>
+                                        <ul>
+                                            <li>
+                                                الحصة: <strong>{{ $saleCustomer->share_percentage }}% | ({{ number_format($shareAmount) }} ر.س)</strong>
+                                            </li>
+                                            <li>
+                                                رقم العقد: <strong>  {{ $saleCustomer->contract_number }} </strong>
+                                            </li>
+                                            <li>
+                                                المبلغ المدفوع: <strong>  {{ number_format($customerPaid )}} ر.س</strong>
+                                            </li>
+
+                                            <li> 
+                                                المبلغ المتبقي: <strong>{{number_format($customerRemaining)}}</strong>
+                                            </li>
+                                            <li>
+                                                المسوق:   <strong>{{ $saleCustomer->marketer->name ?? '-' }} </strong>
+                                            </li>
+                                            <li>
+                                                العمولة: <strong>{{ number_format($saleCustomer->commission_amount ?? 0) }} ر.س </strong> 
+                                            </li>
+                                            <li>
+                                                تاريخ البيع: <strong> {{$saleCustomer->sale_date}}</strong>
+                                            </li>
+                                        </ul>
                                     </div>
+                                    <hr>
                                 @endforeach
                             </div>
                         @else
@@ -123,7 +151,7 @@
                     </td>
                 </tr>
 
-                <tr>
+                {{-- <tr>
                     <th><i class="fas fa-user-tie"></i> المسوق الرئيسي</th>
                     <td>{{$unit->unitSale->marketer->name ?? '-'}}</td>
                 </tr>
@@ -131,12 +159,12 @@
                 <tr>
                     <th><i class="fas fa-money-bill-wave"></i> قيمة العمولة</th>
                     <td>{{number_format($unit->unitSale->commission) ?? 0 }} ر.س</td>
-                </tr>
-
-                 <tr>
+                </tr> --}}
+                    
+                 {{-- <tr>
                     <th><i class="fas fa-calendar-alt"></i> تاريخ البيع</th>
-                    <td>{{ $unit->unitSale->sale_date }}</td>
-                </tr>
+                    <td>{{ $unit->saleCustomer->sale_date }}</td>
+                </tr> --}}
 
                 <tr>
                     <th>الاجراء</th>

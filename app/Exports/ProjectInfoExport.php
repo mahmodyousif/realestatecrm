@@ -3,16 +3,6 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\FromArray;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use Maatwebsite\Excel\Concerns\WithColumnWidths;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-
 
 class ProjectInfoExport implements WithMultipleSheets
 {
@@ -26,102 +16,155 @@ class ProjectInfoExport implements WithMultipleSheets
     public function sheets(): array
     {
         return [
-            new class($this->project) implements FromArray, WithTitle, WithStyles , ShouldAutoSize {
+
+            // =========================
+            // 📊 Sheet 1: تفاصيل المشروع
+            // =========================
+            new class($this->project) implements \Maatwebsite\Excel\Concerns\FromArray, \Maatwebsite\Excel\Concerns\WithTitle, \Maatwebsite\Excel\Concerns\WithStyles, \Maatwebsite\Excel\Concerns\ShouldAutoSize {
+
                 protected $project;
-                public function __construct($project) { $this->project = $project; }
+
+                public function __construct($project)
+                {
+                    $this->project = $project;
+                }
 
                 public function array(): array
                 {
                     $units = $this->project->units;
 
-                    // الوحدات المباعة والمحجوزة
                     $soldOrReservedUnits = $units->whereIn('status', ['sold', 'reserved']);
-                
-                    // حساب القيم المالية فقط للوحدات المباعة + المحجوزة
-                    // $totalUnitsPrice = $soldOrReservedUnits->sum('price'); // إجمالي أسعار المباعة + المحجوزة
-                    $totalUnitsPrice = $soldOrReservedUnits->sum(function($unit) {
+
+                    $totalUnitsPrice = $soldOrReservedUnits->sum(function ($unit) {
                         $sale = $unit->unitSale;
                         if (!$sale) return 0;
-                        return ($sale->price ?? $unit->price) - ($sale->discount ?? 0);
-                    }); // إجمالي أسعار المباعة + المحجوزة مع خصم الخصومات
-                    $totalPaid = $soldOrReservedUnits->sum(function($unit) {
-                        return $unit->unitSale ? $unit->unitSale->payments->sum('amount_paid') : 0;
+
+                        return ($sale->total_price ?? $unit->price)
+                            - ($sale->discount ?? 0);
                     });
+
+                    $totalPaid = $soldOrReservedUnits->sum(function ($unit) {
+                        $sale = $unit->unitSale;
+                        if (!$sale) return 0;
+
+                        return $sale->saleCustomers->sum(function ($sc) {
+                            return $sc->payments->sum('amount_paid');
+                        });
+                    });
+
                     $totalRemaining = $totalUnitsPrice - $totalPaid;
-                
-                    // عد الوحدات حسب الحالة
+
                     $soldUnitsCount = $units->where('status', 'sold')->count();
                     $reservedUnitsCount = $units->where('status', 'reserved')->count();
-                    $partiallyPaidUnitsCount =$units->where('status','partially_paid')->count();
+                    $partiallyPaidUnitsCount = $units->where('status', 'partially_paid')->count();
                     $availableUnitsCount = $units->where('status', 'available')->count();
-                
-                
+
                     return [
-
                         [
-                            'اسم المشروع' , 
-                            'عدد الطوابق' ,
-                            'عدد الوحدات' ,
-                            'نطاق المساحات' ,
-                            'الموقع' ,
-                            'الحالة' ,
-                            'اجمالي اسعار الوحدات المباعة او المحجوزة' ,
-                            'الايردات المحققة' ,
-                            'المبالغ المتبقية' ,
-                            'عدد الوحدات المباعة' , 
-                            'عدد الوحدات المحجوزة' ,
-                            'عدد الوحدات المتاحة' ,
-                            'عدد الوحدات المدفوعة جزئياً'
-
-                        ] ,
+                            'اسم المشروع',
+                            'عدد الطوابق',
+                            'عدد الوحدات',
+                            'نطاق المساحات',
+                            'الموقع',
+                            'الحالة',
+                            'إجمالي قيمة المبيعات',
+                            'الإيرادات المحققة',
+                            'المبالغ المتبقية',
+                            'المباعة',
+                            'المحجوزة',
+                            'المتاحة',
+                            'مدفوعة جزئياً',
+                        ],
 
                         [
                             $this->project->name,
                             $this->project->floors,
                             $this->project->total_units,
-                            $this->project->aria_range, 
-                            $this->project->location ,
-                            $this->project->status === 'planning' ? 'تحت الإنشاء' : ($this->project->status === 'active' ? 'نشط' : 'مكتمل') ,
-                            number_format($totalUnitsPrice) . ' ريال' , 
-                            number_format($totalPaid) . ' ريال' , 
-                            number_format($totalRemaining) . ' ريال' ,
-                            $soldUnitsCount . ' وحدة' , 
-                            $reservedUnitsCount . ' وحدة' , 
-                            $availableUnitsCount . ' وحدة', 
-                            $partiallyPaidUnitsCount . ' وحدة'
-                        ] ,
-                    ] ;
+                            $this->project->aria_range,
+                            $this->project->location,
+                            $this->project->status === 'planning' ? 'تحت الإنشاء' :
+                                ($this->project->status === 'active' ? 'نشط' : 'مكتمل'),
+
+                            number_format($totalUnitsPrice) . ' ريال',
+                            number_format($totalPaid) . ' ريال',
+                            number_format($totalRemaining) . ' ريال',
+
+                            $soldUnitsCount . ' وحدة',
+                            $reservedUnitsCount . ' وحدة',
+                            $availableUnitsCount . ' وحدة',
+                            $partiallyPaidUnitsCount . ' وحدة',
+                        ],
+                    ];
                 }
 
-                public function title(): string { return 'تفاصيل المشروع'; }
-
-                public function styles(Worksheet $sheet)
+                public function title(): string
                 {
-                    $sheet->getStyle('A:M')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                    return 'تفاصيل المشروع';
+                }
+
+                public function styles($sheet)
+                {
+                    $sheet->getStyle('A:M')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
                     $sheet->getStyle('A1:M1')->applyFromArray([
                         'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
-                        'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF2196F3']],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                        'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF2196F3']],
                     ]);
                 }
-               
             },
 
-            new class($this->project) implements FromArray, WithTitle, WithHeadings, WithStyles , ShouldAutoSize {
+            // =========================
+            // 🏠 Sheet 2: الوحدات (بعد التعديل)
+            // =========================
+            new class($this->project) implements \Maatwebsite\Excel\Concerns\FromArray, \Maatwebsite\Excel\Concerns\WithTitle, \Maatwebsite\Excel\Concerns\WithStyles, \Maatwebsite\Excel\Concerns\ShouldAutoSize, \Maatwebsite\Excel\Concerns\WithHeadings {
+
                 protected $project;
-                public function __construct($project) { $this->project = $project; }
+
+                public function __construct($project)
+                {
+                    $this->project = $project;
+                }
 
                 public function array(): array
                 {
-                    return $this->project->units->map(function($unit) {
+                    return $this->project->units->map(function ($unit) {
+
                         $sale = $unit->unitSale;
-                        $paid = $sale ? $sale->payments->sum('amount_paid') : 0;
-                        $salePrice = $sale ? ($sale->price ?? $unit->price) - ($sale->discount ?? 0) : 0;
-                        $remaining = $salePrice - $paid;
-                        $buyer = $unit->unitSale ? $unit->unitSale->customer_names : '-'; 
-                        $marketer = $unit->unitSale ? $unit->unitSale->marketer?->name : '-'; 
-                        $contractNumber = $unit->unitSale?->contract_numbers ?? '-';
-                        
+
+                        if (!$sale) {
+                            return [
+                                $unit->type,
+                                $unit->unit_number,
+                                $unit->area,
+                                $unit->floor,
+                                $unit->rooms,
+                                number_format($unit->price) . ' ريال',
+                                '-',
+                                '-',
+                                0,
+                                0,
+                                0,
+                                '-',
+                                'متاحة',
+                            ];
+                        }
+
+                        $paid = $sale->saleCustomers->sum(function ($sc) {
+                            return $sc->payments->sum('amount_paid');
+                        });
+
+                        $remaining = ($sale->total_price ?? 0) - $paid;
+
+                        $buyers = $sale->saleCustomers
+                            ->pluck('customer.name')
+                            ->unique()
+                            ->implode(', ');
+
+                        $marketers = $sale->saleCustomers
+                            ->pluck('marketer.name')
+                            ->unique()
+                            ->implode(', ');
+
                         return [
                             $unit->type,
                             $unit->unit_number,
@@ -129,36 +172,61 @@ class ProjectInfoExport implements WithMultipleSheets
                             $unit->floor,
                             $unit->rooms,
                             number_format($unit->price) . ' ريال',
-                            $buyer,
-                            $marketer, 
-                            number_format($salePrice) . ' ريال',  
-                            number_format($sale ? ($sale->discount ?? 0) : 0) . ' ريال',   
-                            number_format($remaining) . ' ريال',
-                            $contractNumber,
-                            $unit->status === 'sold' ? 'مباعة' : ($unit->status === 'reserved' ? 'محجوزة': ($unit->status === 'partially_paid' ? 'مدفوعة جزئياً' : 'متاحة')),
 
-                            ];
+                            $buyers,
+                            $marketers,
+
+                            number_format($sale->total_price ?? 0) . ' ريال',
+                            number_format($sale->discount ?? 0) . ' ريال',
+                            number_format($remaining) . ' ريال',
+
+                            $sale->saleCustomers->pluck('contract_number')->implode(', '),
+
+                            $unit->status === 'sold'
+                                ? 'مباعة'
+                                : ($unit->status === 'reserved'
+                                    ? 'محجوزة'
+                                    : ($unit->status === 'partially_paid'
+                                        ? 'مدفوعة جزئياً'
+                                        : 'متاحة')),
+                        ];
                     })->toArray();
                 }
 
                 public function headings(): array
                 {
-                    return ['نوع الوحدة','رقم الوحدة','المساحة','الطابق','عدد الغرف','السعر' ,'المشتري','المسوق' ,'المدفوع' ,'الخصم' ,'المتبقي' ,'رقم العقد','الحالة'];
+                    return [
+                        'نوع الوحدة',
+                        'رقم الوحدة',
+                        'المساحة',
+                        'الطابق',
+                        'عدد الغرف',
+                        'السعر',
+                        'المشترون',
+                        'المسوقون',
+                        'إجمالي البيع',
+                        'الخصم',
+                        'المتبقي',
+                        'أرقام العقود',
+                        'الحالة',
+                    ];
                 }
 
-                public function title(): string { return 'الوحدات'; }
-
-                public function styles(Worksheet $sheet)
+                public function title(): string
                 {
-                    $sheet->getStyle('A:M')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                    return 'الوحدات';
+                }
+
+                public function styles($sheet)
+                {
+                    $sheet->getStyle('A:M')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
                     $sheet->getStyle('A1:M1')->applyFromArray([
                         'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
-                        'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF2196F3']],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                        'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF2196F3']],
                     ]);
                 }
             }
         ];
     }
-  
 }

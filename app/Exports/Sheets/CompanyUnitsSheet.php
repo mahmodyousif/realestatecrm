@@ -4,6 +4,7 @@ namespace App\Exports\Sheets;
 
 use App\Models\Unit;
 use App\Models\UnitSale;
+use App\Models\UnitSaleCustomer;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -23,39 +24,63 @@ class CompanyUnitsSheet implements FromCollection, WithHeadings, WithTitle, With
         $this->companyId = $companyId;
     }
 
-    public function collection()
-    {
-        return UnitSale::with([
-            'unit.project',
-            'marketer',
-            'payments',
-            'saleCustomers.customer'
-        ])->whereHas('unit.project', fn($q) =>
-            $q->where('company_id', $this->companyId)
-        )
-        ->get()
-        ->map(function ($unit) {
-            return [
-                $unit->unit->project->name,
-                $unit->unit->unit_number,
-                $unit->unit->type,
-                $unit->unit->area,
-                $unit->unit->floor,
-                $unit->unit->rooms,
-                $unit->unit->zone,
-                $unit->customer_names,
-                $unit->marketer ? $unit->marketer->name : '-',
-                $unit->saleCustomers->pluck('share_percentage')->join(', ') . '%',
-                $unit->total_price,
-                $unit->payments()->sum('amount_paid'),
-                $unit->total_price - $unit->payments()->sum('amount_paid'),
-                $unit->contract_numbers,
-                $unit->commission,
-                $unit->saleCustomers->first()?->customer?->iban ?? '-',
-                $unit->sale_date,
-            ];
-        });
-    }
+    
+     public function collection()
+{
+    return UnitSaleCustomer::with([
+        'unitSale.unit.project',
+        'marketer',
+        'customer',
+        'payments',
+    ])
+    ->whereHas('unitSale.unit.project', fn($q) =>
+        $q->where('company_id', $this->companyId)
+    )
+    ->get()
+    ->map(function ($saleCustomer) {
+
+        $paid = $saleCustomer->payments->sum('amount_paid');
+
+        return [
+
+            $saleCustomer->unitSale->unit->project->name ?? '-',
+
+            $saleCustomer->unitSale->unit->unit_number ?? '-',
+
+            $saleCustomer->unitSale->unit->type ?? '-',
+
+            $saleCustomer->unitSale->unit->area ?? '-',
+
+            $saleCustomer->unitSale->unit->floor ?? '-',
+
+            $saleCustomer->unitSale->unit->rooms ?? '-',
+
+            $saleCustomer->unitSale->unit->zone ?? '-',
+
+            $saleCustomer->customer->name ?? '-',
+
+            $saleCustomer->marketer->name ?? '-',
+
+            $saleCustomer->share_percentage . '%',
+
+            $saleCustomer->share_amount ?? 0,
+
+            $paid,
+
+            ($saleCustomer->share_amount ?? 0) - $paid,
+
+            $saleCustomer->contract_number ?? '-',
+
+            $saleCustomer->commission_amount ?? 0,
+
+            $saleCustomer->customer->iban ?? '-',
+
+            $saleCustomer->sale_date ?? '-',
+        ];
+    });
+}
+    
+
 
     public function headings(): array
     {

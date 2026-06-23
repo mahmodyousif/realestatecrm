@@ -70,19 +70,14 @@
 function generatePDF() {
     let links = document.querySelectorAll('.links-to-units');
     links.forEach(link => {
-        link.dataset.href = link.href;
-        link.removeAttribute('href');
+        const text = document.createElement('span');
+        text.textContent = link.textContent;
+        link.replaceWith(text);
     });
     const originalTitle = document.title;
     document.title = "تقرير مشروع {{ $project->name }}";
     window.print();
-    document.title = originalTitle;
-    links.forEach(link => {
-        if(link.dataset.href) {
-            link.href = link.dataset.href;
-} 
-});  
-    }
-
+    setTimeout(()=>location.reload(),500)
+    } 
 </script>
 @endsection

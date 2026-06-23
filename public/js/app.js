@@ -63,42 +63,42 @@ function closeAddCompanyModal() {
 }
 
 // --- مودال إضافة وحدة ---
-function openAddUnitModal() {
-    const modal = document.getElementById('addUnitModal');
-    if (modal) modal.style.display = 'block';
-}
+// function openAddUnitModal() {
+//     const modal = document.getElementById('addUnitModal');
+//     if (modal) modal.style.display = 'block';
+// }
 
-function closeAddUnitModal() {
-    const modal = document.getElementById('addUnitModal');
-    if (modal) modal.style.display = 'none';
-}
+// function closeAddUnitModal() {
+//     const modal = document.getElementById('addUnitModal');
+//     if (modal) modal.style.display = 'none';
+// }
 
 // --- مودال بيع الوحدة ---
-function openSellUnitModal(button) {
-    const unitId = button.dataset.unitId;
-    const unitName = button.dataset.unitName;
-    const projectName = button.dataset.projectName;
-    const price = button.dataset.price;
+// function openSellUnitModal(button) {
+//     const unitId = button.dataset.unitId;
+//     const unitName = button.dataset.unitName;
+//     const projectName = button.dataset.projectName;
+//     const price = button.dataset.price;
 
-    const modal = document.getElementById('sellUnitModal');
-    if (!modal) return;
+//     const modal = document.getElementById('sellUnitModal');
+//     if (!modal) return;
 
-    document.getElementById('sale_unit_id').value = unitId;
-    document.getElementById('sale_unit_name').innerText = unitName;
-    document.getElementById('sale_project_name').innerText = projectName;
-    document.getElementById('sale_total_price').value = price;
+//     document.getElementById('sale_unit_id').value = unitId;
+//     document.getElementById('sale_unit_name').innerText = unitName;
+//     document.getElementById('sale_project_name').innerText = projectName;
+//     document.getElementById('sale_total_price').value = price;
 
-    const today = new Date().toISOString().split('T')[0];
-    const saleDateInput = document.querySelector('input[name="sale_date"]');
-    if (saleDateInput) saleDateInput.value = today;
+//     const today = new Date().toISOString().split('T')[0];
+//     const saleDateInput = document.querySelector('input[name="sale_date"]');
+//     if (saleDateInput) saleDateInput.value = today;
 
-    modal.style.display = 'flex';
-}
+//     modal.style.display = 'flex';
+// }
 
-function closeSellUnitModal() {
-    const modal = document.getElementById('sellUnitModal');
-    if (modal) modal.style.display = 'none';
-}
+// function closeSellUnitModal() {
+//     const modal = document.getElementById('sellUnitModal');
+//     if (modal) modal.style.display = 'none';
+// }
 
 // --- مودال إضافة عميل ---
 function openAddClientModal() {
@@ -627,6 +627,13 @@ function addBuyer() {
         });
     }
 
+    let marketerOptions = '<option value="">اختر مسوق</option>';
+    if (typeof marketer !== 'undefined' && Array.isArray(marketer)) {
+        marketer.forEach(m => {
+            marketerOptions += `<option value="${m.id}">${m.name}</option>`;
+        });
+    }
+
     newRow.innerHTML = `
         <h4>المشتري ${buyerIndex + 1}</h4>
         <div class="form-group">
@@ -671,9 +678,32 @@ function addBuyer() {
             <input type="text" name="customers[${buyerIndex}][contract_number]">
         </div>
 
+        <div class="form-group">
+        <label>المسوق</label>
+        <select name="customers[${buyerIndex}][marketer_id]" class="marketer-select">
+                ${marketerOptions}
+        </select>
+    </div>
+
+    <!-- 💰 العمولة -->
+    <div class="form-group">
+        <label>قيمة العمولة</label>
+        <input type="number"
+               name="customers[${buyerIndex}][commission_amount]"
+               min="0"
+               step="0.01">
+    </div>
+
+
+        <div class="form-group">
+            <label><i class="fas fa-calendar-alt"></i> تاريخ البيع</label>
+            <input type="date" name="customers[${buyerIndex}][sale_date]" >
+        </div>
+
         <button type="button" class="btn-remove-buyer btn remove-buyer" onclick="removeBuyer(this)">إزالة هذا المشتري</button>
     `;
 
+    
     container.appendChild(newRow);
     buyerIndex++;
 

@@ -118,7 +118,7 @@ class ProjectsController extends Controller
     {
         $project = Project::find($id);
         return view('projects.edit', compact('project'));
-    }git
+    }
 
     public function update($id, Request $request)
     {

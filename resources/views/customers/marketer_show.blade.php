@@ -100,18 +100,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($marketer->marketedSales as $sale)
+                    @foreach($marketer->marketedCustomers as $sale)
                     <tr>
                         <td>
                             <div class="unit-cell">
-                                <span class="u-type">{{ $sale->unit->type }}</span>
-                                <span class="u-num">#{{ $sale->unit->unit_number }}</span>
+                                <span class="u-type">المشروع: {{$sale->unitSale->unit->project->name}}</span>
+                                <span class="u-type">النوع:  {{ $sale->unitSale->unit->type }}</span>
+                                <span class="u-type">النموذج: {{ $sale->unitSale->unit->unit_number }}</span>
+                                <span class="u-type">الطابق: {{ $sale->unitSale->unit->floor }}</span>
+                                <span class="u-type">الزون: {{ $sale->unitSale->unit->zone }}</span>
+
                             </div>
                         </td>
                         
-                        <td><span class="buyer-name">{{ $sale->commission ?? '-' }} ر.س</span></td>
-                        <td><span class="buyer-name">{{ $sale->saleCustomers->first()->customer->name ?? '-' }}</span></td>
-                        <td><span class="price-bold">{{ number_format($sale->total_price) }} ريال</span></td>
+                        <td><span class="buyer-name">{{ number_format($sale->commission_amount )?? '-' }} ر.س</span></td>
+                        <td><span class="buyer-name">{{ $sale->customer->name ?? '-' }}</span></td>
+                        <td><span class="price-bold">{{ number_format($sale->share_amount) }} ريال</span></td>
                         {{-- <td>
                             <div class="payment-progress-mini">
                                 @php 

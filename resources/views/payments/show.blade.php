@@ -36,33 +36,44 @@
         </div>
         <div class="card-body">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-                <div>
-                    <label style="color: var(--text-muted); font-weight: 600;">الوحدة</label>
-                    <p style="margin: 0.5rem 0;">{{ $unitSale->unit->unit_number }} ({{ $unitSale->unit->type }})</p>
-                </div>
-                <div>
-                    <label style="color: var(--text-muted); font-weight: 600;">المشروع</label>
-                    <p style="margin: 0.5rem 0;">{{ $unitSale->unit->project->name }}</p>
-                </div>
-                <div>
+             
+
+            <div>
                     <label style="color: var(--text-muted); font-weight: 600;">العميل المشتري</label>
                     <p style="margin: 0.5rem 0;">{{ $saleCustomer->customer->name }}</p>
-                </div>
-                <div>
-                    <label style="color: var(--text-muted); font-weight: 600;">نسبة التمليك</label>
-                    <p style="margin: 0.5rem 0;">{{ number_format($saleCustomer->share_percentage, 2) }}%</p>
-                </div>
-                <div>
-                    <label style="color: var(--text-muted); font-weight: 600;">مبلغ الحصة</label>
-                    <p style="margin: 0.5rem 0;">{{ number_format($saleCustomer->share_amount) }} ريال</p>
-                </div>
-                <div>
-                    <label style="color: var(--text-muted); font-weight: 600;">رقم العقد</label>
-                    <p style="margin: 0.5rem 0;">{{ $saleCustomer->contract_number }}</p>
-                </div>
+            </div>
+            <div>
+                <label style="color: var(--text-muted); font-weight: 600;">المشروع</label>
+                <p style="margin: 0.5rem 0;">{{ $unitSale->unit->project->name }}</p>
+            </div>
+            <div>
+                <label style="color: var(--text-muted); font-weight: 600;">الوحدة</label>
+                <p style="margin: 0.5rem 0;">{{ $unitSale->unit->unit_number }} ({{ $unitSale->unit->type }})</p>
+            </div>
+            <div>
+                <label style="color: var(--text-muted); font-weight: 600;">الزون</label>
+                <p style="margin: 0.5rem 0;"> {{ $unitSale->unit->zone }}</p>
+            </div>
+            <div>
+                <label style="color: var(--text-muted); font-weight: 600;">الطابق</label>
+                <p style="margin: 0.5rem 0;"> {{ $unitSale->unit->floor }}</p>
+            </div>
+            
+            <div>
+                <label style="color: var(--text-muted); font-weight: 600;">نسبة التمليك</label>
+                <p style="margin: 0.5rem 0;">{{ number_format($saleCustomer->share_percentage, 2) }}%</p>
+            </div>
+            <div>
+                <label style="color: var(--text-muted); font-weight: 600;">مبلغ الحصة</label>
+                <p style="margin: 0.5rem 0;">{{ number_format($saleCustomer->share_amount) }} ريال</p>
+            </div>
+            <div>
+                <label style="color: var(--text-muted); font-weight: 600;">رقم العقد</label>
+                <p style="margin: 0.5rem 0;">{{ $saleCustomer->contract_number }}</p>
             </div>
         </div>
     </div>
+</div>
 
     <!-- سجل الدفعات -->
     <div class="card">

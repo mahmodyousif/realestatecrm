@@ -11,6 +11,7 @@ use App\Models\Company;
 use App\Models\Customer;
 use App\Models\Project;
 use App\Models\UnitSale;
+use App\Models\UnitSaleCustomer;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -72,23 +73,29 @@ class CustomersController extends Controller
 
    public function marketerShow($id) {
     $marketer = Customer::with([
-        'marketedSales.unit',
-         'marketedSales.saleCustomers.customer',
-        'marketedSales.saleCustomers.payments',
+        // 'marketedCustomers',
+        // 'marketedCustomers.UnitsaleCustomers.customer',
+        // 'marketedCustomers.UnitsaleCustomers.payments',
+        'marketedCustomers.customer',
+        'marketedCustomers.unitSale',
+        'marketedCustomers.payments',
     ])
-    ->withSum('marketedSales as totalPrice', 'total_price')
-    ->withCount('marketedSales as sales_count')
+    ->withSum('marketedCustomers as totalPrice', 'share_amount')
+    ->withCount('marketedCustomers as sales_count')
     ->where('type', 'marketer')
     ->where('id', $id)
     ->firstOrFail();
 
-    $commission = UnitSale::where('marketer_id', $id)->sum('commission');
+    $commission = UnitSaleCustomer::where('marketer_id', $id)->sum('commission_amount');
+    // $totalPaid = $marketer->marketedCustomers->sum(fn($sale) =>
+    //     $sale->saleCustomers->sum(fn($sc) =>
+    //         $sc->payments->sum('amount_paid')
+    //     )
+    // );
 
-    $totalPaid = $marketer->marketedSales->sum(fn($sale) =>
-        $sale->saleCustomers->sum(fn($sc) =>
-            $sc->payments->sum('amount_paid')
-        )
-    );
+    $totalPaid = $marketer->marketedCustomers->sum(function($usc){
+            return $usc->payments->sum('amount_paid') ;
+    });
 
     $remaining           = ($marketer->totalPrice ?? 0) - $totalPaid;
     $marketer->totalPaid = $totalPaid;

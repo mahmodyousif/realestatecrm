@@ -17,19 +17,19 @@ class UnitSaleController extends Controller
 
         $validated = $request->validate([
             'unit_id' => ['required', Rule::exists('units', 'id')],
-            'marketer_id' => ['nullable', 'exists:customers,id'],
             'customers' => ['required', 'array', 'min:1'],
             'customers.*.id' => ['required', 'exists:customers,id'],
             'customers.*.type' => ['required', 'in:customer,investor'],
             'customers.*.share' => ['required', 'numeric', 'min:1', 'max:100'],
             'customers.*.amount_paid' => ['nullable', 'numeric', 'min:0'],
             'customers.*.contract_number' => ['required', 'string', 'unique:unit_sale_customers,contract_number'],
-            'sale_date' => ['required', 'date'],
+            'customers.*.marketer_id' => ['nullable', 'exists:customers,id'],
+            'customers.*.commission_amount' => ['nullable', 'numeric', 'min:0'],
+            'customers.*.sale_date' => ['required', 'date'],
             'payment_method' => ['required', 'string'],
             'unit_price' => ['required', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0', 'lte:total_price'],
             'total_price' => ['nullable', 'numeric', 'min:0'],
-            'commission' => ['nullable', 'numeric', 'min:0'],
         ], [
             'customers.*.contract_number.unique' => 'رقم العقد المستخدم لأحد الشركاء موجود مسبقًا، يرجى تغييره',
             'customers.*.id.required' => 'يجب اختيار عميل أو مستثمر لكل مشتري',
@@ -77,13 +77,11 @@ class UnitSaleController extends Controller
         // إنشاء عملية البيع في unit_sales
         $unitSale = UnitSale::create([
             'unit_id' => $validated['unit_id'],
-            'marketer_id' => $validated['marketer_id'] ?? null,
-            'sale_date' => $validated['sale_date'],
+            'sale_date' => null ,
             'payment_method' => $validated['payment_method'],
             'unit_price' => $validated['unit_price'],
             'discount' => $validated['discount'] ?? 0,
             'total_price' => $validated['unit_price'] - ($validated['discount'] ?? 0),
-            'commission' => $validated['commission'] ,
         ]);
 
         // إنشاء العملاء المشتركين
@@ -95,15 +93,18 @@ class UnitSaleController extends Controller
                     'unit_sale_id' => $unitSale->id,
                     'customer_id' => $customerData['id'],
                     'contract_number' => $customerData['contract_number'],
+                   'marketer_id' => $customerData['marketer_id'] ?? null ,
+                    'commission_amount' => $customerData['commission_amount'] ?? 0,
                     'share_percentage' => $customerData['share'],
                     'share_amount' => $shareAmount,
+                    'sale_date'  => $customerData['sale_date'] 
                 ]);
 
                 // دفعة خاصة بهذا الشريك
                 if (!empty($customerData['amount_paid']) && $customerData['amount_paid'] > 0) {
                     $custRecord->payments()->create([
                         'amount_paid' => $customerData['amount_paid'],
-                        'payment_date' => $validated['sale_date'],
+                        'payment_date' => $customerData['sale_date'],
                         'payment_method' => $validated['payment_method'],
                         'reference_number' => 0,
                         'notes' => 'دفعة أولى',
@@ -111,7 +112,8 @@ class UnitSaleController extends Controller
                 }
             }
         }
-    
+
+                
         // تحديث حالة الوحدة
         $unit = Unit::findOrFail($validated['unit_id']);
 

@@ -73,11 +73,15 @@ class Customer extends Model
     /**
      * عمليات البيع التي سوّقها هذا العميل (marketer)
      */
-    public function marketedSales()
-    {
-        return $this->hasMany(UnitSale::class, 'marketer_id');
-    }
+    // public function marketedSales()
+    // {
+    //     return $this->hasMany(UnitSale::class, 'marketer_id');
+    // }
 
+    public function marketedCustomers()
+    {
+        return $this->hasMany(UnitSaleCustomer::class, 'marketer_id');
+    }
     /**
      * الدفعات المرتبطة بالمبيعات التي سوّقها هذا المسوّق
      * المسار: unit_sales (marketer_id) → unit_sale_customers → payments

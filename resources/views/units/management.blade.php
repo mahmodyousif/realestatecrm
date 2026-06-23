@@ -51,7 +51,9 @@
                             </div>
                             <div>الطابق:
                                 <span>{{ $unit->unit->floor }}</span>
-
+                            </div>
+                            <div>الزون:
+                                <span>{{ $unit->unit->zone }}</span>
                             </div>
                         </div>
                         </td>
@@ -61,14 +63,15 @@
                         <td>{{ number_format($unit->total_paid ?? 0) }} </td>
                         <td>{{number_format($unit->remaining)}}</td>
                         <td>{{ $unit->unit->unitSale->sale_date }}</td>
+                        
                         <td>
                             @if ($unit->unit->status === 'sold')          مباعة
                             @elseif ($unit->unit->status === 'reserved')   محجوزة
                             @elseif ($unit->unit->status === 'partially_paid') دفع جزئي
                             @else جاهزة للبيع
                             @endif 
-                      
                         </td>
+
                         <td>
                             <div class="unit-actions-nested">
                                 <a href="{{ route('units.show', $unit->unit) }}" class="action-link view" title="عرض">

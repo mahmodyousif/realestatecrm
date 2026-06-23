@@ -45,6 +45,7 @@
             <script>
                 const buyer = @json($buyers);
                 const investor = @json($investors);
+                const marketer = @json($marketers);
             </script>
             <!-- الحقول العامة -->
             <div class="form-group">
@@ -74,12 +75,9 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label><i class="fas fa-calendar-alt"></i> تاريخ البيع</label>
-                <input type="date" name="sale_date" id="sale_date" required>
-            </div>
+        
 
-            <div class="form-group">
+            {{-- <div class="form-group">
                 <label><i class="fas fa-bullhorn"></i> المسوق</label>
                 <select name="marketer_id">
                     <option value="">اختر مسوق</option>
@@ -87,12 +85,12 @@
                         <option value="{{ $marketer->id }}">{{ $marketer->name }}</option>
                     @endforeach
                 </select>
-            </div>
+            </div> --}}
 
-            <div class="form-group">
+            {{-- <div class="form-group">
                 <label><i class="fas fa-percentage"></i> قيمة العمولة</label>
                 <input type="number" name="commission" min="0" step="0.01">
-            </div>
+            </div> --}}
 
             <!-- قسم المشترين بحصص -->
             <h3 class="unit-summary-mini">تفاصيل المشترين والحصص</h3>
@@ -147,12 +145,30 @@
                         <label><i class="fas fa-file-contract"></i> رقم العقد</label>
                         <input type="text" name="customers[0][contract_number]" required> 
                     </div>
+                <div class="form-group">
+                    <label><i class="fas fa-bullhorn"></i> المسوق</label>
+                    <select name="customers[0][marketer_id]" class="marketer-select">
+                        <option value="">اختر مسوق</option>
+                        @foreach ($marketers as $marketer)
+                            <option value="{{ $marketer->id }}">{{ $marketer->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-percentage"></i> قيمة العمولة للمسوق</label>
+                    <input type="number" name="customers[0][commission_amount]" class="form-control" step="0.01">
+                </div> 
 
+                <div class="form-group">
+                <label><i class="fas fa-calendar-alt"></i> تاريخ البيع</label>
+                <input type="date" name="customers[0][sale_date]" id="sale_date" required>
+            </div>
                     <button type="button" class="btn add-btn remove-buyer" style="display: none;"
                         onclick="removeBuyer(this)">إزالة هذا المشتري</button>
                 </div>
             </div>
-
+            
+            
             <div class="form-group">
                 <button type="button" id="add-buyer-btn" class="btn add-btn add-buyer">إضافة مشتري آخر</button>
             </div>

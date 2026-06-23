@@ -12,8 +12,11 @@ class UnitSaleCustomer extends Model
         'unit_sale_id',
         'customer_id',
         'contract_number',
+        'marketer_id', 
+        'commission_amount', 
         'share_percentage',
         'share_amount',
+        'sale_date'
     ];
 
     public function unitSale()
@@ -26,8 +29,13 @@ class UnitSaleCustomer extends Model
         return $this->belongsTo(Customer::class, 'customer_id');
     }
 
+    public function marketer()
+    {
+        return $this->belongsTo(Customer::class, 'marketer_id');
+    }
+
     public function payments()
     {
-        return $this->hasMany(\App\Models\Payment::class, 'unit_sale_customer_id');
+        return $this->hasMany(Payment::class, 'unit_sale_customer_id');
     }
 }

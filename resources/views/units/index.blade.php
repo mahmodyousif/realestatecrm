@@ -199,6 +199,7 @@
                         <th>#</th>
                         <th>نوع الوحدة</th>
                         <th>نموذج الوحدة</th>
+                        <th>الزون</th>
                         <th>المشروع</th>
                         <th>الشركة</th>
                         <th>قيمة الوحدة</th>
@@ -213,6 +214,7 @@
                         <td>{{ ++$a }}</td>
                         <td>{{ $unit->type }}</td>
                         <td>{{ $unit->unit_number }}</td>
+                        <td>{{$unit->zone}}</td>
                         <td>{{ $unit->project->name }}</td>
                         <td>{{ $unit->project->company->name }}</td>
                         <td>{{ $unit->price }}</td>

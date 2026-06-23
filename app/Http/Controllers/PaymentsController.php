@@ -40,15 +40,13 @@ class PaymentsController extends Controller
         ->latest('sale_date')
         ->get();
 
-        // ✅ إصلاح: استبدال foreach اليدوي بـ flatMap — أبسط وبدون queries إضافية
         $saleCustomers = $unitSales->flatMap->saleCustomers;
 
-        // ── الوحدات المحجوزة التي لها بيع (للمتابعة) ──
         $remainingUnits = Unit::with([
             'unitSale' => fn($q) => $q->with(['saleCustomers.customer', 'saleCustomers.payments']),
         ])
         ->where('status', 'reserved')
-        ->orWhere('status', 'partially_paid')   // ✅ إضافة: تشمل partially_paid أيضاً
+        ->orWhere('status', 'partially_paid')   
         ->has('unitSale')
         ->get();
 

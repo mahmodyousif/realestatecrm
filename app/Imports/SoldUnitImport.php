@@ -51,6 +51,7 @@ class SoldUnitImport implements
                 'نموذج الوحدة'            => 'unit_number',
                 'نوع الوحدة'              => 'type',
                 'الطابق'                  => 'floor',
+                'الزون'                    => 'zone' ,
                 'اسم المشتري'             => 'buyer',
                 'نوع المشتري'             => 'buyer_type',
                 'رقم العقد'               => 'contract_number',
@@ -83,6 +84,7 @@ class SoldUnitImport implements
                 trim($row['unit_number'] ?? ''),
                 trim($row['type'] ?? ''),
                 trim($row['floor'] ?? ''),
+                trim($row['zone'] ?? ''),
             ]);
         });
 
@@ -109,7 +111,9 @@ class SoldUnitImport implements
         $unit = Unit::where('unit_number', $unitNumber)
             ->where('type', trim($firstRow['type'] ?? ''))
             ->where('floor', trim($firstRow['floor'] ?? ''))
+            ->where('zone', trim($firstRow['zone'] ?? ''))
             ->where('project_id', $project->id)
+            
             ->first();
 
         if (!$unit) {
@@ -154,7 +158,26 @@ class SoldUnitImport implements
         $customers = [];
 
         foreach ($unitRows as $row) {
+            // قصة المسوق
+$marketerName = trim($row['marketer'] ?? '');
 
+$marketer = null;
+
+if ($marketerName !== '') {
+    $marketer = Customer::whereRaw('LOWER(name) = ?', [mb_strtolower($marketerName)])
+        ->where('type', 'marketer')
+        ->first();
+
+    if (!$marketer) {
+        $this->warningMessages['missing_marketer'][] = [
+            'unit_number' => $unitNumber,
+            'project'     => $projectName,
+            'marketer'    => $marketerName,
+        ];
+        return;
+    }
+}
+        // قصة المسوق
             $buyerName = trim($row['buyer'] ?? '');
             $buyerTypeRaw = trim($row['buyer_type'] ?? '');
 
@@ -202,6 +225,9 @@ class SoldUnitImport implements
                 'share'           => (float) ($row['share_percentage'] ?? 0),
                 'amount_paid'     => (float) ($row['amount_paid'] ?? 0),
                 'contract_number' => trim($row['contract_number'] ?? ''),
+                'marketer_id'     => $marketer?->id, // ✔ مهم
+                'commission_amount' => (float) ($row['commission'] ?? 0),
+                'sale_date'       => $this->transformDate($row['sale_date'] ?? null),
             ];
         }
 
@@ -220,26 +246,26 @@ class SoldUnitImport implements
         // ── الأسعار النهائية ──
         $discount   = (float) ($firstRow['discount'] ?? 0);
         $totalPrice = $unitPrice - $discount;
-        $commission = (float) ($firstRow['commission'] ?? 0);
+        // $commission = (float) ($firstRow['commission'] ?? 0);
         $saleDate   = $this->transformDate($firstRow['sale_date'] ?? null);
 
-        $marketerName = trim($firstRow['marketer'] ?? '');
-        $marketer = null;
+        // $marketerName = trim($firstRow['marketer'] ?? '');
+        // $marketer = null;
 
-        if ($marketerName !== '') {
-            $marketer = Customer::whereRaw('LOWER(name) = ?', [mb_strtolower($marketerName)])
-                ->where('type', 'marketer')
-                ->first();
+        // if ($marketerName !== '') {
+        //     $marketer = Customer::whereRaw('LOWER(name) = ?', [mb_strtolower($marketerName)])
+        //         ->where('type', 'marketer')
+        //         ->first();
 
-            if (!$marketer) {
-                $this->warningMessages['missing_marketer'][] = [
-                    'unit_number'   => $unitNumber,
-                    'project'       => $projectName,
-                    'marketer'      => $marketerName,
-                ];
-                return;
-            }
-        }
+        //     if (!$marketer) {
+        //         $this->warningMessages['missing_marketer'][] = [
+        //             'unit_number'   => $unitNumber,
+        //             'project'       => $projectName,
+        //             'marketer'      => $marketerName,
+        //         ];
+        //         return;
+        //     }
+        // }
 
         // ── الدفع ──
         $paymentMethods = [
@@ -273,19 +299,19 @@ class SoldUnitImport implements
         // ── حفظ البيانات ──
         DB::transaction(function () use (
             $unit, $customers, $unitPrice, $discount,
-            $totalPrice, $commission, $saleDate,
+            $totalPrice, $saleDate,
             $paymentMethod, $totalPaid, $marketer
         ) {
 
             $sale = UnitSale::create([
                 'unit_id'        => $unit->id,
-                'marketer_id'    => $marketer?->id,
+                // 'marketer_id'    => $marketer?->id,
                 'sale_date'      => $saleDate,
                 'payment_method' => $paymentMethod,
                 'unit_price'     => $unitPrice,
                 'discount'       => $discount,
                 'total_price'    => $totalPrice,
-                'commission'     => $commission,
+                // 'commission'     => $commission,
             ]);
 
             foreach ($customers as $c) {
@@ -298,6 +324,10 @@ class SoldUnitImport implements
                     'contract_number'  => $c['contract_number'],
                     'share_percentage' => $c['share'],
                     'share_amount'     => $shareAmount,
+                    'marketer_id' => $c['marketer_id'] ?? null,
+                    'commission_amount'=> $c['commission_amount'] ?? 0,
+                    'sale_date'   => $c['sale_date'] ?? $saleDate,
+            
                 ]);
 
                 if ($c['amount_paid'] > 0) {

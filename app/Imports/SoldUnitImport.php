@@ -112,8 +112,7 @@ class SoldUnitImport implements
             ->where('type', trim($firstRow['type'] ?? ''))
             ->where('floor', trim($firstRow['floor'] ?? ''))
             ->where('zone', trim($firstRow['zone'] ?? ''))
-            ->where('project_id', $project->id)
-            
+            ->where('project_id', $project->id)       
             ->first();
 
         if (!$unit) {
@@ -140,18 +139,34 @@ class SoldUnitImport implements
 
         // ── العقود ──
         foreach ($unitRows as $row) {
-            $contractNumber = trim($row['contract_number'] ?? '');
+            $contractNumber = trim($row['contract_number'] ?? '');   
+            
+            // if ($contractNumber &&
+            //     UnitSaleCustomer::where('contract_number', $contractNumber)->exists()
+            // ) {
+            //     $this->warningMessages['contract_isExisting'][] = [
+            //         'unit_number'     => $unitNumber,
+            //         'project'         => $projectName,
+            //         'contract_number' => $contractNumber,
+            //     ];
+            //     return;
+            // }
 
-            if ($contractNumber &&
-                UnitSaleCustomer::where('contract_number', $contractNumber)->exists()
-            ) {
+        
+           $existContract = UnitSaleCustomer::where('contract_number', $contractNumber)
+                ->whereHas('unitSale.unit', function ($q) use ($unit) {
+                    $q->where('project_id', $unit->project_id);
+                })
+            ->exists();
+
+            if( $contractNumber && $existContract) {
                 $this->warningMessages['contract_isExisting'][] = [
                     'unit_number'     => $unitNumber,
                     'project'         => $projectName,
                     'contract_number' => $contractNumber,
-                ];
-                return;
-            }
+               ];
+               return ;
+            } 
         }
 
         // ── العملاء ──

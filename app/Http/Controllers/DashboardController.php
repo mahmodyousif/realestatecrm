@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Payment;
-use Illuminate\Http\Request;
+use App\Models\Project ; 
 use App\Models\Unit ; 
 use App\Models\UnitSale;
-use App\Models\Project ; 
+use App\Models\UnitSaleCustomer;
+use Illuminate\Http\Request;
+
 class DashboardController extends Controller
 {
     public function index(Request $request){
@@ -66,14 +68,14 @@ class DashboardController extends Controller
         })->count();
 
 
-        $latestUnitSold = UnitSale::with('unit.project')
+        $latestUnitSold = UnitSaleCustomer::with('unitSale.unit.project')
             ->when($request->project_id, function ($q) use ($request) {
-                $q->whereHas('unit', function ($query) use ($request) {
+                $q->whereHas('unitSale.unit', function ($query) use ($request) {
                     $query->where('project_id', $request->project_id);
                 });
             })
             ->when($request->company_id, function ($q) use ($request) {
-                $q->whereHas('unit.project', function ($query) use ($request) {
+                $q->whereHas('unitSale.unit.project', function ($query) use ($request) {
                     $query->where('company_id', $request->company_id);
                 });
             })
@@ -93,15 +95,15 @@ class DashboardController extends Controller
             }) ;
         })->whereMonth('created_at' , now()->month)->whereYear('created_at' , now()->year)->where('status' , 'available')->Count() ;
         
-        $soldUnitThisMonth = UnitSale::whereHas('unit', function($q) use ($request){
+        $soldUnitThisMonth = UnitSaleCustomer::whereHas('unitSale.unit', function($q) use ($request){
             $q->where('status', 'sold')
               ->when($request->project_id, fn($q) => $q->where('project_id', $request->project_id))
               ->when($request->company_id, function($q) use ($request){
-                  $q->whereHas('project', fn($p) => $p->where('company_id', $request->company_id));
+                  $q->whereHas('unitSale.unit.project', fn($p) => $p->where('company_id', $request->company_id));
               });
         })
-        ->whereMonth('created_at', now()->month)
-        ->whereYear('created_at', now()->year)
+        ->whereMonth('sale_date', now()->month)
+        ->whereYear('sale_date', now()->year)
         ->count();
         // الإيرادات حسب المشروع
         $revenue = $projects->map(fn($p) => $p->units->sum('price')); 

@@ -155,13 +155,13 @@
                 @foreach($latestUnitSold as $unit)
                 <div class="item-row">
                     <div class="item-details">
-                        <h4> {{$unit->unit->type . " ". $unit->unit->unit_number}} - {{$unit->unit->project->name}} </h4>
-                        <p>المساحة: {{$unit->unit->area}} م² • الطابق: {{$unit->unit->floor}}</p>
+                        <h4> {{$unit->unitSale->unit->type . " ". $unit->unitSale->unit->unit_number}} - {{$unit->unitSale->unit->project->name}} </h4>
+                        <p>المساحة: {{$unit->unitSale->unit->area}} م² • الطابق: {{$unit->unitSale->unit->floor}}</p>
                     </div>
-                    <span class="badge @if ($unit->unit->status === 'sold') sold @elseif ($unit->unit->status === 'reserved') reserved @elseif ($unit->unit->status === 'partially_paid') partially-paid @else unpaid @endif">
-                         @if ($unit->unit->status === 'sold')          مباعة
-                            @elseif ($unit->unit->status === 'reserved')   محجوزة
-                            @elseif ($unit->unit->status === 'partially_paid') دفع جزئي
+                    <span class="badge @if ($unit->unitSale->unit->status === 'sold') sold @elseif ($unit->unitSale->unit->status === 'reserved') reserved @elseif ($unit->unitSale->unit->status === 'partially_paid') partially-paid @else unpaid @endif">
+                         @if ($unit->unitSale->unit->status === 'sold')          مباعة
+                            @elseif ($unit->unitSale->unit->status === 'reserved')   محجوزة
+                            @elseif ($unit->unitSale->unit->status === 'partially_paid') دفع جزئي
                             @else جاهزة للبيع
                             @endif 
                     </span>
